@@ -194,27 +194,7 @@ export default function AdminDashboardPage() {
                 </h2>
               </div>
 
-              {/* Filters */}
-              <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-                <div className="w-full sm:w-64 relative">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary pointer-events-none text-sm">
-                    map
-                  </span>
-                  <select
-                    value={selectedDistrict}
-                    onChange={handleDistrictChange}
-                    className="w-full bg-surface-container-low border border-outline/30 rounded-xl pl-9 pr-8 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none cursor-pointer"
-                  >
-                    <option value="">All Districts</option>
-                    {districts.map(d => (
-                      <option key={d} value={d}>{d}</option>
-                    ))}
-                  </select>
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary pointer-events-none text-sm">
-                    arrow_drop_down
-                  </span>
-                </div>
-              </div>
+              {/* Filters removed from here */}
             </div>
           </section>
 
@@ -311,17 +291,33 @@ export default function AdminDashboardPage() {
 
           {/* Overall Stats Section */}
           <section className="space-y-6">
-            <h3
-              className="text-2xl border-l-4 border-primary pl-4 tracking-wide flex items-center gap-2"
-              style={{ fontFamily: "'Bebas Neue', sans-serif", lineHeight: 1.3 }}
-            >
-              Overall System Stats
-              {selectedDistrict && (
-                <span className="text-sm font-sans tracking-normal bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-bold ml-2">
-                  Filtered: {selectedDistrict}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <h3
+                className="text-2xl border-l-4 border-primary pl-4 tracking-wide flex items-center gap-2"
+                style={{ fontFamily: "'Bebas Neue', sans-serif", lineHeight: 1.3 }}
+              >
+                Overall System Stats
+              </h3>
+              
+              <div className="w-full sm:w-64 relative shrink-0">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary pointer-events-none text-sm">
+                  map
                 </span>
-              )}
-            </h3>
+                <select
+                  value={selectedDistrict}
+                  onChange={handleDistrictChange}
+                  className="w-full bg-surface-container-low border border-outline/20 rounded-xl pl-9 pr-8 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none cursor-pointer shadow-sm"
+                >
+                  <option value="">All Districts Filter</option>
+                  {districts.map(d => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary pointer-events-none text-sm">
+                  arrow_drop_down
+                </span>
+              </div>
+            </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {stats.map((stat, i) => (
