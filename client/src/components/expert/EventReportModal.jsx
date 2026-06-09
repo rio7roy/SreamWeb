@@ -17,6 +17,28 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, onCl
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState(null);
+  const [location, setLocation] = useState(existingEvent?.latitude && existingEvent?.longitude ? { lat: existingEvent.latitude, lng: existingEvent.longitude } : null);
+  const [locationStatus, setLocationStatus] = useState(existingEvent?.latitude ? 'captured' : 'idle');
+
+  useEffect(() => {
+    if (!existingEvent && 'geolocation' in navigator) {
+      setLocationStatus('locating');
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+          setLocationStatus('captured');
+        },
+        (error) => {
+          console.error("Location error:", error);
+          setLocationStatus('error');
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+  }, [existingEvent]);
 
   useEffect(() => {
     // Fetch all BRCs for the "Other BRCs" dropdown
@@ -75,6 +97,11 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, onCl
     if (venueType === 'SELECTED_BRC') finalVenueValue = brcCode;
     data.append('venueValue', finalVenueValue);
 
+    if (location) {
+      data.append('latitude', location.lat);
+      data.append('longitude', location.lng);
+    }
+
     photos.forEach(photo => {
       data.append('photos', photo);
     });
@@ -131,6 +158,48 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, onCl
           )}
 
           <form id="event-form" className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+            {/* Location Status Indicator */}
+            <div className={`p-4 rounded-xl border flex items-center justify-between ${
+              locationStatus === 'captured' ? 'bg-green-50 border-green-200' :
+              locationStatus === 'locating' ? 'bg-amber-50 border-amber-200' :
+              'bg-surface-container-low border-outline/20'
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  locationStatus === 'captured' ? 'bg-green-100 text-green-600' :
+                  locationStatus === 'locating' ? 'bg-amber-100 text-amber-600' :
+                  'bg-surface-container-high text-secondary'
+                }`}>
+                  <span className={`material-symbols-outlined ${locationStatus === 'locating' ? 'animate-spin' : ''}`}>
+                    {locationStatus === 'captured' ? 'my_location' : 
+                     locationStatus === 'locating' ? 'sync' : 'location_disabled'}
+                  </span>
+                </div>
+                <div>
+                  <p className="font-bold text-sm text-on-surface">GPS Location Tracker</p>
+                  <p className="text-xs font-medium text-secondary">
+                    {locationStatus === 'captured' ? `Captured: ${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` :
+                     locationStatus === 'locating' ? 'Acquiring GPS coordinates...' :
+                     'Location could not be captured'}
+                  </p>
+                </div>
+              </div>
+              {locationStatus === 'error' && (
+                <button 
+                  onClick={() => {
+                    setLocationStatus('locating');
+                    navigator.geolocation.getCurrentPosition(
+                      (pos) => { setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }); setLocationStatus('captured'); },
+                      () => setLocationStatus('error')
+                    );
+                  }}
+                  className="text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-lg hover:bg-primary/20 transition-colors"
+                >
+                  Retry
+                </button>
+              )}
+            </div>
+
             <div className="bg-surface-container-low p-4 rounded-xl border border-outline/20 space-y-4">
               <div>
                 <label className="block text-sm font-bold text-secondary mb-1">Venue Type</label>

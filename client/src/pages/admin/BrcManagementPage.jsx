@@ -333,10 +333,12 @@ export default function BrcManagementPage() {
                         {/* Expanded Details */}
                         {isExpanded && (
                           <div className="p-6 border-t border-outline/10 bg-white animate-fade-in-up">
-                            <div className="flex items-center gap-2 text-sm font-semibold text-secondary uppercase tracking-wider mb-4">
-                              <span className="material-symbols-outlined text-sm">calendar_today</span>
-                              {new Date(event.date || event.createdAt).toLocaleDateString()}
-                              <span className="mx-2 opacity-30">•</span>
+                            <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-secondary uppercase tracking-wider mb-4">
+                              <span className="flex items-center gap-1">
+                                <span className="material-symbols-outlined text-sm">calendar_today</span>
+                                {new Date(event.date || event.createdAt).toLocaleDateString()}
+                              </span>
+                              <span className="mx-1 opacity-30">•</span>
                               {event.venueType === 'OTHER_VENUE' && event.venueValue ? (
                                 <span className="flex items-center gap-1 text-primary">
                                   <span className="material-symbols-outlined text-sm">location_on</span>
@@ -344,6 +346,16 @@ export default function BrcManagementPage() {
                                 </span>
                               ) : (
                                 <span>At {brc.name}</span>
+                              )}
+                              
+                              {event.latitude && event.longitude && (
+                                <>
+                                  <span className="mx-1 opacity-30">•</span>
+                                  <a href={`https://www.google.com/maps?q=${event.latitude},${event.longitude}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200 hover:bg-green-100 transition-colors" title="View on Google Maps">
+                                    <span className="material-symbols-outlined text-sm">my_location</span>
+                                    GPS: {parseFloat(event.latitude).toFixed(4)}, {parseFloat(event.longitude).toFixed(4)}
+                                  </a>
+                                </>
                               )}
                             </div>
                             

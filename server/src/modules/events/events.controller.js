@@ -26,7 +26,7 @@ const writeEvents = (data) => {
 
 exports.createEvent = (req, res) => {
   try {
-    const { brcCode, venueType, venueValue, name, date, description, teachersCount, studentsCount, status } = req.body;
+    const { brcCode, venueType, venueValue, name, date, description, teachersCount, studentsCount, status, latitude, longitude } = req.body;
     
     // Process uploaded photos
     const photos = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
@@ -41,6 +41,8 @@ exports.createEvent = (req, res) => {
       description,
       teachersCount: parseInt(teachersCount, 10) || 0,
       studentsCount: parseInt(studentsCount, 10) || 0,
+      latitude: latitude ? parseFloat(latitude) : null,
+      longitude: longitude ? parseFloat(longitude) : null,
       photos,
       status: status || 'DRAFT', // 'DRAFT' or 'SUBMITTED'
       createdAt: new Date().toISOString(),
@@ -113,7 +115,7 @@ exports.getDrafts = (req, res) => {
 exports.updateEvent = (req, res) => {
   try {
     const { id } = req.params;
-    const { name, date, description, teachersCount, studentsCount, status, venueType, venueValue } = req.body;
+    const { name, date, description, teachersCount, studentsCount, status, venueType, venueValue, latitude, longitude } = req.body;
     
     const events = readEvents();
     const eventIndex = events.findIndex(e => e.id === id);
@@ -140,6 +142,8 @@ exports.updateEvent = (req, res) => {
       description: description || existingEvent.description,
       teachersCount: teachersCount !== undefined ? parseInt(teachersCount, 10) : existingEvent.teachersCount,
       studentsCount: studentsCount !== undefined ? parseInt(studentsCount, 10) : existingEvent.studentsCount,
+      latitude: latitude ? parseFloat(latitude) : existingEvent.latitude,
+      longitude: longitude ? parseFloat(longitude) : existingEvent.longitude,
       venueType: venueType || existingEvent.venueType,
       venueValue: venueValue || existingEvent.venueValue,
       status: status || existingEvent.status, // Move to SUBMITTED or keep as DRAFT
