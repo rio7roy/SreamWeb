@@ -20,5 +20,14 @@
     "content": "Test 1",
     "scheduledFor": null,
     "createdAt": "2026-06-09T08:22:14.214Z"
+  },
+  {
+    "id": "95e8c643-8345-4e8a-b9c8-3811f6025c8e",
+    "to": [
+      "BRC:32110100105SH"
+    ],
+    "content": "wertyuio",
+    "scheduledFor": null,
+    "createdAt": "2026-06-09T08:31:25.765Z"
   }
 ]

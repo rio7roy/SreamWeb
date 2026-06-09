@@ -119,8 +119,8 @@ export default function MessageComposer() {
   };
 
   return (
-    <section className="bg-white border border-on-surface/10 rounded-xl overflow-hidden shadow-sm flex flex-col">
-      <div className="p-6 border-b border-on-surface/5 flex items-center gap-3 bg-surface-container-low/50">
+    <section className="bg-white border border-on-surface/10 rounded-xl shadow-sm flex flex-col">
+      <div className="p-6 border-b border-on-surface/5 flex items-center gap-3 bg-surface-container-low/50 rounded-t-xl">
         <span className="material-symbols-outlined text-primary text-2xl">campaign</span>
         <h3 className="text-xl tracking-wide" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
           Broadcast Message to BRCs

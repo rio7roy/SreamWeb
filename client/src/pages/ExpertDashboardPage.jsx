@@ -339,7 +339,7 @@ export default function ExpertDashboardPage() {
           {/* ── INITIAL STATE: BRC Selection ── */}
           {!sessionActive && activeNav === 'Dashboard' && (
             <section className="flex flex-col items-center justify-center min-h-[80vh] py-20 animate-fade-in">
-              <div className="max-w-4xl w-full bg-white border border-on-surface/10 rounded-2xl shadow-xl overflow-hidden flex flex-col text-center">
+              <div className="max-w-4xl w-full bg-white border border-on-surface/10 rounded-2xl shadow-xl flex flex-col text-center">
                 <div className="flex-grow py-16 md:py-24 px-6 md:px-10 flex flex-col justify-center space-y-12">
                   <div>
                     <h2
