@@ -31,13 +31,13 @@ exports.getAllBrcs = (req, res) => {
 exports.updateBrc = (req, res) => {
   try {
     const { code } = req.params;
-    const { name, district, location } = req.body;
+    const { name, district, location, dateOfFormation, inchargeName, issues } = req.body;
     const brcs = readData(brcsPath);
     
     const index = brcs.findIndex(b => b.code === code);
     if (index === -1) return res.status(404).json({ message: 'BRC not found' });
 
-    brcs[index] = { ...brcs[index], name, district, location };
+    brcs[index] = { ...brcs[index], name, district, location, dateOfFormation, inchargeName, issues };
     writeData(brcsPath, brcs);
 
     res.json({ message: 'BRC updated successfully', brc: brcs[index] });

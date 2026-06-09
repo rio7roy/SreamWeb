@@ -9,10 +9,14 @@ export default function BrcManagementPage() {
   const [brc, setBrc] = useState(null);
   const [events, setEvents] = useState([]);
   const [activeTab, setActiveTab] = useState('details'); // 'details', 'stock', 'reports'
+  const [expandedEventId, setExpandedEventId] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     district: '',
-    location: ''
+    location: '',
+    dateOfFormation: '',
+    inchargeName: '',
+    issues: ''
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -28,7 +32,14 @@ export default function BrcManagementPage() {
         const found = brcRes.data.find(b => b.code === code);
         if (found) {
           setBrc(found);
-          setFormData({ name: found.name, district: found.district, location: found.location });
+          setFormData({ 
+            name: found.name || '', 
+            district: found.district || '', 
+            location: found.location || '',
+            dateOfFormation: found.dateOfFormation || '',
+            inchargeName: found.inchargeName || '',
+            issues: found.issues || ''
+          });
         } else {
           setFeedback({ type: 'error', text: 'BRC not found' });
         }
@@ -68,7 +79,7 @@ export default function BrcManagementPage() {
 
   return (
     <div className="min-h-screen bg-surface p-4 md:p-8 flex flex-col items-center">
-      <div className="w-full max-w-3xl flex items-center justify-between mb-8 animate-fade-in-up">
+      <div className="w-full max-w-7xl flex items-center justify-between mb-8 animate-fade-in-up">
         <button 
           onClick={() => navigate('/admin')} 
           className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm text-secondary hover:text-primary transition-colors border border-outline/10 font-bold"
@@ -78,7 +89,7 @@ export default function BrcManagementPage() {
         </button>
       </div>
 
-      <div className="w-full max-w-3xl bg-white rounded-3xl shadow-xl overflow-hidden animate-fade-in-up border border-outline/10">
+      <div className="w-full max-w-7xl bg-white rounded-3xl shadow-xl overflow-hidden animate-fade-in-up border border-outline/10">
         <div className="bg-primary px-8 pt-8 relative overflow-hidden rounded-t-3xl">
           <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-bl-full pointer-events-none"></div>
           <div className="relative z-10 mb-6">
@@ -126,14 +137,42 @@ export default function BrcManagementPage() {
           
           {/* DETAILS TAB */}
           {activeTab === 'details' && brc && (
-            <div className="animate-fade-in-up">
-              <form id="brc-form" onSubmit={handleSubmit} className="space-y-8">
+            <div className="animate-fade-in-up space-y-8">
+              
+              {/* Stats Overview */}
+              <div className="bg-surface-container-low border border-outline/10 rounded-2xl p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-secondary uppercase tracking-wider mb-1">Total Events Conducted</span>
+                  <span className="text-3xl font-black text-primary">{events.length}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-secondary uppercase tracking-wider mb-1">Footfall (Students)</span>
+                  <span className="text-3xl font-black text-on-surface">{events.reduce((sum, e) => sum + (e.studentsCount || 0), 0)}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-secondary uppercase tracking-wider mb-1">Footfall (Teachers)</span>
+                  <span className="text-3xl font-black text-on-surface">{events.reduce((sum, e) => sum + (e.teachersCount || 0), 0)}</span>
+                </div>
+              </div>
+
+              <form id="brc-form" onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">Hub Name</label>
                   <input required name="name" value={formData.name} onChange={handleChange} type="text" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors" />
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">Date of Formation</label>
+                    <input name="dateOfFormation" value={formData.dateOfFormation} onChange={handleChange} type="date" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">In-charge Name</label>
+                    <input name="inchargeName" value={formData.inchargeName} onChange={handleChange} type="text" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">District</label>
                     <input required name="district" value={formData.district} onChange={handleChange} type="text" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors" />
@@ -142,6 +181,11 @@ export default function BrcManagementPage() {
                     <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">Location / Block</label>
                     <input required name="location" value={formData.location} onChange={handleChange} type="text" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors" />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">Issues / Notes</label>
+                  <textarea name="issues" value={formData.issues} onChange={handleChange} rows="4" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors resize-y" placeholder="Describe any hardware issues, general notes, or constraints here..."></textarea>
                 </div>
               </form>
             </div>
@@ -213,67 +257,87 @@ export default function BrcManagementPage() {
                   <p className="text-secondary">No expert has submitted an event report for this hub yet.</p>
                 </div>
               ) : (
-                <div className="space-y-6">
-                  {events.map((event) => (
-                    <div key={event.id} className="bg-surface-container-low border border-outline/10 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col gap-6">
-                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 border-b border-outline/10 pb-6">
-                        <div>
-                          <h3 className="text-2xl font-bold text-on-surface mb-1">{event.name}</h3>
-                          <div className="flex items-center gap-2 text-sm font-semibold text-secondary uppercase tracking-wider">
-                            <span className="material-symbols-outlined text-sm">calendar_today</span>
-                            {new Date(event.date || event.createdAt).toLocaleDateString()}
-                            <span className="mx-2 opacity-30">•</span>
-                            {event.venueType === 'OTHER_VENUE' && event.venueValue ? (
-                              <span className="flex items-center gap-1 text-primary">
-                                <span className="material-symbols-outlined text-sm">location_on</span>
-                                {event.venueValue}
-                              </span>
+                <div className="space-y-4">
+                  {events.map((event) => {
+                    const isExpanded = expandedEventId === event.id;
+                    return (
+                      <div key={event.id} className="bg-surface-container-low border border-outline/10 rounded-2xl shadow-sm overflow-hidden transition-all duration-300">
+                        
+                        {/* Minimalistic Thumbnail Row */}
+                        <div 
+                          className="flex items-center gap-4 p-4 cursor-pointer hover:bg-black/[0.02] transition-colors"
+                          onClick={() => setExpandedEventId(isExpanded ? null : event.id)}
+                        >
+                          {/* Thumbnail */}
+                          <div className="w-16 h-16 rounded-xl bg-surface-container-high border border-outline/20 flex-shrink-0 overflow-hidden flex items-center justify-center">
+                            {event.photos && event.photos.length > 0 ? (
+                              <img src={`${import.meta.env.VITE_API_URL || '/api'}${event.photos[0]}`} alt="Thumbnail" className="w-full h-full object-cover" />
                             ) : (
-                              <span>At {brc.name}</span>
+                              <span className="material-symbols-outlined text-secondary/50 text-3xl">image</span>
                             )}
                           </div>
+                          
+                          {/* Basic Info */}
+                          <div className="flex-grow">
+                            <h3 className="text-lg font-bold text-on-surface leading-tight mb-1">{event.name}</h3>
+                            <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-wider text-secondary">
+                              <span className="flex items-center gap-1">
+                                <span className="material-symbols-outlined text-[14px]">school</span>
+                                {event.studentsCount || 0} Students
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <span className="material-symbols-outlined text-[14px]">person</span>
+                                {event.teachersCount || 0} Teachers
+                              </span>
+                            </div>
+                          </div>
+                          
+                          {/* Expand Icon */}
+                          <div className="pl-4 text-secondary/50">
+                            <span className={`material-symbols-outlined transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
+                              expand_more
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                      
-                      <div className="text-on-surface/80 leading-relaxed">
-                        {event.description}
-                      </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-white p-4 rounded-2xl flex items-center gap-4 shadow-sm border border-black/[0.02]">
-                          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                            <span className="material-symbols-outlined">person</span>
-                          </div>
-                          <div>
-                            <p className="text-2xl font-black text-on-surface">{event.teachersCount || 0}</p>
-                            <p className="text-xs font-bold uppercase tracking-widest text-secondary">Teachers</p>
-                          </div>
-                        </div>
-                        <div className="bg-white p-4 rounded-2xl flex items-center gap-4 shadow-sm border border-black/[0.02]">
-                          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                            <span className="material-symbols-outlined">school</span>
-                          </div>
-                          <div>
-                            <p className="text-2xl font-black text-on-surface">{event.studentsCount || 0}</p>
-                            <p className="text-xs font-bold uppercase tracking-widest text-secondary">Students</p>
-                          </div>
-                        </div>
-                      </div>
+                        {/* Expanded Details */}
+                        {isExpanded && (
+                          <div className="p-6 border-t border-outline/10 bg-white animate-fade-in-up">
+                            <div className="flex items-center gap-2 text-sm font-semibold text-secondary uppercase tracking-wider mb-4">
+                              <span className="material-symbols-outlined text-sm">calendar_today</span>
+                              {new Date(event.date || event.createdAt).toLocaleDateString()}
+                              <span className="mx-2 opacity-30">•</span>
+                              {event.venueType === 'OTHER_VENUE' && event.venueValue ? (
+                                <span className="flex items-center gap-1 text-primary">
+                                  <span className="material-symbols-outlined text-sm">location_on</span>
+                                  {event.venueValue}
+                                </span>
+                              ) : (
+                                <span>At {brc.name}</span>
+                              )}
+                            </div>
+                            
+                            <div className="text-on-surface/80 leading-relaxed mb-6">
+                              {event.description}
+                            </div>
 
-                      {event.photos && event.photos.length > 0 && (
-                        <div className="pt-4 border-t border-outline/10">
-                          <p className="text-xs font-bold uppercase tracking-widest text-secondary mb-3">Event Photos</p>
-                          <div className="flex flex-wrap gap-3">
-                            {event.photos.map((photo, idx) => (
-                              <div key={idx} className="w-24 h-24 rounded-xl overflow-hidden bg-surface-container-high border border-outline/20">
-                                <img src={`${import.meta.env.VITE_API_URL || '/api'}${photo}`} alt="Event" className="w-full h-full object-cover" />
+                            {event.photos && event.photos.length > 0 && (
+                              <div>
+                                <p className="text-xs font-bold uppercase tracking-widest text-secondary mb-3">All Photos</p>
+                                <div className="flex flex-wrap gap-3">
+                                  {event.photos.map((photo, idx) => (
+                                    <div key={idx} className="w-24 h-24 rounded-xl overflow-hidden bg-surface-container-high border border-outline/20">
+                                      <img src={`${import.meta.env.VITE_API_URL || '/api'}${photo}`} alt="Event" className="w-full h-full object-cover" />
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
-                            ))}
+                            )}
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -301,8 +365,6 @@ export default function BrcManagementPage() {
             </button>
           </div>
         )}
-      </div>
-
       </div>
     </div>
   );
