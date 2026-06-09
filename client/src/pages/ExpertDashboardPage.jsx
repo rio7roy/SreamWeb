@@ -213,7 +213,7 @@ export default function ExpertDashboardPage() {
           <div className="flex items-center gap-3 mb-2">
             <div className="h-10 w-10 rounded-full bg-primary-fixed overflow-hidden border border-outline/10 flex items-center justify-center">
               {user?.avatar ? (
-                <img src={`/api/uploads/${user.avatar}`} alt="Profile" className="w-full h-full object-cover" />
+                <img src={`${import.meta.env.VITE_API_URL || '/api'}/uploads/${user.avatar}`} alt="Profile" className="w-full h-full object-cover" />
               ) : (
                 <span className="text-on-primary-container font-bold text-sm">
                   {user?.name?.charAt(0)?.toUpperCase()}

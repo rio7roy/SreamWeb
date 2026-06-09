@@ -11,7 +11,7 @@ export default function ExpertProfileTab({ user, brcData }) {
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState(null);
   
-  const [avatarPreview, setAvatarPreview] = useState(user?.avatar ? `/api/uploads/${user.avatar}` : null);
+  const [avatarPreview, setAvatarPreview] = useState(user?.avatar ? `${import.meta.env.VITE_API_URL || '/api'}/uploads/${user.avatar}` : null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -26,7 +26,7 @@ export default function ExpertProfileTab({ user, brcData }) {
     if (user) {
       setAddress(user.address || '');
       setPhone(user.phone || '');
-      setAvatarPreview(user.avatar ? `/api/uploads/${user.avatar}` : null);
+      setAvatarPreview(user.avatar ? `${import.meta.env.VITE_API_URL || '/api'}/uploads/${user.avatar}` : null);
     }
   }, [user]);
 
@@ -89,14 +89,16 @@ export default function ExpertProfileTab({ user, brcData }) {
       const res = await api.post('/uploads/avatar', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      setAvatarPreview(res.data.data.file.url);
+      const serverUrl = res.data.data.file.url;
+      const baseUrl = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '');
+      setAvatarPreview(baseUrl + serverUrl);
       updateUser({ avatar: res.data.data.file.filename });
       setFeedback({ type: 'success', text: 'Profile photo updated!' });
       setTimeout(() => setFeedback(null), 3000);
     } catch (err) {
       console.error(err);
       setFeedback({ type: 'error', text: 'Failed to upload cropped photo.' });
-      setAvatarPreview(user?.avatar ? `/api/uploads/${user.avatar}` : null);
+      setAvatarPreview(user?.avatar ? `${import.meta.env.VITE_API_URL || '/api'}/uploads/${user.avatar}` : null);
     } finally {
       setUploadingPhoto(false);
       setImageSrc(null);
