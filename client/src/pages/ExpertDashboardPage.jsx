@@ -69,17 +69,23 @@ export default function ExpertDashboardPage() {
     }
   }, []);
 
-  // Fetch BRCs
+  const [messages, setMessages] = useState([]);
+
+  // Fetch BRCs and Messages
   useEffect(() => {
-    const fetchBrcs = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const brcsRes = await api.get('/brcs');
+        const [brcsRes, msgsRes] = await Promise.all([
+          api.get('/brcs'),
+          api.get('/users/me/messages')
+        ]);
         setBrcData(brcsRes.data);
+        setMessages(msgsRes.data.data || []);
       } catch (err) {
-        console.error('Failed to fetch BRC data', err);
+        console.error('Failed to fetch dashboard data', err);
       }
     };
-    fetchBrcs();
+    fetchDashboardData();
   }, []);
 
   // Fetch stats when a session starts
@@ -299,6 +305,35 @@ export default function ExpertDashboardPage() {
           {/* ── SESSION LOGS STATE ── */}
           {activeNav === 'Session Logs' && (
             <ExpertSessionLogsTab />
+          )}
+
+          {/* ── MESSAGES / ANNOUNCEMENTS ── */}
+          {activeNav === 'Dashboard' && messages.length > 0 && (
+            <section className="mb-8 animate-fade-in-up">
+              <h2 className="text-2xl border-l-4 border-error pl-4 tracking-wide text-on-surface mb-6 flex items-center gap-2" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                <span className="material-symbols-outlined text-error">campaign</span>
+                Official Announcements
+              </h2>
+              <div className="flex flex-col gap-4">
+                {messages.map((msg, idx) => (
+                  <div key={msg.id || idx} className="bg-error/5 border border-error/20 rounded-xl p-5 md:p-6 flex gap-4 items-start shadow-sm hover:shadow-md transition-shadow expert-brutalist-hover relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-error/10 rounded-bl-full -z-0"></div>
+                    <div className="w-12 h-12 rounded-full bg-error/10 text-error flex items-center justify-center shrink-0 z-10 hidden md:flex">
+                      <span className="material-symbols-outlined text-2xl">notifications_active</span>
+                    </div>
+                    <div className="flex-grow z-10">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
+                        <span className="text-xs font-bold uppercase tracking-wider text-error/80 bg-error/10 px-2 py-1 rounded w-fit">
+                          {msg.to.some(t => t === 'ALL') ? 'Global Broadcast' : 'Targeted Broadcast'}
+                        </span>
+                        <span className="text-xs font-bold text-secondary">{new Date(msg.createdAt).toLocaleDateString()} at {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                      <p className="text-on-surface text-base leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
           )}
 
           {/* ── INITIAL STATE: BRC Selection ── */}

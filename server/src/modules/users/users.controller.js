@@ -1,5 +1,7 @@
 const usersService = require('./users.service');
 const { success, error } = require('../../utils/response');
+const fs = require('fs');
+const path = require('path');
 
 /**
  * GET /api/users
@@ -15,6 +17,59 @@ async function listUsers(req, res, next) {
       isActive: isActive !== undefined ? isActive === 'true' : undefined,
     });
     return success(res, result);
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * GET /api/users/me/messages
+ */
+async function getMyMessages(req, res, next) {
+  try {
+    const messagesPath = path.join(__dirname, '../../../data/messages.json');
+    let messages = [];
+    if (fs.existsSync(messagesPath)) {
+      messages = JSON.parse(fs.readFileSync(messagesPath, 'utf8'));
+    }
+
+    // Determine user's districts and brcs
+    const brcsPath = path.join(__dirname, '../../../data/brcs.json');
+    let allBrcs = [];
+    if (fs.existsSync(brcsPath)) {
+      allBrcs = JSON.parse(fs.readFileSync(brcsPath, 'utf8'));
+    }
+
+    const assignedBrcCodes = req.user.assignedBrcs || [];
+    const userDistricts = new Set();
+    
+    assignedBrcCodes.forEach(code => {
+      const brc = allBrcs.find(b => b.code === code);
+      if (brc && brc.district) {
+        userDistricts.add(brc.district);
+      }
+    });
+
+    // Filter messages
+    const applicableMessages = messages.filter(msg => {
+      if (!msg.to || !Array.isArray(msg.to)) return false;
+      return msg.to.some(target => {
+        if (target === 'ALL') return true;
+        if (target.startsWith('DISTRICT:')) {
+          const districtName = target.split(':')[1];
+          return userDistricts.has(districtName);
+        }
+        if (target.startsWith('BRC:')) {
+          const brcCode = target.split(':')[1];
+          return assignedBrcCodes.includes(brcCode);
+        }
+        return false;
+      });
+    });
+
+    applicableMessages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    return success(res, applicableMessages);
   } catch (err) {
     next(err);
   }
@@ -82,4 +137,4 @@ async function deleteUser(req, res, next) {
   }
 }
 
-module.exports = { listUsers, getUserById, createUser, updateUser, deleteUser };
+module.exports = { listUsers, getUserById, createUser, updateUser, deleteUser, getMyMessages };

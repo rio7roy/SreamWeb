@@ -12,6 +12,9 @@ router.use(authenticate);
 // List users — ADMIN only
 router.get('/', authorize('ADMIN'), usersController.listUsers);
 
+// Get my messages
+router.get('/me/messages', usersController.getMyMessages);
+
 // Create user — ADMIN only
 router.post('/', authorize('ADMIN'), validate(createUserSchema), usersController.createUser);
 

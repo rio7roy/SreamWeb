@@ -8,5 +8,17 @@
     "content": "hj",
     "scheduledFor": "2026-06-16T09:15:00.000Z",
     "createdAt": "2026-06-06T09:45:13.744Z"
+  },
+  {
+    "id": "7f2452ba-f3c9-4481-8c76-cc5ecbc37cbc",
+    "to": [
+      "GOVT VHSS ARYAD (32110100105SH)",
+      "GHSS VALIYAZHEECKAL (32110200809SH)",
+      "GHSS PULIYOOR (32110300803SH)",
+      "GHS THEKKEKKARA (32110800102SH)"
+    ],
+    "content": "Test 1",
+    "scheduledFor": null,
+    "createdAt": "2026-06-09T08:22:14.214Z"
   }
 ]

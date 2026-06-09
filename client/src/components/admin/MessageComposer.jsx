@@ -102,7 +102,7 @@ export default function MessageComposer() {
     setFeedback(null);
     try {
       await api.post('/admin/messages', {
-        to: toAddresses.map(a => a.label),
+        to: toAddresses.map(a => a.value),
         content: messageBody,
         scheduledFor: scheduleDate || null
       });
