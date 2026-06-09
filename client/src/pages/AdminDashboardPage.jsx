@@ -119,10 +119,14 @@ export default function AdminDashboardPage() {
         {/* User Identity Card */}
         <div className="mb-8 p-4 bg-white/50 rounded-xl border border-on-surface/10">
           <div className="flex items-center gap-3 mb-3">
-            <div className="h-10 w-10 rounded-full bg-error/10 border border-error/20 flex items-center justify-center">
-              <span className="text-error font-bold text-sm">
-                {user?.name?.charAt(0)?.toUpperCase() || 'A'}
-              </span>
+            <div className="h-10 w-10 rounded-full bg-error/10 border border-error/20 flex items-center justify-center overflow-hidden">
+              {user?.avatar ? (
+                <img src={`${import.meta.env.VITE_API_URL || '/api'}/uploads/${user.avatar}`} alt="Admin" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-error font-bold text-sm">
+                  {user?.name?.charAt(0)?.toUpperCase() || 'A'}
+                </span>
+              )}
             </div>
             <div>
               <p className="font-bold text-sm text-on-surface">{user?.name || 'Administrator'}</p>
