@@ -218,7 +218,7 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, onCl
                   <div className="flex gap-2 flex-wrap">
                     {existingEvent.photos.map((photo, idx) => (
                       <div key={idx} className="w-16 h-16 rounded-lg bg-surface-container-high overflow-hidden border border-outline/20">
-                        <img src={`http://localhost:5000${photo}`} alt="Uploaded" className="w-full h-full object-cover" />
+                        <img src={`${import.meta.env.VITE_API_URL || '/api'}${photo}`} alt="Uploaded" className="w-full h-full object-cover" />
                       </div>
                     ))}
                   </div>

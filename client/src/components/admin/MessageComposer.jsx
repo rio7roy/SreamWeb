@@ -41,9 +41,9 @@ export default function MessageComposer() {
   }, [brcs]);
 
   const filteredOptions = useMemo(() => {
-    if (!toSearch.trim()) return [];
+    if (!toSearch.trim()) return addressOptions;
     const searchLower = toSearch.toLowerCase();
-    return addressOptions.filter(opt => opt.label.toLowerCase().includes(searchLower)).slice(0, 8);
+    return addressOptions.filter(opt => opt.label.toLowerCase().includes(searchLower));
   }, [toSearch, addressOptions]);
 
   useEffect(() => {

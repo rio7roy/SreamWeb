@@ -41,5 +41,12 @@
     "name": "maria",
     "email": "wergh@gmail.com",
     "createdAt": "2026-06-08T07:16:27.793Z"
+  },
+  {
+    "id": "9a77f96f-ceb8-47cb-95f6-4c853ac3302c",
+    "token": "94a6abc5585f38bf436961bf1d19517f",
+    "name": "maria",
+    "email": "wergh@gmail.com",
+    "createdAt": "2026-06-09T08:11:57.479Z"
   }
 ]
