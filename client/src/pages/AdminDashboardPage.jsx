@@ -179,9 +179,6 @@ export default function AdminDashboardPage() {
                 >
                   Administrator Console
                 </h2>
-                <p className="text-secondary" style={{ fontFamily: "'Julius Sans One', sans-serif" }}>
-                  Global oversight and multi-district reporting metrics.
-                </p>
               </div>
 
               {/* Filters */}
