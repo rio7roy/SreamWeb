@@ -95,6 +95,20 @@ export default function ExpertDashboardPage() {
     }
   }, [sessionActive, selectedBrc, fetchStatsAndDrafts]);
 
+  // Filter messages for the currently active session BRC
+  const activeMessages = useMemo(() => {
+    if (!sessionActive || !selectedBrc) return [];
+    return messages.filter(msg => {
+      if (!msg.to || !Array.isArray(msg.to)) return false;
+      return msg.to.some(target => {
+        if (target === 'ALL') return true;
+        if (target === `DISTRICT:${selectedBrc.district}`) return true;
+        if (target === `BRC:${selectedBrc.code}`) return true;
+        return false;
+      });
+    });
+  }, [messages, sessionActive, selectedBrc]);
+
   // Filter BRCs based on search query (match start of words in name/location/district, or start of code)
   // ONLY show BRCs assigned to the current expert.
   const assignedBrcCodes = user?.assignedBrcs || [];
@@ -307,34 +321,7 @@ export default function ExpertDashboardPage() {
             <ExpertSessionLogsTab />
           )}
 
-          {/* ── MESSAGES / ANNOUNCEMENTS ── */}
-          {activeNav === 'Dashboard' && messages.length > 0 && (
-            <section className="mb-8 animate-fade-in-up">
-              <h2 className="text-2xl border-l-4 border-error pl-4 tracking-wide text-on-surface mb-6 flex items-center gap-2" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
-                <span className="material-symbols-outlined text-error">campaign</span>
-                Official Announcements
-              </h2>
-              <div className="flex flex-col gap-4">
-                {messages.map((msg, idx) => (
-                  <div key={msg.id || idx} className="bg-error/5 border border-error/20 rounded-xl p-5 md:p-6 flex gap-4 items-start shadow-sm hover:shadow-md transition-shadow expert-brutalist-hover relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-16 h-16 bg-error/10 rounded-bl-full -z-0"></div>
-                    <div className="w-12 h-12 rounded-full bg-error/10 text-error flex items-center justify-center shrink-0 z-10 hidden md:flex">
-                      <span className="material-symbols-outlined text-2xl">notifications_active</span>
-                    </div>
-                    <div className="flex-grow z-10">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
-                        <span className="text-xs font-bold uppercase tracking-wider text-error/80 bg-error/10 px-2 py-1 rounded w-fit">
-                          {msg.to.some(t => t === 'ALL') ? 'Global Broadcast' : 'Targeted Broadcast'}
-                        </span>
-                        <span className="text-xs font-bold text-secondary">{new Date(msg.createdAt).toLocaleDateString()} at {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      </div>
-                      <p className="text-on-surface text-base leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+          {/* ── MESSAGES / ANNOUNCEMENTS removed from here ── */}
 
           {/* ── INITIAL STATE: BRC Selection ── */}
           {!sessionActive && activeNav === 'Dashboard' && (
@@ -427,53 +414,67 @@ export default function ExpertDashboardPage() {
 
           {/* ── DASHBOARD STATE ── */}
           {sessionActive && activeNav === 'Dashboard' && (
-            <div className="space-y-6 animate-fade-in-up">
-              {/* Session Header */}
-              <section className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-on-surface/10 pb-4">
-                <div>
+            <div className="p-4 md:p-8 space-y-8 w-full animate-fade-in">
+              {/* Active Session Header */}
+              <div className="bg-surface-container-low border border-on-surface/10 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-sm relative overflow-hidden expert-brutalist-hover">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary-container/20 rounded-bl-full -z-0"></div>
+                
+                <div className="relative z-10">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold uppercase rounded-full tracking-wider animate-pulse">
+                      Session Active
+                    </span>
+                    <span className="text-sm font-semibold text-secondary font-mono">{selectedBrc?.code}</span>
+                  </div>
                   <h2
-                    className="text-3xl md:text-[32px] text-on-surface tracking-wide"
+                    className="text-3xl md:text-4xl text-on-surface tracking-wide mb-1"
                     style={{ fontFamily: "'Bebas Neue', sans-serif", lineHeight: 1.2 }}
                   >
-                    {selectedBrc ? `${selectedBrc.name} (${selectedBrc.code})` : 'No BRC Selected'}
+                    {selectedBrc?.name}
                   </h2>
-                  <p
-                    className="text-secondary mt-1"
-                    style={{ fontFamily: "'Julius Sans One', sans-serif" }}
-                  >
-                    {selectedBrc ? selectedBrc.location : ''}
+                  <p className="text-secondary flex items-center gap-2">
+                    <span className="material-symbols-outlined text-sm">location_on</span>
+                    {selectedBrc?.location}, {selectedBrc?.district}
                   </p>
                 </div>
+                
                 <button
                   onClick={handleChangeBrc}
-                  className="flex items-center gap-2 px-4 py-2 border border-outline/20 rounded-lg text-secondary hover:bg-surface-container-high transition-colors"
+                  className="relative z-10 px-6 py-3 border border-outline/20 bg-white hover:bg-surface-container rounded-xl text-sm font-bold text-on-surface transition-colors shadow-sm flex items-center gap-2"
                 >
                   <span className="material-symbols-outlined text-sm">swap_horiz</span>
-                  <span className="text-sm font-semibold">Change BRC</span>
+                  Change Hub
                 </button>
-              </section>
+              </div>
 
-              {/* Notification Bar */}
-              <section className="bg-[#fff9e6] border border-primary/30 rounded-xl p-4 md:p-5 flex items-start gap-4 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-1 h-full bg-primary"></div>
-                <div className="bg-white rounded-full p-2 text-primary shadow-sm shrink-0 mt-0.5">
-                  <span className="material-symbols-outlined text-[20px]">campaign</span>
-                </div>
-                <div className="flex-grow">
-                  <div className="flex items-center justify-between gap-4 mb-1.5">
-                    <span className="text-xs font-bold text-primary tracking-wider uppercase flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></span>
-                      From: Admin Console
-                    </span>
-                    <span className="text-xs text-secondary font-medium">
-                      Today, 09:41 AM
-                    </span>
+              {/* ── MESSAGES / ANNOUNCEMENTS ── */}
+              {activeMessages.length > 0 && (
+                <section className="mb-4 animate-fade-in-up">
+                  <h2 className="text-xl border-l-4 border-error pl-4 tracking-wide text-on-surface mb-4 flex items-center gap-2" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+                    <span className="material-symbols-outlined text-error">campaign</span>
+                    Official Announcements
+                  </h2>
+                  <div className="flex flex-col gap-4">
+                    {activeMessages.map((msg, idx) => (
+                      <div key={msg.id || idx} className="bg-error/5 border border-error/20 rounded-xl p-5 md:p-6 flex gap-4 items-start shadow-sm hover:shadow-md transition-shadow expert-brutalist-hover relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-error/10 rounded-bl-full -z-0"></div>
+                        <div className="w-12 h-12 rounded-full bg-error/10 text-error flex items-center justify-center shrink-0 z-10 hidden md:flex">
+                          <span className="material-symbols-outlined text-2xl">notifications_active</span>
+                        </div>
+                        <div className="flex-grow z-10">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
+                            <span className="text-xs font-bold uppercase tracking-wider text-error/80 bg-error/10 px-2 py-1 rounded w-fit">
+                              {msg.to.some(t => t === 'ALL') ? 'Global Broadcast' : 'Targeted Broadcast'}
+                            </span>
+                            <span className="text-xs font-bold text-secondary">{new Date(msg.createdAt).toLocaleDateString()} at {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+                          <p className="text-on-surface text-base leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <p className="text-sm text-on-surface leading-relaxed font-medium">
-                    Priority notification for <span className="font-bold text-primary">{selectedBrc?.name}</span>: Please ensure all newly delivered IoT kits are registered in the inventory module by EOD. A district-wide audit is scheduled for next week.
-                  </p>
-                </div>
-              </section>
+                </section>
+              )}
 
               {/* Statistics Bar */}
               <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
