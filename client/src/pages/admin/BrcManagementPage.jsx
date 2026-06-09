@@ -10,11 +10,11 @@ export default function BrcManagementPage() {
   const [events, setEvents] = useState([]);
   const [activeTab, setActiveTab] = useState('details'); // 'details', 'stock', 'reports'
   const [expandedEventId, setExpandedEventId] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     district: '',
     location: '',
-    dateOfFormation: '',
     inchargeName: '',
     issues: ''
   });
@@ -36,7 +36,6 @@ export default function BrcManagementPage() {
             name: found.name || '', 
             district: found.district || '', 
             location: found.location || '',
-            dateOfFormation: found.dateOfFormation || '',
             inchargeName: found.inchargeName || '',
             issues: found.issues || ''
           });
@@ -60,8 +59,8 @@ export default function BrcManagementPage() {
     try {
       await api.put(`/brcs/${code}`, formData);
       setFeedback({ type: 'success', text: 'BRC Details updated successfully!' });
-      // Keep them on the page to see success
-      setTimeout(() => navigate('/admin'), 2000);
+      setBrc({ ...brc, ...formData });
+      setIsEditing(false);
     } catch (err) {
       setFeedback({ type: 'error', text: 'Failed to update BRC details.' });
     } finally {
@@ -155,39 +154,70 @@ export default function BrcManagementPage() {
                 </div>
               </div>
 
-              <form id="brc-form" onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">Hub Name</label>
-                  <input required name="name" value={formData.name} onChange={handleChange} type="text" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors" />
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Read-Only or Form */}
+              {!isEditing ? (
+                <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">Date of Formation</label>
-                    <input name="dateOfFormation" value={formData.dateOfFormation} onChange={handleChange} type="date" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors" />
+                    <label className="block text-sm font-bold text-secondary mb-1 uppercase tracking-wider">Hub Name</label>
+                    <p className="text-xl font-bold text-on-surface">{brc.name || 'N/A'}</p>
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">In-charge Name</label>
-                    <input name="inchargeName" value={formData.inchargeName} onChange={handleChange} type="text" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors" />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-bold text-secondary mb-1 uppercase tracking-wider">In-charge Name</label>
+                      <p className="text-lg text-on-surface">{brc.inchargeName || 'Not Assigned'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-secondary mb-1 uppercase tracking-wider">District</label>
+                      <p className="text-lg text-on-surface">{brc.district || 'N/A'}</p>
+                    </div>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">District</label>
-                    <input required name="district" value={formData.district} onChange={handleChange} type="text" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-bold text-secondary mb-1 uppercase tracking-wider">Location / Block</label>
+                      <p className="text-lg text-on-surface">{brc.location || 'N/A'}</p>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">Location / Block</label>
-                    <input required name="location" value={formData.location} onChange={handleChange} type="text" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors" />
-                  </div>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">Issues / Notes</label>
-                  <textarea name="issues" value={formData.issues} onChange={handleChange} rows="4" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors resize-y" placeholder="Describe any hardware issues, general notes, or constraints here..."></textarea>
+                  <div>
+                    <label className="block text-sm font-bold text-secondary mb-1 uppercase tracking-wider">Issues / Notes</label>
+                    <p className="text-lg text-on-surface bg-surface-container-low p-4 rounded-xl border border-outline/10 whitespace-pre-wrap">
+                      {brc.issues || 'No reported issues or notes.'}
+                    </p>
+                  </div>
                 </div>
-              </form>
+              ) : (
+                <form id="brc-form" onSubmit={handleSubmit} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">Hub Name</label>
+                    <input required name="name" value={formData.name} onChange={handleChange} type="text" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors" />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">In-charge Name</label>
+                      <input name="inchargeName" value={formData.inchargeName} onChange={handleChange} type="text" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">District</label>
+                      <input required name="district" value={formData.district} onChange={handleChange} type="text" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">Location / Block</label>
+                      <input required name="location" value={formData.location} onChange={handleChange} type="text" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-secondary mb-2 uppercase tracking-wider">Issues / Notes</label>
+                    <textarea name="issues" value={formData.issues} onChange={handleChange} rows="4" className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-5 py-4 text-lg focus:border-primary outline-none transition-colors resize-y" placeholder="Describe any hardware issues, general notes, or constraints here..."></textarea>
+                  </div>
+                </form>
+              )}
             </div>
           )}
 
@@ -347,22 +377,40 @@ export default function BrcManagementPage() {
 
         {activeTab === 'details' && brc && (
           <div className="bg-surface-container-low px-8 py-6 flex justify-end gap-4 border-t border-outline/10 rounded-b-3xl">
-            <button type="button" onClick={() => navigate('/admin')} className="px-8 py-3 rounded-xl text-secondary hover:bg-surface-container transition-colors font-bold text-lg">
-              Cancel
-            </button>
-            <button form="brc-form" type="submit" disabled={saving} className="px-10 py-3 rounded-xl bg-primary text-on-primary font-bold text-lg shadow-lg hover:shadow-primary/30 hover:-translate-y-1 transition-all disabled:opacity-50 disabled:hover:translate-y-0 disabled:shadow-none flex items-center gap-2">
-              {saving ? (
-                <>
-                  <span className="material-symbols-outlined animate-spin text-sm">refresh</span>
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <span className="material-symbols-outlined text-sm">save</span>
-                  Save Changes
-                </>
-              )}
-            </button>
+            {!isEditing ? (
+              <button type="button" onClick={() => setIsEditing(true)} className="px-10 py-3 rounded-xl bg-primary text-on-primary font-bold text-lg shadow-lg hover:shadow-primary/30 hover:-translate-y-1 transition-all flex items-center gap-2">
+                <span className="material-symbols-outlined text-sm">edit</span>
+                Edit Hub Details
+              </button>
+            ) : (
+              <>
+                <button type="button" onClick={() => {
+                  setIsEditing(false);
+                  setFormData({ 
+                    name: brc.name || '', 
+                    district: brc.district || '', 
+                    location: brc.location || '',
+                    inchargeName: brc.inchargeName || '',
+                    issues: brc.issues || ''
+                  });
+                }} className="px-8 py-3 rounded-xl text-secondary hover:bg-surface-container transition-colors font-bold text-lg">
+                  Cancel
+                </button>
+                <button form="brc-form" type="submit" disabled={saving} className="px-10 py-3 rounded-xl bg-primary text-on-primary font-bold text-lg shadow-lg hover:shadow-primary/30 hover:-translate-y-1 transition-all disabled:opacity-50 disabled:hover:translate-y-0 disabled:shadow-none flex items-center gap-2">
+                  {saving ? (
+                    <>
+                      <span className="material-symbols-outlined animate-spin text-sm">refresh</span>
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined text-sm">save</span>
+                      Save Changes
+                    </>
+                  )}
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>
