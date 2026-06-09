@@ -1,0 +1,9 @@
+{
+  "name": "@stream/shared",
+  "version": "1.0.0",
+  "private": true,
+  "main": "schemas/index.js",
+  "dependencies": {
+    "zod": "^3.23.8"
+  }
+}

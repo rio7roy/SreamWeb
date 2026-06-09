@@ -1,0 +1,160 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base Styles ── */
+@layer base {
+  body {
+    @apply bg-background text-on-surface antialiased;
+    font-family: 'Be Vietnam Pro', sans-serif;
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+  }
+}
+
+/* ── Component Styles ── */
+@layer components {
+  /* Login Portal Card */
+  .login-card {
+    @apply bg-white border border-black/[0.04] transition-all duration-[400ms];
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .login-card:hover {
+    @apply border-primary-container;
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+  }
+
+  .login-card:hover .icon-container {
+    @apply bg-primary-fixed text-primary;
+  }
+
+  /* Portal Grid */
+  .portal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+  }
+
+  /* Logo Text */
+  .logo-text-stream {
+    letter-spacing: -0.01em;
+  }
+
+  .logo-text-ecosystem {
+    letter-spacing: 0.1em;
+    opacity: 0.6;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    @apply fixed inset-0 z-[100] flex items-center justify-center p-4;
+    @apply bg-black/10 backdrop-blur-sm;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal-content {
+    transform: scale(0.9) translateY(20px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .modal-overlay.active .modal-content {
+    transform: scale(1) translateY(0);
+  }
+
+  /* Form Input */
+  .form-input {
+    @apply w-full bg-surface-container-low border border-black/[0.05] rounded-xl;
+    @apply px-4 py-3 pl-11 text-base text-on-surface;
+    @apply focus:ring-2 focus:ring-primary-container focus:border-transparent;
+    @apply transition-all outline-none;
+    font-family: 'Be Vietnam Pro', sans-serif;
+  }
+
+  .form-input::placeholder {
+    @apply text-on-surface/40;
+  }
+
+  /* Primary Button */
+  .btn-primary {
+    @apply w-full bg-primary-container text-on-primary-container;
+    @apply font-bold text-base py-4 rounded-xl;
+    @apply hover:shadow-lg hover:shadow-primary-container/20;
+    @apply active:scale-[0.98] transition-all;
+    @apply flex items-center justify-center gap-2 shadow-sm;
+  }
+
+  .btn-primary:disabled {
+    @apply opacity-60 cursor-not-allowed;
+    @apply hover:shadow-none active:scale-100;
+  }
+
+  /* Ghost Button */
+  .btn-ghost {
+    @apply w-full text-secondary font-bold text-sm py-2 rounded-xl;
+    @apply hover:bg-surface-container transition-all text-center;
+  }
+
+  /* Dashboard Sidebar */
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl;
+    @apply text-on-surface/70 font-medium text-sm;
+    @apply hover:bg-surface-container-low hover:text-on-surface;
+    @apply transition-all duration-200;
+  }
+
+  .sidebar-link.active {
+    @apply bg-primary-container/10 text-primary font-bold;
+  }
+
+  /* Expert Dashboard — Brutalist hover effect */
+  .expert-brutalist-hover {
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .expert-brutalist-hover:hover {
+    box-shadow: 4px 4px 0px #1a1a1a;
+  }
+
+  .expert-brutalist-hover:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
+}
+
+/* ── Utility Animations ── */
+@layer utilities {
+  .animation-delay-100 { animation-delay: 0.08s; }
+  .animation-delay-200 { animation-delay: 0.16s; }
+  .animation-delay-300 { animation-delay: 0.24s; }
+  .animation-delay-400 { animation-delay: 0.32s; }
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4c5ab;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #827660;
+}

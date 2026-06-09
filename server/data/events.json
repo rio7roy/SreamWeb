@@ -1,0 +1,77 @@
+[
+  {
+    "id": "1a2e8317-0828-4027-93c4-13414eb49720",
+    "brcCode": "32110600703SH",
+    "name": "Rio Roy",
+    "date": "2026-01-01",
+    "description": "dgrjgggffh",
+    "teachersCount": 4,
+    "studentsCount": 1,
+    "photos": [
+      "/uploads/opt-1780742496061-001bfebf5a584ae6.webp"
+    ],
+    "status": "SUBMITTED",
+    "createdAt": "2026-06-06T10:41:36.196Z",
+    "createdBy": "mock-expert",
+    "updatedAt": "2026-06-06T11:21:06.224Z"
+  },
+  {
+    "id": "7d6c36f0-9caa-4dc6-8727-28b7d442a505",
+    "brcCode": "32110600703SH",
+    "name": "",
+    "date": "",
+    "description": "",
+    "teachersCount": 0,
+    "studentsCount": 0,
+    "photos": [],
+    "status": "SUBMITTED",
+    "createdAt": "2026-06-06T10:43:55.826Z",
+    "createdBy": "mock-expert",
+    "updatedAt": "2026-06-06T11:21:20.718Z"
+  },
+  {
+    "id": "60652d41-b8f0-44f3-9a34-d9bd003f6eb7",
+    "brcCode": "32110600703SH",
+    "name": "",
+    "date": "",
+    "description": "",
+    "teachersCount": 0,
+    "studentsCount": 0,
+    "photos": [],
+    "status": "SUBMITTED",
+    "createdAt": "2026-06-06T11:24:32.027Z",
+    "createdBy": "mock-expert",
+    "updatedAt": "2026-06-06T11:24:38.814Z"
+  },
+  {
+    "id": "61d0dcb5-3184-4add-bca0-c5303aa9c438",
+    "brcCode": "32110600703SH",
+    "name": "",
+    "date": "",
+    "description": "",
+    "teachersCount": 0,
+    "studentsCount": 0,
+    "photos": [],
+    "status": "DRAFT",
+    "createdAt": "2026-06-06T11:24:54.098Z",
+    "createdBy": "mock-expert"
+  },
+  {
+    "id": "74076983-e1c6-4088-a439-9b1805820a3d",
+    "brcCode": "32110100105SH",
+    "venueType": "OTHER_VENUE",
+    "venueValue": "erfgh",
+    "name": "efsfd",
+    "date": "2026-06-09",
+    "description": "dfgh",
+    "teachersCount": 3,
+    "studentsCount": 2,
+    "photos": [
+      "/uploads/opt-1780902659170-1ae576448e07d5b7.webp"
+    ],
+    "status": "SUBMITTED",
+    "createdAt": "2026-06-08T07:10:59.316Z",
+    "createdBy": "fb77e8cd-0e7e-4dc6-9352-9a1a7d4e3947",
+    "updatedAt": "2026-06-08T07:11:09.052Z"
+  }
+]

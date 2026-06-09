@@ -1,0 +1,56 @@
+[
+  {
+    "id": "1a1e5e54-df65-47f6-b7a3-17e07f0b1826",
+    "email": "apitest@stream.edu",
+    "name": "API Test",
+    "createdAt": "2026-06-08T05:19:38.100Z",
+    "username": "apitest",
+    "confirmPassword": "Password123!",
+    "phone": "1234567890",
+    "address": "123 Test St",
+    "password": "$2b$12$m6bm4yIS.tGBAng7iyRvWuvI282jZBfSj.3w8XIYBiJH8d4Pie.jq",
+    "role": "EXPERT",
+    "isActive": true,
+    "activatedAt": "2026-06-08T05:20:35.816Z",
+    "assignedBrcs": [],
+    "deletedAt": "2026-06-08T05:51:43.062Z"
+  },
+  {
+    "id": "e3686e73-7120-4c64-8e78-2c54584b01fd",
+    "name": "Fake Rio",
+    "email": "john365joe@gmail.com",
+    "createdAt": "2026-06-08T05:34:42.481Z",
+    "phone": "80783838833",
+    "address": "ererterte",
+    "username": "sf",
+    "confirmPassword": "1234567",
+    "whatsappJoined": true,
+    "password": "$2b$12$OTOy3w6OR/eGiqKCnA7jJujg1No2uvHUq1Ehh5ZA3o6DplQNkQRFa",
+    "role": "EXPERT",
+    "isActive": true,
+    "activatedAt": "2026-06-08T05:35:24.680Z",
+    "assignedBrcs": [],
+    "deletedAt": "2026-06-08T05:52:02.366Z"
+  },
+  {
+    "id": "fb77e8cd-0e7e-4dc6-9352-9a1a7d4e3947",
+    "name": "maria",
+    "email": "wergh@gmail.com",
+    "createdAt": "2026-06-08T06:47:42.158Z",
+    "phone": "80783838833",
+    "address": "ergjk",
+    "username": "sf",
+    "confirmPassword": "123456",
+    "whatsappJoined": true,
+    "password": "$2b$12$.5QJbnTguhlGNLjllDQbWuTVVs95H17r2ss223yoIYy8L/Eh27WaC",
+    "role": "EXPERT",
+    "isActive": true,
+    "activatedAt": "2026-06-08T06:48:13.783Z",
+    "avatar": "opt-1780901385373-0d95965e1bebd87f.webp",
+    "assignedBrcs": [
+      "32110100105SH",
+      "32110300803SH"
+    ],
+    "deletedAt": "2026-06-08T07:16:04.301Z"
+  }
+]

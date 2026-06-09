@@ -1,0 +1,247 @@
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
+const bcrypt = require('bcrypt');
+const mailer = require('../../utils/mailer');
+const { db } = require('../../config/database');
+
+const DATA_DIR = path.join(__dirname, '../../../data');
+
+const getFilePath = (type, past = false) => {
+  const prefix = past ? 'past_' : '';
+  const validTypes = ['experts', 'labs', 'ilabs', 'creative_corners', 'admins'];
+  if (!validTypes.includes(type)) return null;
+  if (type === 'labs') {
+    return past 
+      ? path.join(__dirname, '../../../../server/data/past_brcs.json')
+      : path.join(__dirname, '../../../../server/data/brcs.json');
+  }
+  return path.join(DATA_DIR, `${prefix}${type}.json`);
+};
+
+const getMessagesPath = () => path.join(DATA_DIR, 'messages.json');
+
+const readData = (filePath) => {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch (err) {
+    return [];
+  }
+};
+
+const writeData = (filePath, data) => {
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+};
+
+exports.getUsers = (req, res) => {
+  const { type } = req.params;
+  const filePath = getFilePath(type);
+  if (!filePath) return res.status(400).json({ message: 'Invalid user type' });
+  
+  const data = readData(filePath);
+  if (type === 'labs') {
+    return res.json(data);
+  }
+  // Do not send passwords to the frontend
+  const sanitized = data.map(u => {
+    const { password, confirmPassword, ...rest } = u;
+    return rest;
+  });
+  res.json(sanitized);
+};
+
+exports.createUser = async (req, res) => {
+  const { type } = req.params;
+  
+  if (type === 'experts' || type === 'admins') {
+    const fileName = type === 'experts' ? 'pending_experts.json' : 'pending_admins.json';
+    const filePath = path.join(DATA_DIR, fileName);
+    const data = readData(filePath);
+    const token = crypto.randomBytes(16).toString('hex');
+    const newUser = { id: crypto.randomUUID(), token, ...req.body, createdAt: new Date().toISOString() };
+    data.push(newUser);
+    writeData(filePath, data);
+    
+    const inviteLink = `http://localhost:5173/onboard/${token}`;
+    
+    try {
+      await mailer.sendInvite(newUser.email, newUser.name, inviteLink);
+      return res.status(201).json({ message: `${type === 'experts' ? 'Expert' : 'Admin'} invited successfully.` });
+    } catch (err) {
+      // If email fails, we might still want to return the link so the admin isn't completely blocked, or just fail.
+      return res.status(201).json({ 
+        message: `${type === 'experts' ? 'Expert' : 'Admin'} invited, but email failed to send.`, 
+        inviteLink 
+      });
+    }
+  }
+
+  const filePath = getFilePath(type);
+  if (!filePath) return res.status(400).json({ message: 'Invalid user type' });
+  
+  const data = readData(filePath);
+  const newUser = { id: crypto.randomUUID(), ...req.body, createdAt: new Date().toISOString() };
+  data.push(newUser);
+  writeData(filePath, data);
+  
+  const { password, confirmPassword, ...safeUser } = newUser;
+  res.status(201).json({ message: 'User created successfully', data: safeUser });
+};
+
+exports.softDeleteUser = (req, res) => {
+  const { type, id } = req.params;
+  const activePath = getFilePath(type, false);
+  const pastPath = getFilePath(type, true);
+  if (!activePath) return res.status(400).json({ message: 'Invalid user type' });
+  
+  const activeData = readData(activePath);
+  
+  if (type === 'labs') {
+    // For BRCs, we match by 'code' instead of 'id'
+    const brcIndex = activeData.findIndex(u => u.code === id);
+    if (brcIndex === -1) return res.status(404).json({ message: 'Hub not found' });
+    
+    const [brc] = activeData.splice(brcIndex, 1);
+    brc.deletedAt = new Date().toISOString();
+    writeData(activePath, activeData);
+    
+    const pastData = readData(pastPath);
+    pastData.push(brc);
+    writeData(pastPath, pastData);
+    
+    return res.json({ message: 'Hub soft deleted successfully' });
+  }
+
+  const userIndex = activeData.findIndex(u => u.id === id);
+  
+  if (userIndex === -1) return res.status(404).json({ message: 'User not found' });
+  
+  const [user] = activeData.splice(userIndex, 1);
+  user.deletedAt = new Date().toISOString();
+  writeData(activePath, activeData);
+  
+  const pastData = readData(pastPath);
+  pastData.push(user);
+  writeData(pastPath, pastData);
+  
+  res.json({ message: 'User soft deleted successfully' });
+};
+
+exports.broadcastMessage = (req, res) => {
+  const messagesPath = getMessagesPath();
+  const messages = readData(messagesPath);
+  const newMessage = { id: crypto.randomUUID(), ...req.body, createdAt: new Date().toISOString() };
+  messages.push(newMessage);
+  writeData(messagesPath, messages);
+  
+  res.status(201).json({ message: 'Message broadcasted successfully', data: newMessage });
+};
+
+exports.getMessages = (req, res) => {
+  const messagesPath = getMessagesPath();
+  res.json(readData(messagesPath));
+};
+
+exports.validateInvite = (req, res) => {
+  const { token } = req.params;
+  
+  const expertData = readData(path.join(DATA_DIR, 'pending_experts.json'));
+  const adminData = readData(path.join(DATA_DIR, 'pending_admins.json'));
+  
+  const pendingUser = expertData.find(e => e.token === token) || adminData.find(a => a.token === token);
+  
+  if (!pendingUser) return res.status(404).json({ message: 'Invalid or expired invite link' });
+  
+  res.json({ name: pendingUser.name, email: pendingUser.email });
+};
+
+exports.completeOnboarding = async (req, res) => {
+  const { token } = req.params;
+  
+  const pendingExpertsPath = path.join(DATA_DIR, 'pending_experts.json');
+  const pendingAdminsPath = path.join(DATA_DIR, 'pending_admins.json');
+  
+  let pendingData = readData(pendingExpertsPath);
+  let userIndex = pendingData.findIndex(e => e.token === token);
+  let role = 'EXPERT';
+  let pendingPath = pendingExpertsPath;
+  let activeType = 'experts';
+  
+  if (userIndex === -1) {
+    pendingData = readData(pendingAdminsPath);
+    userIndex = pendingData.findIndex(e => e.token === token);
+    role = 'ADMIN';
+    pendingPath = pendingAdminsPath;
+    activeType = 'admins';
+  }
+  
+  if (userIndex === -1) return res.status(404).json({ message: 'Invalid invite token' });
+  
+  const [pendingUser] = pendingData.splice(userIndex, 1);
+  writeData(pendingPath, pendingData);
+  
+  const activePath = getFilePath(activeType);
+  const activeData = readData(activePath);
+  
+  const { token: _t, ...userBase } = pendingUser;
+  const { password, ...bodyRest } = req.body;
+  
+  // Hash password for persistent storage
+  let hashedPassword = null;
+  if (password) {
+    hashedPassword = await bcrypt.hash(password, 12);
+  }
+
+  const newUser = { 
+    ...userBase, 
+    ...bodyRest, 
+    password: hashedPassword, // Store hashed password
+    role: role,
+    isActive: true,
+    activatedAt: new Date().toISOString() 
+  };
+  
+  activeData.push(newUser);
+  writeData(activePath, activeData);
+  
+  try {
+    // Inject into in-memory DB immediately to allow login
+    db.users.create({ data: newUser });
+    res.json({ message: 'Onboarding complete', data: { ...newUser, password: undefined } });
+  } catch (err) {
+    if (err.code === 'P2002') {
+      // Revert the file write since db injection failed
+      const revertedData = activeData.filter(u => u.id !== newUser.id);
+      writeData(activePath, revertedData);
+      
+      // Put the pending user back
+      pendingData.push(pendingUser);
+      writeData(pendingPath, pendingData);
+      
+      return res.status(400).json({ message: `Email or username already exists. Please choose a different username.` });
+    }
+    return res.status(500).json({ message: 'Failed to complete onboarding' });
+  }
+};
+
+exports.updateExpertBrcs = (req, res) => {
+  const { id } = req.params;
+  const { brcCodes } = req.body;
+  
+  const activePath = getFilePath('experts');
+  const activeData = readData(activePath);
+  
+  const expertIndex = activeData.findIndex(u => u.id === id);
+  if (expertIndex === -1) return res.status(404).json({ message: 'Expert not found' });
+  
+  activeData[expertIndex].assignedBrcs = brcCodes;
+  writeData(activePath, activeData);
+  
+  // Update in memory db as well
+  db.users.update({
+    where: { id },
+    data: { assignedBrcs: brcCodes }
+  });
+  
+  res.json({ message: 'Expert assignments updated successfully', data: activeData[expertIndex] });
+};

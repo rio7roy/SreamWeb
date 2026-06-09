@@ -1,0 +1,524 @@
+[
+  {
+    "code": "32110100105SH",
+    "name": "GOVT VHSS ARYAD",
+    "location": "ALAPPUZHA",
+    "district": "ALAPPUZHA"
+  },
+  {
+    "code": "32110200809SH",
+    "name": "GHSS VALIYAZHEECKAL",
+    "location": "AMBALAPPUZHA",
+    "district": "ALAPPUZHA"
+  },
+  {
+    "code": "32110300803SH",
+    "name": "GHSS PULIYOOR",
+    "location": "CHENGANNUR",
+    "district": "ALAPPUZHA"
+  },
+  {
+    "code": "32110400102SH",
+    "name": "GHS POLLETHAI",
+    "location": "CHERTHALA",
+    "district": "ALAPPUZHA"
+  },
+  {
+    "code": "32110500702SH",
+    "name": "GBHSS HARIPAD",
+    "location": "HARIPPAD",
+    "district": "ALAPPUZHA"
+  },
+  {
+    "code": "32110600703SH",
+    "name": "GHSS RAMAPURAM",
+    "location": "KAYAMKULAM",
+    "district": "ALAPPUZHA"
+  },
+  {
+    "code": "32110700504SH",
+    "name": "GVHSS CHUNAKKARA",
+    "location": "MAVELIKKARA",
+    "district": "ALAPPUZHA"
+  },
+  {
+    "code": "32110800102SH",
+    "name": "GHS THEKKEKKARA",
+    "location": "MONCOMPU",
+    "district": "ALAPPUZHA"
+  },
+  {
+    "code": "32110901034SH",
+    "name": "KKKPS GHS KARUMADY",
+    "location": "THALAVADY",
+    "district": "ALAPPUZHA"
+  },
+  {
+    "code": "32111000804SH",
+    "name": "SCUGVHSS PATTANAKKAD",
+    "location": "THURAVOOR",
+    "district": "ALAPPUZHA"
+  },
+  {
+    "code": "32111100607SH",
+    "name": "GHSS KIDANGARA",
+    "location": "VELIYANADU",
+    "district": "ALAPPUZHA"
+  },
+  {
+    "code": "32080102104SH",
+    "name": "GHSS KONGORPILLY",
+    "location": "ALUVA",
+    "district": "ERNAKULAM"
+  },
+  {
+    "code": "32080101705SH",
+    "name": "GHSS CHENGAMANAD",
+    "location": "ANGAMALY",
+    "district": "ERNAKULAM"
+  },
+  {
+    "code": "32080303316SH",
+    "name": "SRVGMVHSS EKM",
+    "location": "ERNAKULAM",
+    "district": "ERNAKULAM"
+  },
+  {
+    "code": "32080500302SH",
+    "name": "GHSS KADAYIRIPPU",
+    "location": "KOLENCHERY",
+    "district": "ERNAKULAM"
+  },
+  {
+    "code": "32080600504SH",
+    "name": "GHS AROOR",
+    "location": "KOOTHATTUKULAM",
+    "district": "ERNAKULAM"
+  },
+  {
+    "code": "32080701105SH",
+    "name": "GMHSS CHERUVATTOOR",
+    "location": "KOTHAMANGALAM",
+    "district": "ERNAKULAM"
+  },
+  {
+    "code": "32060300206SH",
+    "name": "GHSS PUTHENTHODE",
+    "location": "MATTANCHERY",
+    "district": "ERNAKULAM"
+  },
+  {
+    "code": "32080901201SH",
+    "name": "GHSS PEZHAKKAPILLY",
+    "location": "MUVATTUPUZHA",
+    "district": "ERNAKULAM"
+  },
+  {
+    "code": "32081000706SH",
+    "name": "GVHSS KAITHARAM",
+    "location": "N. PARAVOOR",
+    "district": "ERNAKULAM"
+  },
+  {
+    "code": "32081100506SH",
+    "name": "GHSS CHERANALLOR",
+    "location": "PERUMABVOOR",
+    "district": "ERNAKULAM"
+  },
+  {
+    "code": "32081200102SH",
+    "name": "GV&HSS MANEED",
+    "location": "PIRAVOM",
+    "district": "ERNAKULAM"
+  },
+  {
+    "code": "32081300407SH",
+    "name": "GOVT SANSKRIT HSS THRIPUNITHURA",
+    "location": "TRIPUNITHURA",
+    "district": "ERNAKULAM"
+  },
+  {
+    "code": "32080100806SH",
+    "name": "GHS ELAKUNNAPUZHA",
+    "location": "VYPIN",
+    "district": "ERNAKULAM"
+  },
+  {
+    "code": "32081500701SH",
+    "name": "GUPS KOMBANAD",
+    "location": "KOOVAPPADY",
+    "district": "ERNAKULAM"
+  },
+  {
+    "code": "32080400301SH",
+    "name": "PUPS VELLARAMKALLU",
+    "location": "KALLOORKKAD",
+    "district": "ERNAKULAM"
+  },
+  {
+    "code": "32020500202SH",
+    "name": "GUPS PUTHUSSERI",
+    "location": "CHOKLI",
+    "district": "KANNUR"
+  },
+  {
+    "code": "32021501306SH",
+    "name": "GHSS CHUZHALI",
+    "location": "IRIKKUR",
+    "district": "KANNUR"
+  },
+  {
+    "code": "32020901306SH",
+    "name": "GHSS CHAVASSERY",
+    "location": "IRITTY",
+    "district": "KANNUR"
+  },
+  {
+    "code": "32020100224SH",
+    "name": "GOVT HSS CHALA",
+    "location": "KANNUR NORTH",
+    "district": "KANNUR"
+  },
+  {
+    "code": "32020200921SH",
+    "name": "PERALASSERY AKG SMARAKA GHSS",
+    "location": "KANNUR SOUTH",
+    "district": "KANNUR"
+  },
+  {
+    "code": "32020700306SH",
+    "name": "GUPS PALAYATHUVAYAL",
+    "location": "KUTHUPARAMBA",
+    "district": "KANNUR"
+  },
+  {
+    "code": "32020140520SH",
+    "name": "GVHSS BOYS MADAYI",
+    "location": "MADAYI",
+    "district": "KANNUR"
+  },
+  {
+    "code": "32020800314SH",
+    "name": "GVHSS EDAYANNUR",
+    "location": "MATTANNUR",
+    "district": "KANNUR"
+  },
+  {
+    "code": "32020600909SH",
+    "name": "ABDURAHIMAN SMARAKAM UPS",
+    "location": "PANOOR",
+    "district": "KANNUR"
+  },
+  {
+    "code": "32021301010SH",
+    "name": "GHS AZHIKODE",
+    "location": "PAPPINISSERY",
+    "district": "KANNUR"
+  },
+  {
+    "code": "32021201301SH",
+    "name": "MVMKVNSGHSS MATHIL",
+    "location": "PAYYANNUR",
+    "district": "KANNUR"
+  },
+  {
+    "code": "32020400402SH",
+    "name": "GVHSS KADIRUR",
+    "location": "THALASSERY NORTH",
+    "district": "KANNUR"
+  },
+  {
+    "code": "32020100605SH",
+    "name": "GOVT TOWN HSS THALASSERY",
+    "location": "THALASSERY SOUTH",
+    "district": "KANNUR"
+  },
+  {
+    "code": "32021000715SH",
+    "name": "KKN PMG VHS SCHOOL",
+    "location": "THALIPARAMBA NORTH",
+    "district": "KANNUR"
+  },
+  {
+    "code": "32021100905SH",
+    "name": "GUPS KADAMBERY",
+    "location": "THALIPARAMBA SOUTH PALAKKAD",
+    "district": "KANNUR"
+  },
+  {
+    "code": "32060100307SH",
+    "name": "GTHS SHOLAYUR",
+    "location": "AGALI",
+    "district": "PALAKKAD"
+  },
+  {
+    "code": "32061000301SH",
+    "name": "GVHSS PATHIRIPALA",
+    "location": "PARALI",
+    "district": "PALAKKAD"
+  },
+  {
+    "code": "32060200710SH",
+    "name": "GHSS KIZHAKENCHERY",
+    "location": "ALATHUR",
+    "district": "PALAKKAD"
+  },
+  {
+    "code": "32060300715SH",
+    "name": "GVHSS CHERPULASSERY",
+    "location": "CHERPPULASSERY",
+    "district": "PALAKKAD"
+  },
+  {
+    "code": "32060400104SH",
+    "name": "GHSS CHITTUR",
+    "location": "CHITTUR",
+    "district": "PALAKKAD"
+  },
+  {
+    "code": "32060500301SH",
+    "name": "GHSS KODUVAYUR",
+    "location": "KOLLENGODE",
+    "district": "PALAKKAD"
+  },
+  {
+    "code": "32060600201SH",
+    "name": "GHSS PERINGOTTUKURISSI",
+    "location": "KUZHALMANNAM",
+    "district": "PALAKKAD"
+  },
+  {
+    "code": "32060700606SH",
+    "name": "GHSS POTTASSERY",
+    "location": "MANNARKKAD",
+    "district": "PALAKKAD"
+  },
+  {
+    "code": "32020200412SH",
+    "name": "GHSS KADAMBUR",
+    "location": "OTTAPPALAM",
+    "district": "PALAKKAD"
+  },
+  {
+    "code": "32060900747SH",
+    "name": "GHSS BIGBAZAR",
+    "location": "PALAKKAD",
+    "district": "PALAKKAD"
+  },
+  {
+    "code": "32061100108SH",
+    "name": "GHSS PATTAMBI",
+    "location": "PATTAMBI",
+    "district": "PALAKKAD"
+  },
+  {
+    "code": "32061200219SH",
+    "name": "GHSS MARAYAMANGALAM",
+    "location": "SHORANUR",
+    "district": "PALAKKAD"
+  },
+  {
+    "code": "32061300309SH",
+    "name": "GGHSS KALLADATHUR",
+    "location": "THRITHALA",
+    "district": "PALAKKAD"
+  },
+  {
+    "code": "32070203701SH",
+    "name": "GHS VETTILAPPARA",
+    "location": "AREACODE",
+    "district": "MALAPPURAM"
+  },
+  {
+    "code": "32050700412SH",
+    "name": "PCNGHSS MOOKKUTHALA",
+    "location": "EDAPPAL",
+    "district": "MALAPPURAM"
+  },
+  {
+    "code": "32050200516SH",
+    "name": "GHSS KOTTAPPURAM",
+    "location": "KONDOTTY",
+    "district": "MALAPPURAM"
+  },
+  {
+    "code": "32050800618SH",
+    "name": "GHSS PERASSANNUR",
+    "location": "KUTTIPPURAM",
+    "district": "MALAPPURAM"
+  },
+  {
+    "code": "32050101826SH",
+    "name": "GBHSS MALAPPURAM",
+    "location": "MALAPPURAM",
+    "district": "MALAPPURAM"
+  },
+  {
+    "code": "32050600631SH",
+    "name": "GGHSS MANJERI",
+    "location": "MANJERI",
+    "district": "MALAPPURAM"
+  },
+  {
+    "code": "32051500318SH",
+    "name": "GHSS MANKADA PALLIPPURAM",
+    "location": "MANKADA",
+    "district": "MALAPPURAM"
+  },
+  {
+    "code": "32020100136SH",
+    "name": "GHS MUNDERI",
+    "location": "NILAMBUR",
+    "district": "MALAPPURAM"
+  },
+  {
+    "code": "32051200106SH",
+    "name": "GHS NEDUVA",
+    "location": "PARAPPANANGADI",
+    "district": "MALAPPURAM"
+  },
+  {
+    "code": "32050500910SH",
+    "name": "GHSS VETTATHUR",
+    "location": "PERINTALMANNA",
+    "district": "MALAPPURAM"
+  },
+  {
+    "code": "32050900510SH",
+    "name": "GHSS THRIKKAV",
+    "location": "PONNANI",
+    "district": "MALAPPURAM"
+  },
+  {
+    "code": "32051100131SH",
+    "name": "GRFTVHSS TANLUR",
+    "location": "TANUR",
+    "district": "MALAPPURAM"
+  },
+  {
+    "code": "32051000627SH",
+    "name": "GBHSS TIRUR",
+    "location": "TIRUR",
+    "district": "MALAPPURAM"
+  },
+  {
+    "code": "32051300201SH",
+    "name": "GVHSS VENGARA",
+    "location": "VENGARA",
+    "district": "MALAPPURAM"
+  },
+  {
+    "code": "32050100706SH",
+    "name": "GHSS PULLENGODE",
+    "location": "WANDOOR",
+    "district": "MALAPPURAM"
+  },
+  {
+    "code": "32070101302SH",
+    "name": "GHSS PERINGOTTUKARA",
+    "location": "ANTHIKKAD",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32070203701SH",
+    "name": "GHSS VETTILAPPARA",
+    "location": "CHALAKUDY",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32070303021SH",
+    "name": "GHSS MANATHALA",
+    "location": "CHAVAKKAD",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32070400504SH",
+    "name": "GVHSS CHERPU",
+    "location": "CHERPU",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32070502201SH",
+    "name": "GHSS KADAVALLUR",
+    "location": "CHOWANNUR",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32070700705SH",
+    "name": "GMBHSS IRINJALAKUDA",
+    "location": "IRINJALAKUDA",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32070800501SH",
+    "name": "GHSS KODAKARA",
+    "location": "KODAKARA",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32070303021SH",
+    "name": "PBMGHSS KODUNGALLUR",
+    "location": "KODUNGALLUR",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32070900301SH",
+    "name": "GSHSS MELADOOR",
+    "location": "MALA",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32071000403SH",
+    "name": "GMHSS CHAMAKKALA",
+    "location": "MATHILAKAM",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32071100901SH",
+    "name": "GHSS MULLASSERY",
+    "location": "MULLASSERY",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32071205403SH",
+    "name": "GHSS PATTIKAD",
+    "location": "OLLUKKARA",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32071210901SH",
+    "name": "CHANDRA MGHSS KUTTUR",
+    "location": "OLLUKKARA",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32071300106SH",
+    "name": "SMTGHSS CHELAKKARA",
+    "location": "PAZHAYANNUR",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32071501104SH",
+    "name": "GHSS VATANAPPALLY",
+    "location": "THALIKULAM",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32071800404SH",
+    "name": "GMHSS FOR BOYS THRISSUR",
+    "location": "URC THRISSUR",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32071703301SH",
+    "name": "VNMMGHSS MACHAD",
+    "location": "WADAKKANCHERY",
+    "district": "THRISSUR"
+  },
+  {
+    "code": "32071601701SH",
+    "name": "GHSS KARUPADANNA",
+    "location": "VELLANGALLUR",
+    "district": "THRISSUR"
+  }
+]
