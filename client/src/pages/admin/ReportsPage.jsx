@@ -25,7 +25,7 @@ export default function ReportsPage() {
   }, [brcs, selectedDistrict]);
 
   const handleDownloadExcel = () => {
-    let url = '/api/events/export/excel';
+    let url = `${import.meta.env.VITE_API_URL || '/api'}/events/export/excel`;
     const params = new URLSearchParams();
     if (selectedDistrict) params.append('district', selectedDistrict);
     if (selectedBrc) params.append('brcCode', selectedBrc);
@@ -84,7 +84,7 @@ export default function ReportsPage() {
             User Reports
           </h2>
           <a
-            href="/api/reports/users/excel"
+            href={`${import.meta.env.VITE_API_URL || '/api'}/reports/users/excel`}
             className="block bg-white border border-black/[0.04] rounded-2xl p-8 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
           >
             <div className="w-12 h-12 bg-green-100 text-green-700 rounded-xl flex items-center justify-center mb-5">
@@ -94,7 +94,7 @@ export default function ReportsPage() {
             <p className="text-secondary text-sm">Download a complete user list as an Excel spreadsheet.</p>
           </a>
           <a
-            href="/api/reports/users/pdf"
+            href={`${import.meta.env.VITE_API_URL || '/api'}/reports/users/pdf`}
             className="block bg-white border border-black/[0.04] rounded-2xl p-8 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
           >
             <div className="w-12 h-12 bg-red-100 text-red-700 rounded-xl flex items-center justify-center mb-5">

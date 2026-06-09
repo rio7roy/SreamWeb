@@ -64,6 +64,19 @@ export default function AdminDashboardPage() {
     ];
   }, [selectedDistrict, filteredBrcs.length]);
 
+  // Derived Issues
+  const issuesList = useMemo(() => {
+    return filteredBrcs
+      .filter(b => b.issues && b.issues.trim() !== '')
+      .map(b => ({
+        code: b.code,
+        name: b.name,
+        district: b.district,
+        issues: b.issues
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [filteredBrcs]);
+
   const handleLogout = () => {
     logout();
     navigate('/');
