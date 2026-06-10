@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -29,8 +29,7 @@ export default function PortalPage() {
   // Redirect if already authenticated
   if (isAuthenticated) {
     const dest = user?.role === 'EXPERT' ? '/expert' : user?.role === 'ADMIN' ? '/admin' : '/dashboard';
-    navigate(dest);
-    return null;
+    return <Navigate to={dest} replace />;
   }
 
   const openLoginModal = (portal) => {
