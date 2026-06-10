@@ -11,6 +11,7 @@ import ReportsPage from '../pages/admin/ReportsPage';
 import ExpertOnboardingPage from '../pages/ExpertOnboardingPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import ErrorPage from '../pages/ErrorPage';
+import ProfilePage from '../pages/ProfilePage';
 
 const RootLayout = () => (
   <>
@@ -42,16 +43,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'profile',
-        element: (
-          <div className="max-w-2xl mx-auto animate-fade-in-up">
-            <h1 className="text-3xl font-black text-on-surface tracking-tight mb-6" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>
-              My Profile
-            </h1>
-            <div className="bg-white border border-black/[0.04] rounded-2xl p-8">
-              <p className="text-secondary">Profile management coming soon.</p>
-            </div>
-          </div>
-        ),
+        element: <ProfilePage />,
       },
       {
         path: 'users',
