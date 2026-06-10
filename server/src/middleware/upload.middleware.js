@@ -23,13 +23,13 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter — only allow images
+// File filter — allow images and PDFs
 const fileFilter = (_req, file, cb) => {
-  const allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
+  const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
   if (allowedMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Only JPEG, PNG, and WebP images are allowed.'), false);
+    cb(new Error('Only JPEG, PNG, WebP, and PDF files are allowed.'), false);
   }
 };
 
@@ -47,7 +47,7 @@ const upload = multer({
  * Replaces the original file with the optimized version.
  */
 async function compressImage(req, res, next) {
-  if (!req.file) {
+  if (!req.file || req.file.mimetype === 'application/pdf') {
     return next();
   }
 
@@ -90,6 +90,10 @@ async function compressImages(req, res, next) {
 
   try {
     await Promise.all(req.files.map(async (file) => {
+      if (file.mimetype === 'application/pdf') {
+        return;
+      }
+      
       const filePath = file.path;
       const outputFilename = `opt-${file.filename.replace(path.extname(file.filename), '.webp')}`;
       const outputPath = path.join(uploadDir, outputFilename);

@@ -26,6 +26,9 @@ router.get('/', authenticate, eventsController.getEvents);
 // Export events as Excel
 router.get('/export/excel', authenticate, eventsController.exportEventsExcel);
 
+// Export events as PDF
+router.get('/export/pdf', authenticate, eventsController.exportEventsPdf);
+
 // Update an existing event (e.g., submitting a draft)
 router.put(
   '/:id',
@@ -33,6 +36,17 @@ router.put(
   upload.array('photos', 10),
   compressImages,
   eventsController.updateEvent
+);
+
+// Delete an event/draft
+router.delete('/:id', authenticate, eventsController.deleteEvent);
+
+// Upload PDF report for an event
+router.post(
+  '/:id/report',
+  authenticate,
+  upload.single('reportPdf'),
+  eventsController.uploadReportPdf
 );
 
 module.exports = router;

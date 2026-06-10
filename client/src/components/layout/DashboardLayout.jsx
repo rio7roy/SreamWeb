@@ -13,7 +13,7 @@ const ROLE_LABELS = {
 const NAV_ITEMS = [
   { path: '/dashboard', label: 'Overview', icon: 'dashboard', roles: 'all' },
   { path: '/dashboard/users', label: 'Users', icon: 'group', roles: ['ADMIN'] },
-  { path: '/dashboard/reports', label: 'Reports', icon: 'description', roles: ['ADMIN'] },
+  { path: '/dashboard/reports', label: 'Reports', icon: 'description', roles: ['ADMIN', 'STREAM_LAB'] },
   { path: '/dashboard/profile', label: 'My Profile', icon: 'person', roles: 'all' },
 ];
 

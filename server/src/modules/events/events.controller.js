@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const ExcelJS = require('exceljs');
+const PDFDocument = require('pdfkit');
 
 const DATA_DIR = path.join(__dirname, '../../../data');
 const EVENTS_FILE = path.join(DATA_DIR, 'events.json');
@@ -26,7 +27,7 @@ const writeEvents = (data) => {
 
 exports.createEvent = (req, res) => {
   try {
-    const { brcCode, venueType, venueValue, name, date, description, teachersCount, studentsCount, status, latitude, longitude } = req.body;
+    const { brcCode, venueType, venueValue, name, date, description, teachersCount, studentsCount, status, latitude, longitude, locationTimestamp, tag, customTag } = req.body;
     
     // Process uploaded photos
     const photos = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
@@ -43,6 +44,9 @@ exports.createEvent = (req, res) => {
       studentsCount: parseInt(studentsCount, 10) || 0,
       latitude: latitude ? parseFloat(latitude) : null,
       longitude: longitude ? parseFloat(longitude) : null,
+      locationTimestamp: locationTimestamp || null,
+      tag: tag || null,
+      customTag: tag === 'other event' ? (customTag || null) : null,
       photos,
       status: status || 'DRAFT', // 'DRAFT' or 'SUBMITTED'
       createdAt: new Date().toISOString(),
@@ -94,6 +98,55 @@ exports.getEventStats = (req, res) => {
   }
 };
 
+exports.uploadReportPdf = (req, res) => {
+  try {
+    const { id } = req.params;
+    const events = readEvents();
+    const eventIndex = events.findIndex(e => e.id === id);
+
+    if (eventIndex === -1) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No PDF file uploaded' });
+    }
+
+    const reportPdf = `/uploads/${req.file.filename}`;
+    events[eventIndex].reportPdf = reportPdf;
+    events[eventIndex].updatedAt = new Date().toISOString();
+
+    writeEvents(events);
+
+    res.json({ message: 'PDF report uploaded successfully', data: events[eventIndex] });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to upload PDF report', error: err.message });
+  }
+};
+
+exports.deleteEvent = (req, res) => {
+  try {
+    const { id } = req.params;
+    const events = readEvents();
+    const eventIndex = events.findIndex(e => e.id === id);
+
+    if (eventIndex === -1) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    if (events[eventIndex].createdBy !== req.user.id && req.user.role !== 'ADMIN') {
+      return res.status(403).json({ message: 'Unauthorized to delete this event' });
+    }
+
+    events.splice(eventIndex, 1);
+    writeEvents(events);
+
+    res.json({ message: 'Event deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete event', error: err.message });
+  }
+};
+
 exports.getDrafts = (req, res) => {
   try {
     const { brcCode } = req.query;
@@ -101,10 +154,32 @@ exports.getDrafts = (req, res) => {
       return res.status(400).json({ message: 'brcCode is required' });
     }
 
+    const now = Date.now();
+    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+
     // Return only DRAFT events for this specific BRC created by this user
-    const drafts = readEvents().filter(
-      e => e.brcCode === brcCode && e.status === 'DRAFT' && e.createdBy === req.user.id
-    );
+    // Filter out drafts older than 24 hours
+    const allEvents = readEvents();
+    let eventsChanged = false;
+
+    const drafts = allEvents.filter(e => {
+      if (e.brcCode === brcCode && e.status === 'DRAFT' && e.createdBy === req.user.id) {
+        const age = now - new Date(e.createdAt).getTime();
+        if (age > TWENTY_FOUR_HOURS) {
+          e.expired = true; // Mark for cleanup
+          eventsChanged = true;
+          return false;
+        }
+        return true;
+      }
+      return false;
+    });
+
+    if (eventsChanged) {
+      // Actually purge expired drafts
+      const cleanEvents = allEvents.filter(e => !e.expired);
+      writeEvents(cleanEvents);
+    }
 
     res.json(drafts);
   } catch (err) {
@@ -115,7 +190,7 @@ exports.getDrafts = (req, res) => {
 exports.updateEvent = (req, res) => {
   try {
     const { id } = req.params;
-    const { name, date, description, teachersCount, studentsCount, status, venueType, venueValue, latitude, longitude } = req.body;
+    const { name, date, description, teachersCount, studentsCount, status, venueType, venueValue, latitude, longitude, locationTimestamp, tag, customTag } = req.body;
     
     const events = readEvents();
     const eventIndex = events.findIndex(e => e.id === id);
@@ -144,6 +219,9 @@ exports.updateEvent = (req, res) => {
       studentsCount: studentsCount !== undefined ? parseInt(studentsCount, 10) : existingEvent.studentsCount,
       latitude: latitude ? parseFloat(latitude) : existingEvent.latitude,
       longitude: longitude ? parseFloat(longitude) : existingEvent.longitude,
+      locationTimestamp: locationTimestamp || existingEvent.locationTimestamp,
+      tag: tag !== undefined ? tag : existingEvent.tag,
+      customTag: tag === 'other event' ? customTag : (tag !== undefined ? null : existingEvent.customTag),
       venueType: venueType || existingEvent.venueType,
       venueValue: venueValue || existingEvent.venueValue,
       status: status || existingEvent.status, // Move to SUBMITTED or keep as DRAFT
@@ -162,11 +240,53 @@ exports.updateEvent = (req, res) => {
 
 exports.getEvents = (req, res) => {
   try {
-    const { brcCode } = req.query;
-    let events = readEvents().filter(e => e.status === 'SUBMITTED');
+    const { brcCode, district, month } = req.query;
+    let events = readEvents();
+
+    // Clean up expired drafts while we're fetching events
+    const now = Date.now();
+    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+    const cleanEvents = events.filter(e => {
+      if (e.status === 'DRAFT') {
+        const age = now - new Date(e.createdAt).getTime();
+        return age <= TWENTY_FOUR_HOURS;
+      }
+      return true;
+    });
+    
+    if (cleanEvents.length !== events.length) {
+      writeEvents(cleanEvents);
+      events = cleanEvents;
+    }
+    
+    events = events.filter(e => e.status === 'SUBMITTED');
+
+    // Read BRCs to map BRC codes to Districts
+    let brcs = [];
+    try {
+      brcs = JSON.parse(fs.readFileSync(BRCS_FILE, 'utf8'));
+    } catch(e) {}
+    
+    const brcMap = {};
+    brcs.forEach(b => brcMap[b.code] = b);
+
+    // Filter by District
+    if (district) {
+      events = events.filter(e => {
+        const brc = brcMap[e.brcCode];
+        return brc && brc.district === district;
+      });
+    }
 
     if (brcCode) {
       events = events.filter(e => e.brcCode === brcCode || e.venueValue === brcCode);
+    }
+    
+    if (month) {
+      events = events.filter(e => {
+        const date = new Date(e.date || e.createdAt);
+        return (date.getMonth() + 1).toString() === month;
+      });
     }
 
     // Sort by most recent first
@@ -180,7 +300,7 @@ exports.getEvents = (req, res) => {
 
 exports.exportEventsExcel = async (req, res) => {
   try {
-    const { brcCode, district } = req.query;
+    const { brcCode, district, month } = req.query;
     
     // Read BRCs to map BRC codes to Districts
     let brcs = [];
@@ -206,6 +326,14 @@ exports.exportEventsExcel = async (req, res) => {
     if (brcCode) {
       events = events.filter(e => e.brcCode === brcCode || e.venueValue === brcCode);
     }
+    
+    // Filter by Month
+    if (month) {
+      events = events.filter(e => {
+        const date = new Date(e.date || e.createdAt);
+        return (date.getMonth() + 1).toString() === month;
+      });
+    }
 
     // Sort by Date
     events.sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt));
@@ -217,11 +345,13 @@ exports.exportEventsExcel = async (req, res) => {
     worksheet.columns = [
       { header: 'Event Date', key: 'date', width: 15 },
       { header: 'Event Name', key: 'name', width: 30 },
+      { header: 'GPS Timestamp', key: 'gpsTime', width: 25 },
       { header: 'Venue Type', key: 'venueType', width: 15 },
       { header: 'Venue Value', key: 'venueValue', width: 25 },
       { header: 'District', key: 'district', width: 20 },
       { header: 'Teachers Attended', key: 'teachers', width: 20 },
       { header: 'Students Attended', key: 'students', width: 20 },
+      { header: 'Event Tag', key: 'tag', width: 25 },
       { header: 'Description', key: 'desc', width: 50 },
     ];
 
@@ -239,11 +369,13 @@ exports.exportEventsExcel = async (req, res) => {
       worksheet.addRow({
         date: new Date(e.date || e.createdAt).toLocaleDateString(),
         name: e.name || 'Untitled Event',
+        gpsTime: e.locationTimestamp ? new Date(parseInt(e.locationTimestamp)).toLocaleString() : 'N/A',
         venueType: e.venueType || 'SELECTED_BRC',
         venueValue: e.venueValue || e.brcCode,
         district: brc ? brc.district : 'N/A',
         teachers: e.teachersCount || 0,
         students: e.studentsCount || 0,
+        tag: e.tag === 'other event' ? e.customTag : e.tag || 'N/A',
         desc: e.description || '',
       });
     });
@@ -255,5 +387,72 @@ exports.exportEventsExcel = async (req, res) => {
     res.end();
   } catch (err) {
     res.status(500).json({ message: 'Failed to generate Excel report', error: err.message });
+  }
+};
+
+exports.exportEventsPdf = async (req, res) => {
+  try {
+    const { brcCode, district, month } = req.query;
+    let events = readEvents().filter(e => e.status === 'SUBMITTED');
+
+    let brcs = [];
+    try { brcs = JSON.parse(fs.readFileSync(BRCS_FILE, 'utf8')); } catch(e) {}
+    const brcMap = {};
+    brcs.forEach(b => brcMap[b.code] = b);
+
+    if (district) {
+      events = events.filter(e => {
+        const brc = brcMap[e.brcCode];
+        return brc && brc.district === district;
+      });
+    }
+
+    if (brcCode) {
+      events = events.filter(e => e.brcCode === brcCode || e.venueValue === brcCode);
+    }
+    
+    if (month) {
+      events = events.filter(e => {
+        const date = new Date(e.date || e.createdAt);
+        return (date.getMonth() + 1).toString() === month;
+      });
+    }
+
+    events.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
+
+    const doc = new PDFDocument({ margin: 30, size: 'A4' });
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=Event_Reports.pdf');
+    doc.pipe(res);
+
+    doc.fontSize(20).font('Helvetica-Bold').text('STREAM Hub Event Reports', { align: 'center' });
+    doc.moveDown();
+
+    doc.fontSize(12).font('Helvetica').text(`Generated on: ${new Date().toLocaleString()}`, { align: 'center' });
+    doc.moveDown(2);
+
+    if (events.length === 0) {
+      doc.fontSize(14).text('No events found for the selected filters.', { align: 'center' });
+    } else {
+      events.forEach((event, index) => {
+        doc.fontSize(14).font('Helvetica-Bold').text(`${index + 1}. ${event.name}`);
+        doc.fontSize(10).font('Helvetica').text(`Date: ${new Date(event.date || event.createdAt).toLocaleDateString()}`);
+        doc.text(`Hub: ${event.brcCode} ${brcMap[event.brcCode] ? `(${brcMap[event.brcCode].name})` : ''}`);
+        doc.text(`Tag: ${event.customTag || event.tag || 'N/A'}`);
+        doc.text(`Attendance: ${event.teachersCount} Teachers, ${event.studentsCount} Students`);
+        
+        if (event.description) {
+          doc.moveDown(0.5);
+          doc.text(`Description: ${event.description}`);
+        }
+        
+        doc.moveDown(1.5);
+      });
+    }
+
+    doc.end();
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to export PDF', error: err.message });
   }
 };

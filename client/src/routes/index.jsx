@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, ScrollRestoration, Outlet } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import PortalPage from '../pages/PortalPage';
@@ -10,19 +10,31 @@ import ExpertManagementPage from '../pages/admin/ExpertManagementPage';
 import ReportsPage from '../pages/admin/ReportsPage';
 import ExpertOnboardingPage from '../pages/ExpertOnboardingPage';
 import NotFoundPage from '../pages/NotFoundPage';
+import ErrorPage from '../pages/ErrorPage';
+
+const RootLayout = () => (
+  <>
+    <ScrollRestoration />
+    <Outlet />
+  </>
+);
 
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: <PortalPage />,
-  },
-  {
-    path: '/dashboard',
-    element: (
-      <ProtectedRoute>
-        <DashboardLayout />
-      </ProtectedRoute>
-    ),
+    element: <RootLayout />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: '/',
+        element: <PortalPage />,
+      },
+      {
+        path: '/dashboard',
+        element: (
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        ),
     children: [
       {
         index: true,
@@ -66,46 +78,48 @@ const router = createBrowserRouter([
       },
     ],
   },
-  {
-    path: '/expert',
-    element: (
-      <ProtectedRoute allowedRoles={['EXPERT']}>
-        <ExpertDashboardPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/admin',
-    element: (
-      <ProtectedRoute allowedRoles={['ADMIN']}>
-        <AdminDashboardPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/admin/brcs/:code',
-    element: (
-      <ProtectedRoute allowedRoles={['ADMIN']}>
-        <BrcManagementPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/admin/experts/:id',
-    element: (
-      <ProtectedRoute allowedRoles={['ADMIN']}>
-        <ExpertManagementPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/onboard/:token',
-    element: <ExpertOnboardingPage />
-  },
-  {
-    path: '*',
-    element: <NotFoundPage />,
-  },
+      {
+        path: '/expert',
+        element: (
+          <ProtectedRoute allowedRoles={['EXPERT']}>
+            <ExpertDashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/admin',
+        element: (
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <AdminDashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/admin/brcs/:code',
+        element: (
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <BrcManagementPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/admin/experts/:id',
+        element: (
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <ExpertManagementPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/onboard/:token',
+        element: <ExpertOnboardingPage />
+      },
+      {
+        path: '*',
+        element: <NotFoundPage />,
+      },
+    ]
+  }
 ]);
 
 export default router;

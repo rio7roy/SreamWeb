@@ -5,6 +5,7 @@ import api from '../lib/api';
 import EventReportModal from '../components/expert/EventReportModal';
 import ExpertProfileTab from '../components/expert/ExpertProfileTab';
 import ExpertSessionLogsTab from '../components/expert/ExpertSessionLogsTab';
+import PdfReportModal from '../components/expert/PdfReportModal';
 
 const EXPERT_NAV = [
   { label: 'Dashboard', icon: 'dashboard', active: true },
@@ -13,22 +14,28 @@ const EXPERT_NAV = [
 
 const TOOLSET = [
   {
-    title: 'Stock Management',
-    description: 'Review and update inventory levels for laboratory kits and academic materials.',
-    icon: 'inventory_2',
-    cta: 'Open Inventory',
-  },
-  {
     title: 'Attendance Tools',
     description: 'Digital roster for expert sessions and student tracking at this BRC.',
     icon: 'how_to_reg',
     cta: 'Launch Tracker',
   },
   {
+    title: 'Upload Event Report',
+    description: 'Attach a PDF report to a previously submitted event.',
+    icon: 'picture_as_pdf',
+    cta: 'Upload PDF',
+  },
+  {
     title: 'Observation Forms',
     description: 'Standardized feedback forms for academic audits and classroom visits.',
     icon: 'assignment',
     cta: 'New Report',
+  },
+  {
+    title: 'Stock Management',
+    description: 'Review and update inventory levels for laboratory kits and academic materials.',
+    icon: 'inventory_2',
+    cta: 'Open Inventory',
   },
 ];
 
@@ -41,33 +48,64 @@ export default function ExpertDashboardPage() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeNav, setActiveNav] = useState('Dashboard');
+  const [showSupportModal, setShowSupportModal] = useState(false);
+  const [isClosingSupport, setIsClosingSupport] = useState(false);
   const dropdownRef = useRef(null);
 
   const [brcData, setBrcData] = useState([]);
 
   const [showEventModal, setShowEventModal] = useState(false);
+  const [showPdfModal, setShowPdfModal] = useState(false);
   const [selectedDraft, setSelectedDraft] = useState(null);
   const [drafts, setDrafts] = useState([]);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [eventStats, setEventStats] = useState({
     totalReported: 0,
     totalDrafted: 0,
     studentFootfall: 0,
     teacherFootfall: 0
   });
+  
+  const [globalStats, setGlobalStats] = useState({
+    totalReported: 0,
+    studentFootfall: 0,
+    teacherFootfall: 0
+  });
 
-  const fetchStatsAndDrafts = useCallback(async (brcCode) => {
-    if (!brcCode) return;
+  const handleSupportClose = () => {
+    setIsClosingSupport(true);
+    setTimeout(() => {
+      setShowSupportModal(false);
+      setIsClosingSupport(false);
+    }, 300);
+  };
+
+  const fetchStatsAndDrafts = useCallback(async (code) => {
     try {
-      const [statsRes, draftsRes] = await Promise.all([
-        api.get(`/events/stats?brcCode=${brcCode}`),
-        api.get(`/events/drafts?brcCode=${brcCode}`)
-      ]);
+      const statsRes = await api.get(`/events/stats?brcCode=${code}`);
       setEventStats(statsRes.data);
+
+      const draftsRes = await api.get(`/events/drafts?brcCode=${code}`);
       setDrafts(draftsRes.data);
     } catch (err) {
-      console.error('Failed to fetch stats or drafts', err);
+      console.error('Failed to load stats or drafts', err);
     }
   }, []);
+
+  const handleDeleteDraft = async (e, id) => {
+    e.stopPropagation();
+    if (!window.confirm("Are you sure you want to delete this draft?")) return;
+    setIsDeleting(true);
+    try {
+      await api.delete(`/events/${id}`);
+      fetchStatsAndDrafts(selectedBrc.code);
+    } catch (err) {
+      console.error("Failed to delete draft", err);
+      alert("Failed to delete draft.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const [messages, setMessages] = useState([]);
 
@@ -87,6 +125,42 @@ export default function ExpertDashboardPage() {
     };
     fetchDashboardData();
   }, []);
+
+  const assignedBrcCodes = user?.assignedBrcs || [];
+  const allowedBrcs = brcData.filter(b => assignedBrcCodes.includes(b.code));
+
+  // Fetch global stats for all allowed BRCs when NOT in a session
+  useEffect(() => {
+    if (!sessionActive && allowedBrcs.length > 0) {
+      const fetchGlobalStats = async () => {
+        try {
+          const promises = allowedBrcs.map(brc => api.get(`/events/stats?brcCode=${brc.code}`));
+          const results = await Promise.all(promises);
+          
+          let reported = 0;
+          let students = 0;
+          let teachers = 0;
+          
+          results.forEach(res => {
+            if (res.data) {
+              reported += res.data.totalReported || 0;
+              students += res.data.studentFootfall || 0;
+              teachers += res.data.teacherFootfall || 0;
+            }
+          });
+          
+          setGlobalStats({
+            totalReported: reported,
+            studentFootfall: students,
+            teacherFootfall: teachers
+          });
+        } catch (error) {
+          console.error("Failed to fetch global stats", error);
+        }
+      };
+      fetchGlobalStats();
+    }
+  }, [sessionActive, allowedBrcs.length]);
 
   // Fetch stats when a session starts
   useEffect(() => {
@@ -109,35 +183,8 @@ export default function ExpertDashboardPage() {
     });
   }, [messages, sessionActive, selectedBrc]);
 
-  // Filter BRCs based on search query (match start of words in name/location/district, or start of code)
-  // ONLY show BRCs assigned to the current expert.
-  const assignedBrcCodes = user?.assignedBrcs || [];
-  const allowedBrcs = brcData.filter(b => assignedBrcCodes.includes(b.code));
-
-  const searchLower = brcSearch.trim().toLowerCase();
-  const rawFiltered = searchLower
-    ? allowedBrcs.filter((b) => {
-        const nameLower = b.name.toLowerCase();
-        const locLower = b.location.toLowerCase();
-        const distLower = b.district ? b.district.toLowerCase() : '';
-        const codeLower = b.code.toLowerCase();
-        
-        // Match if the string starts with the search term or contains it after a space
-        const matches = (str) => str.startsWith(searchLower) || str.includes(` ${searchLower}`);
-        
-        return matches(nameLower) || matches(locLower) || matches(distLower) || codeLower.startsWith(searchLower);
-      })
-    : [];
-
-  // Deduplicate by unique code and name combination
-  const uniqueBrcsMap = new Map();
-  rawFiltered.forEach((b) => {
-    const key = `${b.code}-${b.name}`;
-    if (!uniqueBrcsMap.has(key)) {
-      uniqueBrcsMap.set(key, b);
-    }
-  });
-  const filteredBrcs = Array.from(uniqueBrcsMap.values());
+  // Filtered BRCs
+  const filteredBrcs = allowedBrcs;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -155,33 +202,11 @@ export default function ExpertDashboardPage() {
     navigate('/');
   };
 
-  const handleSelectBrc = (brc) => {
-    setSelectedBrc(brc);
-    setBrcSearch(brc.name);
-    setShowDropdown(false);
-  };
-
-  const handleInitSession = () => {
-    // If user typed but didn't pick from dropdown, try to match
-    if (!selectedBrc && brcSearch.trim()) {
-      const match = BRC_DATA.find(
-        (b) =>
-          b.name.toLowerCase() === brcSearch.toLowerCase() ||
-          b.code.toLowerCase() === brcSearch.toLowerCase()
-      );
-      if (match) {
-        setSelectedBrc(match);
-      } else {
-        // No match — use first filtered result or show error
-        if (filteredBrcs.length > 0) {
-          setSelectedBrc(filteredBrcs[0]);
-        } else {
-          return; // nothing to select
-        }
-      }
+  const handleInitSession = (brc) => {
+    if (brc) {
+      setSelectedBrc(brc);
+      setSessionActive(true);
     }
-    if (!selectedBrc && filteredBrcs.length === 0) return;
-    setSessionActive(true);
   };
 
   const handleChangeBrc = () => {
@@ -190,7 +215,6 @@ export default function ExpertDashboardPage() {
     setBrcSearch('');
   };
 
-  // Brutalist hover effect for cards
   const cardRef = useRef([]);
 
   return (
@@ -209,7 +233,6 @@ export default function ExpertDashboardPage() {
           sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
-        {/* Brand */}
         <div className="mb-6 px-2">
           <h1
             className="text-2xl tracking-wider text-on-surface"
@@ -222,7 +245,6 @@ export default function ExpertDashboardPage() {
           </p>
         </div>
 
-        {/* User Identity Card */}
         <div 
           onClick={() => {
             setActiveNav('Profile');
@@ -259,7 +281,6 @@ export default function ExpertDashboardPage() {
           </div>
         </div>
 
-        {/* Navigation Links */}
         <nav className="flex flex-col gap-1 flex-grow">
           {EXPERT_NAV.map((item) => (
             <button
@@ -280,9 +301,8 @@ export default function ExpertDashboardPage() {
           ))}
         </nav>
 
-        {/* Bottom Actions */}
         <div className="mt-auto pt-4 border-t border-on-surface/5">
-          <button className="flex items-center gap-3 px-3 py-2 text-secondary hover:text-primary transition-colors w-full">
+          <button onClick={() => setShowSupportModal(true)} className="flex items-center gap-3 px-3 py-2 text-secondary hover:text-primary transition-colors w-full">
             <span className="material-symbols-outlined text-xl">contact_support</span>
             <span style={{ fontFamily: "'Julius Sans One', sans-serif" }}>Support</span>
           </button>
@@ -296,9 +316,7 @@ export default function ExpertDashboardPage() {
         </div>
       </aside>
 
-      {/* ── Main Canvas ── */}
       <main className="flex-grow overflow-y-auto flex flex-col relative z-10">
-        {/* Mobile Header (Hidden on Desktop) */}
         <header className="w-full h-16 bg-white/80 backdrop-blur-md flex items-center px-4 md:hidden border-b border-on-surface/10 shrink-0 sticky top-0 z-30">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -308,122 +326,102 @@ export default function ExpertDashboardPage() {
           </button>
         </header>
 
-        {/* ── Content Area ── */}
         <div className="p-4 md:p-8 md:px-20 space-y-6 max-w-[1280px] mx-auto w-full">
-
-          {/* ── PROFILE STATE ── */}
           {activeNav === 'Profile' && (
             <ExpertProfileTab user={user} brcData={brcData} />
           )}
 
-          {/* ── SESSION LOGS STATE ── */}
           {activeNav === 'Session Logs' && (
-            <ExpertSessionLogsTab />
+            <ExpertSessionLogsTab 
+              selectedBrc={selectedBrc}
+              drafts={drafts}
+              refreshDrafts={fetchStatsAndDrafts}
+              onResumeDraft={(draft) => {
+                setSelectedDraft(draft);
+                setShowEventModal(true);
+              }}
+            />
           )}
 
-          {/* ── MESSAGES / ANNOUNCEMENTS removed from here ── */}
-
-          {/* ── INITIAL STATE: BRC Selection ── */}
           {!sessionActive && activeNav === 'Dashboard' && (
-            <section className="flex flex-col items-center justify-center min-h-[80vh] py-20 animate-fade-in">
-              <div className="max-w-4xl w-full bg-white border border-on-surface/10 rounded-2xl shadow-xl flex flex-col text-center">
-                <div className="flex-grow py-16 md:py-24 px-6 md:px-10 flex flex-col justify-center space-y-12">
-                  <div>
+            <section className="flex flex-col items-center justify-center py-10 animate-fade-in w-full">
+              <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div className="bg-white border border-on-surface/10 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center">
+                  <div className="w-12 h-12 bg-primary-container/20 text-primary rounded-xl flex items-center justify-center mb-3">
+                    <span className="material-symbols-outlined">description</span>
+                  </div>
+                  <h3 className="text-3xl font-black text-on-surface mb-1">{globalStats.totalReported}</h3>
+                  <p className="text-sm font-bold text-secondary uppercase tracking-widest text-center">Total Reports</p>
+                </div>
+                <div className="bg-white border border-on-surface/10 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center">
+                  <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mb-3">
+                    <span className="material-symbols-outlined">school</span>
+                  </div>
+                  <h3 className="text-3xl font-black text-on-surface mb-1">{globalStats.studentFootfall}</h3>
+                  <p className="text-sm font-bold text-secondary uppercase tracking-widest text-center">Student Footfall</p>
+                </div>
+                <div className="bg-white border border-on-surface/10 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center">
+                  <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center mb-3">
+                    <span className="material-symbols-outlined">person</span>
+                  </div>
+                  <h3 className="text-3xl font-black text-on-surface mb-1">{globalStats.teacherFootfall}</h3>
+                  <p className="text-sm font-bold text-secondary uppercase tracking-widest text-center">Teacher Footfall</p>
+                </div>
+              </div>
+
+              <div className="max-w-4xl w-full bg-white border border-on-surface/10 rounded-2xl shadow-xl flex flex-col">
+                <div className="py-10 px-6 md:px-10 flex flex-col justify-center">
+                  <div className="mb-8 text-center">
                     <h2
-                      className="text-3xl md:text-[32px] text-on-surface mb-4 tracking-wide"
+                      className="text-3xl md:text-[32px] text-on-surface mb-2 tracking-wide"
                       style={{ fontFamily: "'Bebas Neue', sans-serif", lineHeight: 1.2 }}
                     >
-                      Select block resource centre
+                      Select Block Resource Centre
                     </h2>
                     <p
-                      className="text-secondary leading-relaxed max-w-2xl mx-auto"
+                      className="text-secondary leading-relaxed max-w-2xl mx-auto text-sm"
                       style={{ fontFamily: "'Julius Sans One', sans-serif" }}
                     >
-                      To access expert tools and regional data, please initialize a session at a specific Block Resource Centre (BRC).
+                      Click on a BRC below to initialize a session and access expert tools for that region.
                     </p>
                   </div>
-                  <div className="space-y-8 mx-auto max-w-md w-full">
-                    <div className="relative" ref={dropdownRef}>
-                      <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary z-10">
-                        search
-                      </span>
-                      <input
-                        type="text"
-                        value={brcSearch}
-                        onChange={(e) => {
-                          setBrcSearch(e.target.value);
-                          setSelectedBrc(null);
-                          setShowDropdown(true);
-                        }}
-                        onFocus={() => setShowDropdown(true)}
-                        className="w-full bg-surface-container-low border border-outline/30 rounded-xl pl-12 pr-4 py-4 focus:border-primary outline-none transition-shadow focus:shadow-inner disabled:bg-surface-container-high disabled:opacity-50 disabled:cursor-not-allowed"
-                        style={{ fontFamily: "'Julius Sans One', sans-serif" }}
-                        placeholder={assignedBrcCodes.length === 0 ? "No BRC has been assigned" : "Enter School Name or BRC Code..."}
-                        disabled={assignedBrcCodes.length === 0}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            if (filteredBrcs.length > 0 && !selectedBrc) {
-                              handleSelectBrc(filteredBrcs[0]);
-                            }
-                            handleInitSession();
-                          }
-                        }}
-                      />
-
-                      {/* BRC Dropdown */}
-                      {showDropdown && brcSearch.trim().length > 0 && (
-                        <div className="absolute left-0 right-0 top-full mt-2 bg-white border border-outline/20 rounded-xl shadow-xl max-h-64 overflow-y-auto z-50 animate-fade-in">
-                          {filteredBrcs.length === 0 ? (
-                            <div className="px-4 py-4 text-sm text-secondary text-center">
-                              No BRCs found matching "{brcSearch}"
-                            </div>
-                          ) : (
-                            filteredBrcs.map((brc) => (
-                              <button
-                                key={brc.code}
-                                onClick={() => handleSelectBrc(brc)}
-                                className={`w-full text-left px-4 py-3 hover:bg-primary-container/10 transition-colors flex items-center justify-between gap-4 border-b border-on-surface/5 last:border-b-0 ${
-                                  selectedBrc?.code === brc.code ? 'bg-primary-container/10' : ''
-                                }`}
-                              >
-                                <div>
-                                  <p className="font-semibold text-sm text-on-surface">{brc.name}</p>
-                                  <p className="text-xs text-secondary">{brc.location} {brc.district ? `• ${brc.district}` : ''}</p>
-                                </div>
-                                <span className="text-xs font-mono font-bold text-primary bg-primary-container/20 px-2 py-0.5 rounded shrink-0">
-                                  {brc.code}
-                                </span>
-                              </button>
-                            ))
-                          )}
-                        </div>
-                      )}
-                    </div>
-                    <button
-                      onClick={handleInitSession}
-                      disabled={!selectedBrc && filteredBrcs.length === 0}
-                      className="w-full bg-primary-container text-on-primary-container py-4 rounded-xl font-bold transition-all active:scale-95 text-lg shadow-sm expert-brutalist-hover disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Initialize Expert Session
-                    </button>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {allowedBrcs.length === 0 ? (
+                      <div className="col-span-full py-12 text-center text-secondary border-2 border-dashed border-outline/20 rounded-xl">
+                        No BRCs have been assigned to your account yet.
+                      </div>
+                    ) : (
+                      allowedBrcs.map((brc) => (
+                        <button
+                          key={brc.code}
+                          onClick={() => handleInitSession(brc)}
+                          className="text-left bg-surface-container-low hover:bg-primary-container/10 border border-outline/20 hover:border-primary/30 rounded-xl p-5 transition-all flex items-center gap-4 group"
+                        >
+                          <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm shrink-0 group-hover:scale-110 transition-transform">
+                            <span className="material-symbols-outlined text-primary">location_city</span>
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-on-surface mb-1 leading-tight group-hover:text-primary transition-colors">{brc.name}</h3>
+                            <p className="text-xs text-secondary font-medium">{brc.location} {brc.district ? `• ${brc.district}` : ''}</p>
+                            <p className="text-[10px] font-mono text-secondary mt-1">{brc.code}</p>
+                          </div>
+                        </button>
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
             </section>
           )}
 
-          {/* ── DASHBOARD STATE ── */}
           {sessionActive && activeNav === 'Dashboard' && (
             <div className="p-4 md:p-8 space-y-8 w-full animate-fade-in">
-              {/* Active Session Header */}
               <div className="bg-surface-container-low border border-on-surface/10 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-sm relative overflow-hidden expert-brutalist-hover">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary-container/20 rounded-bl-full -z-0"></div>
                 
                 <div className="relative z-10">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold uppercase rounded-full tracking-wider animate-pulse">
-                      Session Active
-                    </span>
                     <span className="text-sm font-semibold text-secondary font-mono">{selectedBrc?.code}</span>
                   </div>
                   <h2
@@ -447,7 +445,6 @@ export default function ExpertDashboardPage() {
                 </button>
               </div>
 
-              {/* ── MESSAGES / ANNOUNCEMENTS ── */}
               {activeMessages.length > 0 && (
                 <section className="mb-4 animate-fade-in-up">
                   <h2 className="text-xl border-l-4 border-error pl-4 tracking-wide text-on-surface mb-4 flex items-center gap-2" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
@@ -476,7 +473,6 @@ export default function ExpertDashboardPage() {
                 </section>
               )}
 
-              {/* Statistics Bar */}
               <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-white border border-on-surface/10 rounded-xl p-4 md:p-5 flex flex-col justify-center shadow-sm">
                   <p className="text-sm font-bold text-secondary uppercase tracking-wider mb-1">Reported Events</p>
@@ -496,7 +492,6 @@ export default function ExpertDashboardPage() {
                 </div>
               </section>
 
-              {/* Expert Toolset Grid */}
               <section className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h2
@@ -509,44 +504,45 @@ export default function ExpertDashboardPage() {
                     {TOOLSET.length} Modules Available
                   </span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {TOOLSET.map((tool, i) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-6">
+                  {TOOLSET.map((tool, idx) => (
                     <div
                       key={tool.title}
+                      ref={(el) => (cardRef.current[idx] = el)}
                       onClick={() => {
                         if (tool.title === 'Attendance Tools') {
-                          setSelectedDraft(null); // Ensure no draft is selected for a new report
+                          if (drafts.length > 0) {
+                            alert("A draft report already exists for this session! Please resume or delete it from the Session Logs tab.");
+                            return;
+                          }
+                          setSelectedDraft(null);
                           setShowEventModal(true);
+                        } else if (tool.title === 'Upload Event Report') {
+                          setShowPdfModal(true);
                         }
                       }}
-                      className="bg-white border border-on-surface/10 rounded-xl p-8 hover:border-primary/40 transition-all cursor-pointer group flex flex-col h-full expert-brutalist-hover"
+                      className="group bg-white border border-on-surface/10 rounded-xl p-5 flex flex-col shadow-sm hover:-translate-y-1 hover:shadow-md transition-all cursor-pointer"
                     >
-                      <div className="w-12 h-12 rounded-lg bg-surface-container-low flex items-center justify-center text-primary mb-6 group-hover:bg-primary-container transition-colors">
-                        <span
-                          className="material-symbols-outlined text-3xl"
-                          style={{ fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}
-                        >
-                          {tool.icon}
-                        </span>
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="w-10 h-10 rounded-lg bg-primary-container/30 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                          <span className="material-symbols-outlined text-xl">{tool.icon}</span>
+                        </div>
+                        <h3 className="text-lg font-bold text-on-surface tracking-tight leading-tight">
+                          {tool.title}
+                        </h3>
                       </div>
-                      <h3
-                        className="text-2xl mb-8 tracking-wide flex-grow"
-                        style={{ fontFamily: "'Bebas Neue', sans-serif", lineHeight: 1.3 }}
-                      >
-                        {tool.title}
-                      </h3>
-                      <div className="flex items-center justify-between mt-auto">
-                        <span className="text-sm font-semibold text-primary group-hover:underline">
-                          {tool.cta}
-                        </span>
-                        <span className="material-symbols-outlined text-primary">arrow_forward</span>
+                      <p className="text-secondary text-sm leading-relaxed flex-grow">
+                        {tool.description}
+                      </p>
+                      <div className="mt-4 flex items-center gap-1 text-primary font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        {tool.cta}
+                        <span className="material-symbols-outlined text-base">arrow_forward</span>
                       </div>
                     </div>
                   ))}
                 </div>
               </section>
 
-              {/* Saved Drafts */}
               {drafts.length > 0 && (
                 <section className="space-y-6">
                   <h2
@@ -555,7 +551,7 @@ export default function ExpertDashboardPage() {
                   >
                     Saved Drafts
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {drafts.map((draft) => (
                       <div
                         key={draft.id}
@@ -569,7 +565,18 @@ export default function ExpertDashboardPage() {
                           <span className="px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold uppercase rounded-full tracking-wider">
                             Draft
                           </span>
-                          <span className="text-sm text-secondary font-semibold">{new Date(draft.createdAt).toLocaleDateString()}</span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm text-secondary font-semibold">{new Date(draft.createdAt).toLocaleDateString()}</span>
+                            <button
+                              type="button"
+                              onClick={(e) => handleDeleteDraft(e, draft.id)}
+                              disabled={isDeleting}
+                              className="text-secondary hover:text-error transition-colors p-1 rounded-md hover:bg-error/10 disabled:opacity-50"
+                              title="Delete Draft"
+                            >
+                              <span className="material-symbols-outlined text-[20px]">delete</span>
+                            </button>
+                          </div>
                         </div>
                         <h3 className="text-xl font-bold text-on-surface mb-2">{draft.name || 'Untitled Event'}</h3>
                         <p className="text-secondary text-sm line-clamp-2 flex-grow">{draft.description || 'No description provided.'}</p>
@@ -587,13 +594,38 @@ export default function ExpertDashboardPage() {
         </div>
       </main>
 
-      {/* ── Contextual FAB ── */}
-      <button className="fixed bottom-8 right-8 w-14 h-14 bg-on-background text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all group z-50">
-        <span className="material-symbols-outlined text-2xl">chat_bubble</span>
-        <span className="absolute right-16 bg-on-background text-on-primary px-3 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-          Help Desk
-        </span>
-      </button>
+      {/* Support Modal */}
+        {showSupportModal && (
+          <div className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 ${isClosingSupport ? 'animate-fade-out' : 'animate-fade-in'}`}>
+            <div className={`bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl relative ${isClosingSupport ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}>
+              <button 
+                onClick={handleSupportClose}
+                className="absolute top-4 right-4 text-secondary hover:text-on-surface"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="material-symbols-outlined text-3xl">support_agent</span>
+                </div>
+                <h2 className="text-2xl font-black text-on-surface">Support Contacts</h2>
+                <p className="text-secondary text-sm mt-2">Reach out to the system administrators for assistance.</p>
+              </div>
+              <div className="space-y-4">
+                <div className="bg-surface-container-low p-4 rounded-xl border border-outline/10">
+                  <p className="font-bold text-on-surface">Admin One</p>
+                  <p className="text-sm text-secondary flex items-center gap-2 mt-1"><span className="material-symbols-outlined text-sm">mail</span> admin1@stream.edu</p>
+                  <p className="text-sm text-secondary flex items-center gap-2 mt-1"><span className="material-symbols-outlined text-sm">phone</span> +91 9876543210</p>
+                </div>
+                <div className="bg-surface-container-low p-4 rounded-xl border border-outline/10">
+                  <p className="font-bold text-on-surface">Admin Two</p>
+                  <p className="text-sm text-secondary flex items-center gap-2 mt-1"><span className="material-symbols-outlined text-sm">mail</span> admin2@stream.edu</p>
+                  <p className="text-sm text-secondary flex items-center gap-2 mt-1"><span className="material-symbols-outlined text-sm">phone</span> +91 9876543211</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
       {/* Modals */}
       {showEventModal && selectedBrc && (
@@ -605,6 +637,14 @@ export default function ExpertDashboardPage() {
             setShowEventModal(false);
             setSelectedDraft(null);
           }}
+          onRefresh={() => fetchStatsAndDrafts(selectedBrc.code)}
+        />
+      )}
+
+      {showPdfModal && selectedBrc && (
+        <PdfReportModal
+          brcCode={selectedBrc.code}
+          onClose={() => setShowPdfModal(false)}
           onRefresh={() => fetchStatsAndDrafts(selectedBrc.code)}
         />
       )}
