@@ -14,7 +14,6 @@ const NAV_ITEMS = [
   { path: '/dashboard', label: 'Overview', icon: 'dashboard', roles: 'all' },
   { path: '/dashboard/users', label: 'Users', icon: 'group', roles: ['ADMIN'] },
   { path: '/dashboard/reports', label: 'Reports', icon: 'description', roles: ['ADMIN', 'STREAM_LAB'] },
-  { path: '/dashboard/profile', label: 'My Profile', icon: 'person', roles: 'all' },
 ];
 
 export default function DashboardLayout() {
@@ -87,17 +86,28 @@ export default function DashboardLayout() {
 
         {/* User Card */}
         <div className="p-4 border-t border-black/[0.04]">
-          <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center">
-              <span className="text-on-primary-container font-bold text-sm">
-                {user?.name?.charAt(0)?.toUpperCase()}
-              </span>
+          <Link
+            to="/dashboard/profile"
+            onClick={() => setSidebarOpen(false)}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-black/[0.02] transition-colors cursor-pointer group mb-2"
+          >
+            <div className="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center overflow-hidden shrink-0">
+              {user?.avatar ? (
+                <img src={`${import.meta.env.VITE_API_URL || '/api'}/uploads/${user.avatar}`} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-on-primary-container font-bold text-sm">
+                  {user?.name?.charAt(0)?.toUpperCase()}
+                </span>
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-on-surface truncate">{user?.name}</p>
               <p className="text-xs text-secondary truncate">{ROLE_LABELS[user?.role]}</p>
             </div>
-          </div>
+            <span className="material-symbols-outlined text-[14px] text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
+              arrow_forward
+            </span>
+          </Link>
           <button
             onClick={handleLogout}
             className="sidebar-link w-full text-error/80 hover:text-error hover:bg-error/5 mt-2"

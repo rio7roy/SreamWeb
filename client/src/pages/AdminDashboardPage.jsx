@@ -11,7 +11,6 @@ const ADMIN_NAV = [
   { label: 'Overview', icon: 'dashboard' },
   { label: 'User Management', icon: 'group_add' },
   { label: 'Program Reports', icon: 'analytics' },
-  { label: 'My Profile', icon: 'person' },
   { label: 'System Settings', icon: 'settings' },
 ];
 
@@ -119,9 +118,15 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* User Identity Card */}
-        <div className="mb-8 p-4 bg-white/50 rounded-xl border border-on-surface/10">
+        <div 
+          onClick={() => {
+            setActiveNav('My Profile');
+            setSidebarOpen(false);
+          }}
+          className="mb-8 p-4 bg-white/50 rounded-xl border border-on-surface/10 cursor-pointer hover:bg-white/80 transition-colors group"
+        >
           <div className="flex items-center gap-3 mb-3">
-            <div className="h-10 w-10 rounded-full bg-error/10 border border-error/20 flex items-center justify-center overflow-hidden">
+            <div className="h-10 w-10 rounded-full bg-error/10 border border-error/20 flex items-center justify-center overflow-hidden shrink-0">
               {user?.avatar ? (
                 <img src={`${import.meta.env.VITE_API_URL || '/api'}/uploads/${user.avatar}`} alt="Admin" className="w-full h-full object-cover" />
               ) : (
@@ -130,10 +135,19 @@ export default function AdminDashboardPage() {
                 </span>
               )}
             </div>
-            <div>
-              <p className="font-bold text-sm text-on-surface">{user?.name || 'Administrator'}</p>
-              <p className="text-[11px] text-secondary uppercase font-semibold">System Admin</p>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-sm text-on-surface truncate">{user?.name || 'Administrator'}</p>
+              <p className="text-[11px] text-secondary uppercase font-semibold truncate">System Admin</p>
             </div>
+          </div>
+          
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-on-surface/5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-primary group-hover:text-primary transition-colors">
+              Manage Profile
+            </span>
+            <span className="material-symbols-outlined text-[14px] text-secondary group-hover:text-primary transition-colors">
+              arrow_forward
+            </span>
           </div>
         </div>
 
