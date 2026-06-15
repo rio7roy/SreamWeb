@@ -297,9 +297,9 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
       {/* ── Bell Modal (all messages) ── */}
       {showModal && createPortal(
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
-          <div className="bg-surface w-full max-w-lg rounded-2xl shadow-xl border border-outline/10 flex flex-col max-h-[80vh] overflow-hidden">
+          <div className="bg-surface w-full max-w-lg rounded-2xl shadow-xl border border-outline/10 flex flex-col max-h-[80vh] overflow-y-auto relative">
 
-            <div className="p-4 border-b border-outline/10 flex items-center justify-between bg-surface-container-low">
+            <div className="p-4 border-b border-outline/10 flex items-center justify-between bg-surface-container-low sticky top-0 z-20">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary">notifications</span>
                 <h3 className="text-xl tracking-wide text-on-surface" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
@@ -314,7 +314,7 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
               </button>
             </div>
 
-            <div className="overflow-y-auto flex-1 min-h-0 p-4 flex flex-col gap-3 bg-surface text-on-surface">
+            <div className="p-4 space-y-3 bg-surface text-on-surface">
               {bellMessages.length === 0 && (
                 <div className="text-center p-8 text-secondary">
                   <span className="material-symbols-outlined text-4xl text-secondary/40 mb-3 block">notifications_off</span>
