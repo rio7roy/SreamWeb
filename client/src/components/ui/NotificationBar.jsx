@@ -7,8 +7,9 @@ export default function NotificationBar() {
   useEffect(() => {
     api.get('/users/me/messages')
       .then(res => {
-        if (res.data && res.data.length > 0) {
-          setMessages(res.data);
+        const msgs = res.data?.data;
+        if (Array.isArray(msgs) && msgs.length > 0) {
+          setMessages(msgs);
         }
       })
       .catch(console.error);
