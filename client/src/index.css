@@ -154,11 +154,11 @@
   }
 
   @keyframes breathe {
-    0%, 100% { opacity: 1; text-shadow: 0 0 0px rgba(255,255,255,0); }
-    50% { opacity: 0.9; text-shadow: 0 0 5px rgba(255,255,255,0.4); }
+    0%, 100% { opacity: 1; text-shadow: 0 0 2px rgba(255,255,255,0.3); transform: scale(1); }
+    50% { opacity: 0.5; text-shadow: 0 0 12px rgba(255,255,255,0.9); transform: scale(1.01); }
   }
   .animate-breathe {
-    animation: breathe 3s ease-in-out infinite;
+    animation: breathe 2.5s ease-in-out infinite;
   }
 }
 
