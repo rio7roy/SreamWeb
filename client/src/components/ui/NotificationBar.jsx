@@ -58,39 +58,25 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
   const [activeToasts, setActiveToasts] = useState([]);
   const toastTimers = useRef({});
 
-  // Fetch messages on mount
-  useEffect(() => {
+  const fetchMessages = useCallback(() => {
     api.get('/users/me/messages')
       .then(res => {
         const msgs = res.data?.data;
-        if (Array.isArray(msgs) && msgs.length > 0) {
+        if (Array.isArray(msgs)) {
           setAllMessages(msgs);
         }
       })
       .catch(console.error);
   }, []);
 
-  // Socket.io connection for real-time messages
+  // Fetch messages on mount and poll every 15 seconds
   useEffect(() => {
-    import('socket.io-client').then(({ io }) => {
-      const socketUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
-      const socket = io(socketUrl);
+    fetchMessages();
+    const intervalId = setInterval(fetchMessages, 15000);
+    return () => clearInterval(intervalId);
+  }, [fetchMessages]);
 
-      socket.on('connect', () => {
-        console.log('Connected to real-time message stream');
-      });
 
-      socket.on('new_broadcast_message', (msg) => {
-        setAllMessages(prev => {
-          // Prevent duplicates if by chance it's already there
-          if (prev.some(m => m.id === msg.id)) return prev;
-          return [...prev, msg];
-        });
-      });
-
-      return () => socket.disconnect();
-    }).catch(console.error);
-  }, []);
 
   // Filter messages relevant to this expert's assigned BRCs (or selected BRC)
   const relevantMessages = useMemo(() => {
