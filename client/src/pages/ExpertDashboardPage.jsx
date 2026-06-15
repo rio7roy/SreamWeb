@@ -209,7 +209,9 @@ export default function ExpertDashboardPage() {
   const cardRef = useRef([]);
 
   return (
-    <div className="bg-[#fdfbf7] min-h-screen flex overflow-hidden">
+    <div className="flex flex-col h-screen overflow-hidden bg-background">
+      <NotificationBar />
+      <div className="bg-[#fdfbf7] flex-1 flex overflow-hidden">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
