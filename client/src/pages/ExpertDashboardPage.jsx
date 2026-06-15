@@ -59,28 +59,6 @@ export default function ExpertDashboardPage() {
   const dropdownRef = useRef(null);
 
   const [brcData, setBrcData] = useState([]);
-  const [messages, setMessages] = useState([]);
-
-  const [clearedMessages, setClearedMessages] = useState(() => {
-    try {
-      const stored = localStorage.getItem(`clearedMessages_${user?.id}`);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  const handleClearMessage = (msgId) => {
-    setClearedMessages(prev => {
-      const updated = [...prev, msgId];
-      try {
-        localStorage.setItem(`clearedMessages_${user?.id}`, JSON.stringify(updated));
-      } catch (e) {
-        console.error("Failed to save cleared messages", e);
-      }
-      return updated;
-    });
-  };
 
   const [showEventModal, setShowEventModal] = useState(false);
   const [showPdfModal, setShowPdfModal] = useState(false);
@@ -136,16 +114,12 @@ export default function ExpertDashboardPage() {
     }
   };
 
-  // Fetch BRCs and Messages
+  // Fetch BRCs
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [brcsRes, messagesRes] = await Promise.all([
-          api.get("/brcs"),
-          api.get("/users/me/messages").catch(() => ({ data: { data: [] } }))
-        ]);
+        const brcsRes = await api.get("/brcs");
         setBrcData(brcsRes.data?.data || brcsRes.data || []);
-        setMessages(messagesRes.data?.data || messagesRes.data || []);
       } catch (err) {
         console.error("Failed to fetch dashboard data", err);
       }
@@ -358,7 +332,7 @@ export default function ExpertDashboardPage() {
       </aside>
 
       <div className="flex-grow flex flex-col overflow-hidden relative z-10">
-        {sessionActive && selectedBrc && <NotificationBar selectedBrc={selectedBrc} />}
+        <NotificationBar selectedBrc={selectedBrc} assignedBrcs={allowedBrcs} />
         <main className="flex-1 overflow-y-auto flex flex-col">
           <header className="w-full h-16 bg-white/80 backdrop-blur-md flex items-center px-4 md:hidden border-b border-on-surface/10 shrink-0 sticky top-0 z-30">
             <button
