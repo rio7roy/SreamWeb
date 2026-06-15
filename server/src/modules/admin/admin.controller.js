@@ -47,6 +47,17 @@ exports.getUsers = (req, res) => {
     const { password, confirmPassword, ...rest } = u;
     return rest;
   });
+
+  if (type === 'experts') {
+    const eventsPath = path.join(DATA_DIR, 'events.json');
+    const allEvents = readData(eventsPath).filter(e => e.status === 'SUBMITTED');
+    sanitized.forEach(u => {
+      const userEvents = allEvents.filter(e => e.createdBy === u.id);
+      const uniqueDates = new Set(userEvents.map(e => new Date(e.date || e.createdAt).toLocaleDateString()));
+      u.attendanceCount = uniqueDates.size;
+    });
+  }
+
   res.json(sanitized);
 };
 

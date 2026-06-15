@@ -129,6 +129,9 @@ export default function UserRemovalModal({ type, entityName, onClose }) {
 
               <div className="w-full bg-surface-container-low rounded-xl p-4 mb-8 text-sm">
                 <p className="text-secondary mb-1">Registered: {new Date(selectedUser.createdAt).toLocaleDateString()}</p>
+                {type === 'experts' && selectedUser.attendanceCount !== undefined && (
+                  <p className="text-secondary mb-1 font-bold text-primary">Attendance: {selectedUser.attendanceCount} days</p>
+                )}
                 {selectedUser.email && <p className="text-secondary">Email: {selectedUser.email}</p>}
                 {selectedUser.phone && <p className="text-secondary">Phone: {selectedUser.phone}</p>}
                 {selectedUser.assignedBrcs && (

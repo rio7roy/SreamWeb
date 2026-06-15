@@ -240,8 +240,12 @@ exports.updateEvent = (req, res) => {
 
 exports.getEvents = (req, res) => {
   try {
-    const { brcCode, district, month } = req.query;
+    const { brcCode, district, month, mine } = req.query;
     let events = readEvents();
+
+    if (mine === 'true') {
+      events = events.filter(e => e.createdBy === req.user.id);
+    }
 
     // Clean up expired drafts while we're fetching events
     const now = Date.now();
@@ -300,7 +304,7 @@ exports.getEvents = (req, res) => {
 
 exports.exportEventsExcel = async (req, res) => {
   try {
-    const { brcCode, district, month } = req.query;
+    const { brcCode, district, month, mine } = req.query;
     
     // Read BRCs to map BRC codes to Districts
     let brcs = [];
@@ -313,6 +317,10 @@ exports.exportEventsExcel = async (req, res) => {
 
     // Read Events
     let events = readEvents().filter(e => e.status === 'SUBMITTED');
+
+    if (mine === 'true') {
+      events = events.filter(e => e.createdBy === req.user.id);
+    }
 
     // Filter by District
     if (district) {

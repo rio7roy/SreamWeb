@@ -7,6 +7,7 @@ import EventReportModal from "../components/expert/EventReportModal";
 import ExpertProfileTab from "../components/expert/ExpertProfileTab";
 import ExpertSessionLogsTab from "../components/expert/ExpertSessionLogsTab";
 import PdfReportModal from "../components/expert/PdfReportModal";
+import ExpertAttendanceTab from "../components/expert/ExpertAttendanceTab";
 import StockManagementModal from "../components/expert/StockManagementModal";
 import NotificationBar from "../components/ui/NotificationBar";
 
@@ -361,43 +362,9 @@ export default function ExpertDashboardPage() {
             )}
 
             {!sessionActive && activeNav === "Dashboard" && (
-              <section className="flex flex-col items-center justify-center py-10 animate-fade-in w-full">
-                <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                  <div className="bg-white border border-on-surface/10 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center">
-                    <div className="w-12 h-12 bg-primary-container/20 text-primary rounded-xl flex items-center justify-center mb-3">
-                      <span className="material-symbols-outlined">
-                        description
-                      </span>
-                    </div>
-                    <h3 className="text-3xl font-black text-on-surface mb-1">
-                      {globalStats.totalReported}
-                    </h3>
-                    <p className="text-sm font-bold text-secondary uppercase tracking-widest text-center">
-                      Total Reports
-                    </p>
-                  </div>
-                  <div className="bg-white border border-on-surface/10 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center">
-                    <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mb-3">
-                      <span className="material-symbols-outlined">school</span>
-                    </div>
-                    <h3 className="text-3xl font-black text-on-surface mb-1">
-                      {globalStats.studentFootfall}
-                    </h3>
-                    <p className="text-sm font-bold text-secondary uppercase tracking-widest text-center">
-                      Student Footfall
-                    </p>
-                  </div>
-                  <div className="bg-white border border-on-surface/10 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center">
-                    <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center mb-3">
-                      <span className="material-symbols-outlined">person</span>
-                    </div>
-                    <h3 className="text-3xl font-black text-on-surface mb-1">
-                      {globalStats.teacherFootfall}
-                    </h3>
-                    <p className="text-sm font-bold text-secondary uppercase tracking-widest text-center">
-                      Teacher Footfall
-                    </p>
-                  </div>
+              <section className="flex flex-col items-center justify-center py-10 animate-fade-in w-full h-full">
+                <div className="w-full mb-12">
+                  <ExpertAttendanceTab user={user} />
                 </div>
 
                 <div className="max-w-4xl w-full bg-white border border-on-surface/10 rounded-2xl shadow-xl flex flex-col">
