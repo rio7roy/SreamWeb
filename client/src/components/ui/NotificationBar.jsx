@@ -307,24 +307,46 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
                     key={msg.id} 
                     onClick={() => {
                       if (isUnread) markAsRead(msg.id);
+                      
+                      let targetBrcCode = null;
+                      if (msg.to && Array.isArray(msg.to)) {
+                        for (const target of msg.to) {
+                          if (target.startsWith('BRC:')) {
+                            targetBrcCode = target.split(':')[1];
+                            break;
+                          }
+                        }
+                      }
+                      
+                      if (targetBrcCode && onSelectBrc) {
+                        onSelectBrc(targetBrcCode);
+                        setShowModal(false);
+                      }
                     }}
-                    className={`p-4 rounded-xl border relative overflow-hidden group transition-colors ${
+                    className={`p-4 rounded-xl border relative overflow-hidden group cursor-pointer transition-colors ${
                       isUnread 
-                        ? 'bg-surface-container-low border-primary/20 hover:border-primary/40 cursor-pointer' 
-                        : 'bg-surface border-outline/5 opacity-70'
+                        ? 'bg-surface-container-low border-primary/20 hover:border-primary/40' 
+                        : 'bg-surface border-outline/5 hover:border-outline/10'
                     }`}
                   >
                     {isUnread && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>}
 
                     <div className="flex justify-between items-start gap-4">
                       <div className="pl-2 flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          {isUnread && <div className="w-2 h-2 rounded-full bg-error animate-pulse shrink-0"></div>}
-                          <p className={`text-sm ${isUnread ? 'font-bold' : 'font-medium'}`}>{msg.content}</p>
-                        </div>
-                        <p className="text-[11px] text-secondary font-semibold tracking-wider uppercase">
-                          {new Date(msg.createdAt).toLocaleString()}
+                        <p className={`text-sm mb-2 ${isUnread ? 'font-bold text-on-surface' : 'font-medium text-secondary'}`}>
+                          {msg.content}
                         </p>
+                        <div className="flex items-center gap-1">
+                          <p className="text-[11px] text-secondary font-semibold tracking-wider uppercase">
+                            {new Date(msg.createdAt).toLocaleString()}
+                          </p>
+                          <span 
+                            className={`material-symbols-outlined text-[16px] ml-1 ${isUnread ? 'text-secondary/50' : 'text-blue-500'}`}
+                            title={isUnread ? "Unread" : "Read"}
+                          >
+                            done_all
+                          </span>
+                        </div>
                       </div>
 
                       <button

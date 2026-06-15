@@ -4,11 +4,11 @@ import api from '../../lib/api';
 
 export default function ExpertAttendanceTab({ user }) {
   const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedMonth, setSelectedMonth] = useState('');
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
+  const [selectedMonth, setSelectedMonth] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
     fetchEvents();
@@ -188,7 +188,11 @@ export default function ExpertAttendanceTab({ user }) {
                       </thead>
                       <tbody className="divide-y divide-outline/10">
                         {filteredEvents.map(e => (
-                          <tr key={e.id} className="hover:bg-surface-container-low transition-colors">
+                          <tr 
+                            key={e.id} 
+                            onClick={() => setSelectedEvent(e)}
+                            className="hover:bg-surface-container-low transition-colors cursor-pointer"
+                          >
                             <td className="px-6 py-4">{new Date(e.date || e.createdAt).toLocaleDateString()}</td>
                             <td className="px-6 py-4 truncate max-w-[300px]" title={e.name}>{e.name}</td>
                             <td className="px-6 py-4 font-mono text-xs text-secondary">{e.brcCode}</td>
@@ -206,6 +210,87 @@ export default function ExpertAttendanceTab({ user }) {
               </div>
             </div>
           </div>
+
+          {/* Event Details Sub-Modal */}
+          {selectedEvent && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[10000] flex items-center justify-center p-4">
+              <div className="bg-surface rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col animate-fade-in-up">
+                <div className="p-6 border-b border-outline/10 flex items-center justify-between sticky top-0 bg-surface/95 backdrop-blur z-10">
+                  <div>
+                    <h3 className="text-xl font-bold text-on-surface" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>
+                      {selectedEvent.name}
+                    </h3>
+                    <p className="text-sm text-secondary font-medium">
+                      {new Date(selectedEvent.date || selectedEvent.createdAt).toLocaleDateString()} &bull; BRC: {selectedEvent.brcCode}
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedEvent(null)}
+                    className="w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center text-secondary transition-colors shrink-0"
+                  >
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+                
+                <div className="p-6 space-y-8 flex-grow">
+                  {/* Stats Row */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-primary-container/30 p-4 rounded-2xl flex flex-col items-center justify-center">
+                      <span className="material-symbols-outlined text-primary mb-1">school</span>
+                      <span className="text-2xl font-bold text-on-surface">{selectedEvent.teachersCount || 0}</span>
+                      <span className="text-xs font-bold text-secondary uppercase tracking-wider">Teachers</span>
+                    </div>
+                    <div className="bg-blue-100 p-4 rounded-2xl flex flex-col items-center justify-center">
+                      <span className="material-symbols-outlined text-blue-700 mb-1">groups</span>
+                      <span className="text-2xl font-bold text-on-surface">{selectedEvent.studentsCount || 0}</span>
+                      <span className="text-xs font-bold text-secondary uppercase tracking-wider">Students</span>
+                    </div>
+                    <div className="bg-surface-container p-4 rounded-2xl flex flex-col items-center justify-center">
+                      <span className="material-symbols-outlined text-secondary mb-1">label</span>
+                      <span className="text-sm font-bold text-on-surface capitalize text-center leading-tight mt-1">{selectedEvent.customTag || selectedEvent.tag || 'N/A'}</span>
+                      <span className="text-xs font-bold text-secondary uppercase tracking-wider mt-1">Tag</span>
+                    </div>
+                    <div className="bg-surface-container p-4 rounded-2xl flex flex-col items-center justify-center">
+                      <span className="material-symbols-outlined text-secondary mb-1">info</span>
+                      <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mt-1 ${selectedEvent.status === 'SUBMITTED' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                        {selectedEvent.status}
+                      </span>
+                      <span className="text-xs font-bold text-secondary uppercase tracking-wider mt-1">Status</span>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <h4 className="text-sm font-bold text-secondary uppercase tracking-wider mb-3">Description</h4>
+                    <div className="bg-surface-container-low p-4 rounded-2xl">
+                      <p className="text-on-surface whitespace-pre-wrap text-sm leading-relaxed">
+                        {selectedEvent.description || "No description provided."}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Photos */}
+                  {selectedEvent.photos && selectedEvent.photos.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-bold text-secondary uppercase tracking-wider mb-3">Photos ({selectedEvent.photos.length})</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {selectedEvent.photos.map((photo, i) => (
+                          <div key={i} className="aspect-square rounded-2xl overflow-hidden bg-surface-container border border-outline/10">
+                            <img 
+                              src={`${import.meta.env.VITE_API_URL?.replace('/api', '') || ''}${photo}`}
+                              alt={`Event photo ${i + 1}`}
+                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>,
         document.body
       )}
