@@ -70,6 +70,28 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
       .catch(console.error);
   }, []);
 
+  // Socket.io connection for real-time messages
+  useEffect(() => {
+    import('socket.io-client').then(({ io }) => {
+      const socketUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+      const socket = io(socketUrl);
+
+      socket.on('connect', () => {
+        console.log('Connected to real-time message stream');
+      });
+
+      socket.on('new_broadcast_message', (msg) => {
+        setAllMessages(prev => {
+          // Prevent duplicates if by chance it's already there
+          if (prev.some(m => m.id === msg.id)) return prev;
+          return [...prev, msg];
+        });
+      });
+
+      return () => socket.disconnect();
+    }).catch(console.error);
+  }, []);
+
   // Filter messages relevant to this expert's assigned BRCs (or selected BRC)
   const relevantMessages = useMemo(() => {
     return allMessages.filter(msg => {

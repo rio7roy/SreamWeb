@@ -145,6 +145,11 @@ exports.broadcastMessage = (req, res) => {
   messages.push(newMessage);
   writeData(messagesPath, messages);
   
+  const io = req.app.get('io');
+  if (io) {
+    io.emit('new_broadcast_message', newMessage);
+  }
+  
   res.status(201).json({ message: 'Message broadcasted successfully', data: newMessage });
 };
 

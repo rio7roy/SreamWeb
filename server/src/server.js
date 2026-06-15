@@ -1,4 +1,6 @@
 const app = require('./app');
+const http = require('http');
+const { Server } = require('socket.io');
 const { env } = require('./config/env');
 const { seedDatabase } = require('./config/database');
 
@@ -8,7 +10,24 @@ async function startServer() {
     await seedDatabase();
     console.log('✅ In-memory database ready');
 
-    app.listen(env.PORT, () => {
+    const server = http.createServer(app);
+    const io = new Server(server, {
+      cors: {
+        origin: '*', // Adjust in production
+        methods: ['GET', 'POST']
+      }
+    });
+
+    app.set('io', io);
+
+    io.on('connection', (socket) => {
+      console.log('🔌 Client connected:', socket.id);
+      socket.on('disconnect', () => {
+        console.log('🔌 Client disconnected:', socket.id);
+      });
+    });
+
+    server.listen(env.PORT, () => {
       console.log('');
       console.log('══════════════════════════════════════════════');
       console.log('  🚀 STREAM Ecosystem API Server');
