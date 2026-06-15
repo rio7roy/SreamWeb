@@ -7,6 +7,22 @@ export default function NotificationBar({ selectedBrc }) {
   const [isVisible, setIsVisible] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [fadeKey, setFadeKey] = useState(0); // used to re-trigger fade animation
+  const [dismissedMessages, setDismissedMessages] = useState(() => {
+    try {
+      const stored = localStorage.getItem('dismissed_notifications');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const handleDismissMessage = (id) => {
+    setDismissedMessages(prev => {
+      const newDismissed = [...prev, id];
+      localStorage.setItem('dismissed_notifications', JSON.stringify(newDismissed));
+      return newDismissed;
+    });
+  };
 
   useEffect(() => {
     api.get('/users/me/messages')
@@ -20,17 +36,20 @@ export default function NotificationBar({ selectedBrc }) {
   }, []);
 
   const displayMessages = React.useMemo(() => {
-    if (!selectedBrc) return messages;
-    return messages.filter(msg => {
-      if (!msg.to || !Array.isArray(msg.to)) return false;
-      return msg.to.some(target => {
-        if (target === 'ALL') return true;
-        if (target === `DISTRICT:${selectedBrc.district}`) return true;
-        if (target === `BRC:${selectedBrc.code}`) return true;
-        return false;
+    let filtered = messages;
+    if (selectedBrc) {
+      filtered = messages.filter(msg => {
+        if (!msg.to || !Array.isArray(msg.to)) return false;
+        return msg.to.some(target => {
+          if (target === 'ALL') return true;
+          if (target === `DISTRICT:${selectedBrc.district}`) return true;
+          if (target === `BRC:${selectedBrc.code}`) return true;
+          return false;
+        });
       });
-    });
-  }, [messages, selectedBrc]);
+    }
+    return filtered.filter(msg => !dismissedMessages.includes(msg.id));
+  }, [messages, selectedBrc, dismissedMessages]);
 
   // Cycle through messages every 10 seconds
   useEffect(() => {
@@ -104,13 +123,31 @@ export default function NotificationBar({ selectedBrc }) {
             </div>
             
             <div className="overflow-y-auto p-4 flex flex-col gap-3 bg-surface text-on-surface">
+              {displayMessages.length === 0 && (
+                <div className="text-center p-6 text-secondary border-2 border-dashed border-outline/10 rounded-xl">
+                  No notifications available.
+                </div>
+              )}
               {displayMessages.map((msg, idx) => (
-                <div key={msg.id} className="p-4 bg-surface-container-low rounded-xl border border-outline/5 relative overflow-hidden">
+                <div key={msg.id} className="p-4 bg-surface-container-low rounded-xl border border-outline/5 relative overflow-hidden group">
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-error"></div>
-                  <p className="font-bold text-sm mb-2">{msg.content}</p>
-                  <p className="text-[11px] text-secondary font-semibold tracking-wider uppercase">
-                    {new Date(msg.createdAt).toLocaleString()}
-                  </p>
+                  
+                  <div className="flex justify-between items-start gap-4">
+                    <div>
+                      <p className="font-bold text-sm mb-2">{msg.content}</p>
+                      <p className="text-[11px] text-secondary font-semibold tracking-wider uppercase">
+                        {new Date(msg.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                    
+                    <button
+                      onClick={() => handleDismissMessage(msg.id)}
+                      className="shrink-0 w-8 h-8 rounded-lg bg-surface-container hover:bg-error/10 hover:text-error text-secondary transition-colors flex items-center justify-center"
+                      title="Clear notification"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">delete</span>
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

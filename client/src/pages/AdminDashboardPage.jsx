@@ -7,12 +7,14 @@ import UserManagementTab from '../components/admin/UserManagementTab';
 import ReportsPage from './admin/ReportsPage';
 import StockAdministrationPage from './admin/StockAdministrationPage';
 import ProfilePage from './ProfilePage';
+import BroadcastLogsTab from '../components/admin/BroadcastLogsTab';
 
 const ADMIN_NAV = [
   { label: 'Overview', icon: 'dashboard' },
   { label: 'User Management', icon: 'group_add' },
   { label: 'Program Reports', icon: 'analytics' },
   { label: 'Stock Administration', icon: 'inventory_2' },
+  { label: 'Broadcast Logs', icon: 'campaign' },
   { label: 'System Settings', icon: 'settings' },
 ];
 
@@ -388,6 +390,10 @@ export default function AdminDashboardPage() {
         ) : activeNav === 'My Profile' ? (
           <div className="w-full h-full overflow-y-auto">
             <ProfilePage />
+          </div>
+        ) : activeNav === 'Broadcast Logs' ? (
+          <div className="p-4 md:p-8 md:px-12 w-full h-full animate-fade-in-up">
+            <BroadcastLogsTab />
           </div>
         ) : (
           <div className="p-8 md:p-12 animate-fade-in-up flex flex-col items-center justify-center h-full text-secondary">
