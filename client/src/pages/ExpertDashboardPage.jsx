@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
 import api from '../lib/api';
@@ -462,7 +463,7 @@ export default function ExpertDashboardPage() {
                     </button>
                     
                     {/* Notifications Floating Window Modal */}
-                    {showNotifications && (
+                    {showNotifications && createPortal(
                       <div 
                         className="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
                         onClick={() => setShowNotifications(false)}
@@ -519,7 +520,8 @@ export default function ExpertDashboardPage() {
                             )}
                           </div>
                         </div>
-                      </div>
+                      </div>,
+                      document.body
                     )}
                   </div>
 
