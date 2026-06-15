@@ -70,54 +70,10 @@ export default function DashboardPage() {
         <p className="text-secondary text-lg">{config.subtitle}</p>
       </div>
 
-      {/* Quick Stats (Admin Only) */}
-      {user?.role === 'ADMIN' && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-          {[
-            { label: 'Total Users', value: '—', icon: 'group', change: '' },
-            { label: 'Active Today', value: '—', icon: 'verified', change: '' },
-            { label: 'New This Week', value: '—', icon: 'person_add', change: '' },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-white border border-black/[0.04] rounded-2xl p-6 flex items-center gap-4"
-            >
-              <div className="w-12 h-12 bg-primary-container/15 rounded-xl flex items-center justify-center">
-                <span className="material-symbols-outlined text-primary text-2xl">{stat.icon}</span>
-              </div>
-              <div>
-                <p className="text-2xl font-black text-on-surface">{stat.value}</p>
-                <p className="text-xs font-bold uppercase tracking-widest text-secondary">{stat.label}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Feature Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {config.cards.map((card, index) => (
-          <div
-            key={card.title}
-            className="bg-white border border-black/[0.04] rounded-2xl p-8 hover:shadow-lg hover:shadow-black/[0.03] hover:-translate-y-1 transition-all duration-300 cursor-pointer group animate-fade-in-up"
-            style={{ animationDelay: `${(index + 2) * 0.08}s` }}
-          >
-            <div className={`w-12 h-12 ${card.color} rounded-xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110`}>
-              <span
-                className="material-symbols-outlined text-2xl"
-                style={{ fontVariationSettings: "'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24" }}
-              >
-                {card.icon}
-              </span>
-            </div>
-            <h3 className="text-xl font-bold text-on-surface mb-2">{card.title}</h3>
-            <p className="text-secondary text-sm leading-relaxed">{card.description}</p>
-            <div className="mt-5 flex items-center gap-1 text-primary font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              Open
-              <span className="material-symbols-outlined text-base">arrow_forward</span>
-            </div>
-          </div>
-        ))}
+      <div className="bg-white border border-black/[0.04] rounded-2xl p-12 text-center text-secondary">
+        <span className="material-symbols-outlined text-5xl mb-4 opacity-30">construction</span>
+        <h2 className="text-xl font-bold text-on-surface mb-2">Under Construction</h2>
+        <p>Specific features for your role are currently being built.</p>
       </div>
     </div>
   );

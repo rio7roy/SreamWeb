@@ -139,6 +139,19 @@
   .animation-delay-200 { animation-delay: 0.16s; }
   .animation-delay-300 { animation-delay: 0.24s; }
   .animation-delay-400 { animation-delay: 0.32s; }
+
+  @keyframes marquee {
+    0% { transform: translateX(100vw); }
+    100% { transform: translateX(-100%); }
+  }
+  .animate-marquee {
+    display: inline-block;
+    white-space: nowrap;
+    animation: marquee 30s linear infinite;
+  }
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
 }
 
 /* ── Scrollbar ── */
