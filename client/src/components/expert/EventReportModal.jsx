@@ -136,11 +136,6 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, onCl
       }
     }
 
-    Object.keys(formData).forEach(key => {
-      if (key !== 'tag' && key !== 'customTag') {
-        data.append(key, formData[key]);
-      }
-    });
 
     if (formData.tag) {
       data.append('tag', formData.tag);
