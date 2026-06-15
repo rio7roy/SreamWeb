@@ -4,7 +4,7 @@ import api from '../../lib/api';
 export default function BroadcastLogsTab() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterTarget, setFilterTarget] = useState('ALL_TYPES');
+  const [filterTarget, setFilterTarget] = useState('ALL_TARGETS');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -25,18 +25,22 @@ export default function BroadcastLogsTab() {
     }
   };
 
+  const uniqueTargets = useMemo(() => {
+    const targets = new Set();
+    messages.forEach(msg => {
+      if (Array.isArray(msg.to)) {
+        msg.to.forEach(t => targets.add(t));
+      }
+    });
+    return Array.from(targets).sort();
+  }, [messages]);
+
   const filteredMessages = useMemo(() => {
     return messages.filter(msg => {
-      if (filterTarget !== 'ALL_TYPES') {
+      if (filterTarget !== 'ALL_TARGETS') {
         if (!msg.to || !Array.isArray(msg.to)) return false;
         
-        const matchesTarget = msg.to.some(target => {
-          if (filterTarget === 'ALL' && target === 'ALL') return true;
-          if (filterTarget === 'DISTRICT' && target.startsWith('DISTRICT:')) return true;
-          if (filterTarget === 'BRC' && target.startsWith('BRC:')) return true;
-          return false;
-        });
-        if (!matchesTarget) return false;
+        if (!msg.to.includes(filterTarget)) return false;
       }
 
       if (searchQuery) {
@@ -85,16 +89,16 @@ export default function BroadcastLogsTab() {
           </div>
         </div>
         <div className="w-full md:w-64 shrink-0">
-          <label className="block text-xs font-bold text-secondary uppercase tracking-wider mb-2">Target Type</label>
+          <label className="block text-xs font-bold text-secondary uppercase tracking-wider mb-2">Target Audience</label>
           <select
             value={filterTarget}
             onChange={(e) => setFilterTarget(e.target.value)}
             className="w-full px-4 py-3 bg-surface-container-low border border-outline/20 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-medium"
           >
-            <option value="ALL_TYPES">All Broadcasts</option>
-            <option value="ALL">Global (ALL)</option>
-            <option value="DISTRICT">District Level</option>
-            <option value="BRC">BRC Level</option>
+            <option value="ALL_TARGETS">All Broadcasts</option>
+            {uniqueTargets.map(t => (
+              <option key={t} value={t}>{t}</option>
+            ))}
           </select>
         </div>
       </div>
