@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../lib/api';
 
-export default function NotificationBar() {
+export default function NotificationBar({ selectedBrc }) {
   const [messages, setMessages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
@@ -19,21 +19,34 @@ export default function NotificationBar() {
       .catch(console.error);
   }, []);
 
+  const displayMessages = React.useMemo(() => {
+    if (!selectedBrc) return messages;
+    return messages.filter(msg => {
+      if (!msg.to || !Array.isArray(msg.to)) return false;
+      return msg.to.some(target => {
+        if (target === 'ALL') return true;
+        if (target === `DISTRICT:${selectedBrc.district}`) return true;
+        if (target === `BRC:${selectedBrc.code}`) return true;
+        return false;
+      });
+    });
+  }, [messages, selectedBrc]);
+
   // Cycle through messages every 10 seconds
   useEffect(() => {
-    if (messages.length <= 1) return;
+    if (displayMessages.length <= 1) return;
     
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % messages.length);
+      setCurrentIndex((prev) => (prev + 1) % displayMessages.length);
       setFadeKey(k => k + 1);
     }, 10000); // 10 seconds
 
     return () => clearInterval(interval);
-  }, [messages.length]);
+  }, [displayMessages.length]);
 
-  if (messages.length === 0 || !isVisible) return null;
+  if (displayMessages.length === 0 || !isVisible) return null;
 
-  const currentMsg = messages[currentIndex];
+  const currentMsg = displayMessages[currentIndex];
 
   return (
     <>
@@ -56,9 +69,9 @@ export default function NotificationBar() {
             </p>
           </div>
 
-          {messages.length > 1 && (
+          {displayMessages.length > 1 && (
             <div className="shrink-0 text-xs font-bold bg-black/20 px-2 py-1 rounded-full group-hover:bg-black/30 transition-colors">
-              {currentIndex + 1} / {messages.length}
+              {currentIndex + 1} / {displayMessages.length}
             </div>
           )}
         </div>
@@ -91,7 +104,7 @@ export default function NotificationBar() {
             </div>
             
             <div className="overflow-y-auto p-4 flex flex-col gap-3 bg-surface text-on-surface">
-              {messages.map((msg, idx) => (
+              {displayMessages.map((msg, idx) => (
                 <div key={msg.id} className="p-4 bg-surface-container-low rounded-xl border border-outline/5 relative overflow-hidden">
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-error"></div>
                   <p className="font-bold text-sm mb-2">{msg.content}</p>
