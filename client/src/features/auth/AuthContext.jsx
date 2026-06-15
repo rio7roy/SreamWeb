@@ -22,11 +22,26 @@ export function AuthProvider({ children }) {
       const response = await api.get('/auth/me');
       setUser(response.data.data);
       setToken(storedToken);
-    } catch {
-      localStorage.removeItem('stream_token');
-      localStorage.removeItem('stream_user');
-      setUser(null);
-      setToken(null);
+    } catch (error) {
+      // If error is 401, the token is genuinely invalid
+      if (error.response?.status === 401) {
+        localStorage.removeItem('stream_token');
+        localStorage.removeItem('stream_user');
+        setUser(null);
+        setToken(null);
+      } else {
+        // Render free tier sleeping or network error - use cached user data
+        const cachedUser = localStorage.getItem('stream_user');
+        if (cachedUser) {
+          try {
+            setUser(JSON.parse(cachedUser));
+            setToken(storedToken);
+          } catch {
+            setUser(null);
+            setToken(null);
+          }
+        }
+      }
     } finally {
       setIsLoading(false);
     }
