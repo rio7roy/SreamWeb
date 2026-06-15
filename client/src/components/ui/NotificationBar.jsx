@@ -3,7 +3,6 @@ import api from '../../lib/api';
 
 export default function NotificationBar() {
   const [messages, setMessages] = useState([]);
-  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     api.get('/users/me/messages')
@@ -15,7 +14,7 @@ export default function NotificationBar() {
       .catch(console.error);
   }, []);
 
-  if (messages.length === 0 || !isVisible) return null;
+  if (messages.length === 0) return null;
 
   // Combine all messages into a single string separated by bullets
   const combinedMessage = messages.map(m => m.content).join(' ✦ ');
@@ -30,13 +29,6 @@ export default function NotificationBar() {
         </div>
       </div>
 
-      <button 
-        onClick={() => setIsVisible(false)}
-        className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-black/20 transition-colors ml-2 z-10 bg-error relative"
-        title="Dismiss"
-      >
-        <span className="material-symbols-outlined text-base">close</span>
-      </button>
     </div>
   );
 }
