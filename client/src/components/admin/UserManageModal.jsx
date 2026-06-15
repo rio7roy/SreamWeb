@@ -49,7 +49,7 @@ export default function UserManageModal({ type, entityName, onClose, initialUser
     ? users.filter(u => (u.name || u.email || '').toLowerCase().includes(search.toLowerCase()))
     : users;
 
-  const assignedCodes = selectedUser?.brcs || [];
+  const assignedCodes = selectedUser?.assignedBrcs || [];
   const assignedBrcsList = allBrcs.filter(b => assignedCodes.includes(b.code));
   
   const searchLower = brcSearch.trim().toLowerCase();
@@ -63,10 +63,10 @@ export default function UserManageModal({ type, entityName, onClose, initialUser
   const handleUpdateBrcs = async (newBrcsList) => {
     try {
       setFeedback(null);
-      await api.put(`/admin/users/experts/${selectedUser.id}/brcs`, { brcs: newBrcsList });
+      await api.put(`/admin/users/experts/${selectedUser.id}/brcs`, { brcCodes: newBrcsList });
       // Update local state
-      setSelectedUser({ ...selectedUser, brcs: newBrcsList });
-      setUsers(users.map(u => u.id === selectedUser.id ? { ...u, brcs: newBrcsList } : u));
+      setSelectedUser({ ...selectedUser, assignedBrcs: newBrcsList });
+      setUsers(users.map(u => u.id === selectedUser.id ? { ...u, assignedBrcs: newBrcsList } : u));
       setFeedback({ type: 'success', text: 'BRCs updated successfully.' });
     } catch (err) {
       setFeedback({ type: 'error', text: 'Failed to update BRCs.' });
@@ -74,7 +74,7 @@ export default function UserManageModal({ type, entityName, onClose, initialUser
   };
 
   const handleToggleBrc = (brcCode) => {
-    const currentBrcs = selectedUser.brcs || [];
+    const currentBrcs = selectedUser.assignedBrcs || [];
     let newBrcs;
     if (currentBrcs.includes(brcCode)) {
       newBrcs = currentBrcs.filter(b => b !== brcCode);
@@ -159,14 +159,14 @@ export default function UserManageModal({ type, entityName, onClose, initialUser
                           <p className="text-sm text-secondary">{u.email}</p>
                           {type === 'experts' && (
                             <p className="text-[10px] font-mono text-secondary mt-1 max-w-[250px] truncate">
-                              {(u.brcs && u.brcs.length > 0) ? u.brcs.join(', ') : 'No hubs assigned'}
+                              {(u.assignedBrcs && u.assignedBrcs.length > 0) ? u.assignedBrcs.join(', ') : 'No hubs assigned'}
                             </p>
                           )}
                         </div>
                         <div className="flex items-center gap-4">
                           {type === 'experts' && (
                             <span className="text-[10px] font-bold px-2 py-1 bg-blue-100 text-blue-700 rounded-lg whitespace-nowrap">
-                              {(u.brcs || []).length} Hubs
+                              {(u.assignedBrcs || []).length} Hubs
                             </span>
                           )}
                           <span className="material-symbols-outlined text-outline group-hover:text-blue-500">
