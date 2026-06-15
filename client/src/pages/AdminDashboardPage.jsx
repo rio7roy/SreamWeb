@@ -8,6 +8,7 @@ import ReportsPage from './admin/ReportsPage';
 import StockAdministrationPage from './admin/StockAdministrationPage';
 import ProfilePage from './ProfilePage';
 import BroadcastLogsTab from '../components/admin/BroadcastLogsTab';
+import UserManageModal from '../components/admin/UserManageModal';
 
 const ADMIN_NAV = [
   { label: 'Overview', icon: 'dashboard' },
@@ -31,6 +32,7 @@ export default function AdminDashboardPage() {
   const [brcs, setBrcs] = useState([]);
   const [experts, setExperts] = useState([]);
   const [selectedExpertId, setSelectedExpertId] = useState('');
+  const [showExpertManageModal, setShowExpertManageModal] = useState(false);
 
   // Fetch BRCs and Experts on mount
   useEffect(() => {
@@ -301,7 +303,7 @@ export default function AdminDashboardPage() {
                   </span>
                 </div>
                 <button
-                  onClick={() => navigate(`/admin/experts/${selectedExpertId}`)}
+                  onClick={() => setShowExpertManageModal(true)}
                   disabled={!selectedExpertId}
                   className="shrink-0 px-6 py-3 bg-amber-500 text-white font-bold rounded-xl shadow hover:opacity-90 transition-all disabled:opacity-50 disabled:shadow-none flex items-center gap-2"
                 >
@@ -402,7 +404,15 @@ export default function AdminDashboardPage() {
         )}
       </main>
 
-
+      {/* Modals */}
+      {showExpertManageModal && (
+        <UserManageModal
+          type="experts"
+          entityName="STREAM Expert"
+          initialUserId={selectedExpertId}
+          onClose={() => setShowExpertManageModal(false)}
+        />
+      )}
     </div>
   );
 }

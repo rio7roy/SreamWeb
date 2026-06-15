@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import api from '../../lib/api';
 
-export default function UserManageModal({ type, entityName, onClose }) {
+export default function UserManageModal({ type, entityName, onClose, initialUserId = null }) {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
@@ -17,7 +17,13 @@ export default function UserManageModal({ type, entityName, onClose }) {
   useEffect(() => {
     // Fetch users of this type
     api.get(`/admin/users/${type}`)
-      .then(res => setUsers(res.data))
+      .then(res => {
+        setUsers(res.data);
+        if (initialUserId) {
+          const u = res.data.find(x => x.id === initialUserId);
+          if (u) setSelectedUser(u);
+        }
+      })
       .catch(err => setFeedback({ type: 'error', text: 'Failed to load existing users.' }));
       
     if (type === 'experts') {
