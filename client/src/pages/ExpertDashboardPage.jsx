@@ -8,6 +8,7 @@ import ExpertProfileTab from "../components/expert/ExpertProfileTab";
 import ExpertSessionLogsTab from "../components/expert/ExpertSessionLogsTab";
 import PdfReportModal from "../components/expert/PdfReportModal";
 import StockManagementModal from "../components/expert/StockManagementModal";
+import NotificationBar from "../components/ui/NotificationBar";
 
 const EXPERT_NAV = [
   { label: "Dashboard", icon: "dashboard", active: true },
@@ -765,6 +766,7 @@ export default function ExpertDashboardPage() {
           onClose={() => setShowStockModal(false)}
         />
       )}
+      </div>
     </div>
   );
 }
