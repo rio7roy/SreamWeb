@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import api from '../../lib/api';
 
 export default function ExpertAttendanceTab({ user }) {
@@ -88,7 +89,7 @@ export default function ExpertAttendanceTab({ user }) {
       </button>
 
       {/* Floating Modal for Sheets View */}
-      {showModal && (
+      {showModal && createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowModal(false)}></div>
           
@@ -205,7 +206,8 @@ export default function ExpertAttendanceTab({ user }) {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

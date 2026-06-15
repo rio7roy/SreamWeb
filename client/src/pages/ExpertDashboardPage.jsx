@@ -205,6 +205,12 @@ export default function ExpertDashboardPage() {
     setSelectedBrc(null);
     setBrcSearch("");
   };
+  const handleNotificationBrcSelect = (brcCode) => {
+    const brc = allowedBrcs.find(b => b.code === brcCode);
+    if (brc) {
+      handleInitSession(brc);
+    }
+  };
 
   const cardRef = useRef([]);
 
@@ -333,7 +339,7 @@ export default function ExpertDashboardPage() {
       </aside>
 
       <div className="flex-grow flex flex-col overflow-hidden relative z-10">
-        <NotificationBar selectedBrc={selectedBrc} assignedBrcs={allowedBrcs} />
+        <NotificationBar selectedBrc={selectedBrc} assignedBrcs={allowedBrcs} onSelectBrc={handleNotificationBrcSelect} />
         <main className="flex-1 overflow-y-auto flex flex-col">
           <header className="w-full h-16 bg-white/80 backdrop-blur-md flex items-center px-4 md:hidden border-b border-on-surface/10 shrink-0 sticky top-0 z-30">
             <button

@@ -8,7 +8,7 @@ import api from '../../lib/api';
  *  2. Toast popup for NEW messages that auto-vanishes after 5 seconds
  *  3. Dismissed messages are persisted to localStorage and never reappear
  */
-export default function NotificationBar({ selectedBrc, assignedBrcs = [] }) {
+export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSelectBrc }) {
   const [allMessages, setAllMessages] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
@@ -59,36 +59,33 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [] }) {
           if (target === `DISTRICT:${selectedBrc.district}`) return true;
           if (target === `BRC:${selectedBrc.code}`) return true;
         }
-        // Also match any of the expert's assigned BRCs
-        if (assignedBrcs.length > 0) {
-          return assignedBrcs.some(brc => {
-            if (target === `DISTRICT:${brc.district}`) return true;
-            if (target === `BRC:${brc.code}`) return true;
-            return false;
-          });
-        }
-        return false;
+        // Otherwise match any of the assigned BRCs
+        return assignedBrcs.some(b => {
+          if (target === `DISTRICT:${b.district}`) return true;
+          if (target === `BRC:${b.code}`) return true;
+          return false;
+        });
       });
     });
   }, [allMessages, selectedBrc, assignedBrcs]);
 
-  // Messages visible in the bell icon modal (all relevant, minus dismissed)
+  // Messages for the bell dropdown (all relevant, not dismissed)
   const bellMessages = useMemo(() => {
-    return relevantMessages.filter(msg => !dismissedIds.includes(msg.id));
+    return relevantMessages.filter(m => !dismissedIds.includes(m.id))
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }, [relevantMessages, dismissedIds]);
 
-  // Detect NEW messages and show toasts
+  // Handle TOAST popups for completely NEW messages
   useEffect(() => {
-    const newMsgs = relevantMessages.filter(msg =>
-      !seenToastIds.includes(msg.id) && !dismissedIds.includes(msg.id)
+    const newMsgs = relevantMessages.filter(m => 
+      !seenToastIds.includes(m.id) && !dismissedIds.includes(m.id)
     );
 
     if (newMsgs.length === 0) return;
 
-    // Mark them as seen so we don't re-toast
-    const newIds = newMsgs.map(m => m.id);
+    // Mark these as seen for the toast
     setSeenToastIds(prev => {
-      const updated = [...new Set([...prev, ...newIds])];
+      const updated = [...new Set([...prev, ...newMsgs.map(m => m.id)])];
       try { localStorage.setItem('seen_toast_ids', JSON.stringify(updated)); } catch {}
       return updated;
     });
@@ -96,7 +93,7 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [] }) {
     // Add to active toasts
     setActiveToasts(prev => [...prev, ...newMsgs]);
 
-    // Auto-vanish each toast after 5 seconds
+    // Set auto-vanish timers for each new toast
     newMsgs.forEach(msg => {
       toastTimers.current[msg.id] = setTimeout(() => {
         setActiveToasts(prev => prev.filter(t => t.id !== msg.id));
@@ -126,13 +123,34 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [] }) {
     }
   }, []);
 
-  const dismissToast = useCallback((id) => {
+  const dismissToast = useCallback((id, e) => {
+    if (e) e.stopPropagation();
     setActiveToasts(prev => prev.filter(t => t.id !== id));
     if (toastTimers.current[id]) {
       clearTimeout(toastTimers.current[id]);
       delete toastTimers.current[id];
     }
   }, []);
+
+  const handleToastClick = (toast) => {
+    // Determine the BRC code if explicitly targeted
+    let targetBrcCode = null;
+    if (toast.to && Array.isArray(toast.to)) {
+      for (const target of toast.to) {
+        if (target.startsWith('BRC:')) {
+          targetBrcCode = target.split(':')[1];
+          break;
+        }
+      }
+    }
+
+    if (targetBrcCode && onSelectBrc) {
+      onSelectBrc(targetBrcCode);
+    }
+    
+    setShowModal(true);
+    dismissToast(toast.id);
+  };
 
   return (
     <>
@@ -160,32 +178,44 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [] }) {
       {/* ── Toast Popups for NEW Messages ── */}
       {activeToasts.length > 0 && createPortal(
         <div className="fixed top-16 right-4 z-[60] flex flex-col gap-3 max-w-sm w-full pointer-events-none">
-          {activeToasts.map(toast => (
-            <div
-              key={toast.id}
-              className="pointer-events-auto bg-white border border-primary/20 rounded-xl shadow-xl p-4 animate-fade-in-up flex items-start gap-3"
-              style={{
-                animation: 'slideInRight 0.4s ease-out',
-              }}
-            >
-              <div className="w-8 h-8 bg-primary-container rounded-lg flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-primary text-lg">campaign</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">New Message</p>
-                <p className="text-sm font-semibold text-on-surface leading-snug">{toast.content}</p>
-                <p className="text-[10px] text-secondary mt-1">
-                  {new Date(toast.createdAt).toLocaleString()}
-                </p>
-              </div>
-              <button
-                onClick={() => dismissToast(toast.id)}
-                className="shrink-0 w-6 h-6 rounded-full hover:bg-surface-container flex items-center justify-center text-secondary hover:text-on-surface transition-colors"
+          {activeToasts.map(toast => {
+            // Determine target label
+            let targetLabel = 'ALL';
+            if (toast.to && Array.isArray(toast.to)) {
+              const specificTargets = toast.to.filter(t => t !== 'ALL').map(t => t.split(':')[1]);
+              if (specificTargets.length > 0) {
+                targetLabel = specificTargets.join(', ');
+              }
+            }
+
+            return (
+              <div
+                key={toast.id}
+                onClick={() => handleToastClick(toast)}
+                className="pointer-events-auto bg-white border border-primary/20 rounded-xl shadow-xl p-4 animate-fade-in-up flex items-start gap-3 cursor-pointer hover:bg-surface-container-low transition-colors"
+                style={{
+                  animation: 'slideInRight 0.4s ease-out',
+                }}
               >
-                <span className="material-symbols-outlined text-sm">close</span>
-              </button>
-            </div>
-          ))}
+                <div className="w-8 h-8 bg-primary-container rounded-lg flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-primary text-lg">campaign</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">New Message <span className="text-secondary ml-1 lowercase font-medium">to {targetLabel}</span></p>
+                  <p className="text-sm font-semibold text-on-surface leading-snug">{toast.content}</p>
+                  <p className="text-[10px] text-secondary mt-1">
+                    {new Date(toast.createdAt).toLocaleString()}
+                  </p>
+                </div>
+                <button
+                  onClick={(e) => dismissToast(toast.id, e)}
+                  className="shrink-0 w-6 h-6 rounded-full hover:bg-surface-container flex items-center justify-center text-secondary hover:text-on-surface transition-colors"
+                >
+                  <span className="material-symbols-outlined text-sm">close</span>
+                </button>
+              </div>
+            );
+          })}
         </div>,
         document.body
       )}
