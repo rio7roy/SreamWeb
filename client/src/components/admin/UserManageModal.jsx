@@ -8,6 +8,7 @@ export default function UserManageModal({ type, entityName, onClose, initialUser
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState(null);
+  const [brcSearch, setBrcSearch] = useState('');
   
   // Specific data for Experts
   const [allBrcs, setAllBrcs] = useState([]);
@@ -47,6 +48,17 @@ export default function UserManageModal({ type, entityName, onClose, initialUser
   const filteredUsers = search.trim()
     ? users.filter(u => (u.name || u.email || '').toLowerCase().includes(search.toLowerCase()))
     : users;
+
+  const assignedCodes = selectedUser?.brcs || [];
+  const assignedBrcsList = allBrcs.filter(b => assignedCodes.includes(b.code));
+  
+  const searchLower = brcSearch.trim().toLowerCase();
+  const searchResults = searchLower 
+    ? allBrcs.filter(b => 
+        !assignedCodes.includes(b.code) && 
+        (b.name.toLowerCase().includes(searchLower) || b.code.toLowerCase().includes(searchLower) || (b.district || '').toLowerCase().includes(searchLower))
+      ).slice(0, 8)
+    : [];
 
   const handleUpdateBrcs = async (newBrcsList) => {
     try {
@@ -187,33 +199,74 @@ export default function UserManageModal({ type, entityName, onClose, initialUser
                   </div>
 
                   {/* BRC Assignment */}
-                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-outline/10">
-                    <h4 className="text-sm font-bold uppercase tracking-wider text-secondary mb-4 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-lg">assignment_ind</span>
-                      Assigned STREAM Hubs
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {allBrcs.filter(b => b.district === selectedUser.district || !selectedUser.district).map(brc => {
-                        const isAssigned = (selectedUser.brcs || []).includes(brc.code);
-                        return (
-                          <button
-                            key={brc.code}
-                            onClick={() => handleToggleBrc(brc.code)}
-                            className={`px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-2 border transition-colors ${
-                              isAssigned 
-                                ? 'bg-primary-container text-on-primary-container border-primary/30 hover:bg-error/10 hover:border-error/30 hover:text-error' 
-                                : 'bg-surface border-outline/20 text-secondary hover:bg-surface-container'
-                            }`}
-                          >
-                            {isAssigned && <span className="material-symbols-outlined text-[14px]">check</span>}
-                            {brc.name}
-                          </button>
-                        );
-                      })}
+                  <div className="bg-white p-6 rounded-2xl shadow-sm border border-outline/10 overflow-visible">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                      <h4 className="text-sm font-bold uppercase tracking-wider text-secondary flex items-center gap-2">
+                        <span className="material-symbols-outlined text-lg">assignment_ind</span>
+                        Assigned STREAM Hubs ({assignedCodes.length})
+                      </h4>
+                      
+                      <div className="relative w-full md:w-72 z-[60]">
+                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-sm pointer-events-none">search</span>
+                        <input 
+                          type="text" 
+                          value={brcSearch}
+                          onChange={(e) => setBrcSearch(e.target.value)}
+                          placeholder="Search to assign hubs..."
+                          className="w-full bg-surface-container-low border border-outline/20 rounded-xl pl-9 pr-3 py-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm"
+                        />
+                        
+                        {/* Dropdown Overlay */}
+                        {brcSearch && (
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-outline/10 overflow-hidden max-h-[250px] flex flex-col z-[70]">
+                            {searchResults.length > 0 ? (
+                              <div className="overflow-y-auto p-1 custom-scrollbar">
+                                {searchResults.map(brc => (
+                                  <button
+                                    key={brc.code}
+                                    onClick={() => {
+                                      handleToggleBrc(brc.code);
+                                      setBrcSearch('');
+                                    }}
+                                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-primary-container flex items-center justify-between group transition-colors"
+                                  >
+                                    <div>
+                                      <p className="font-bold text-on-surface text-sm truncate">{brc.name}</p>
+                                      <p className="text-[10px] text-secondary mt-0.5">{brc.code} • {brc.district}</p>
+                                    </div>
+                                    <span className="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity text-sm">add_circle</span>
+                                  </button>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="p-3 text-center text-xs text-secondary">
+                                No unassigned hubs found.
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    {(selectedUser.brcs || []).length === 0 && (
-                      <p className="text-sm text-amber-600 mt-2 font-medium">This expert has no hubs assigned.</p>
-                    )}
+
+                    <div className="flex flex-wrap gap-2 relative z-10">
+                      {assignedBrcsList.map(brc => (
+                        <div
+                          key={brc.code}
+                          className="px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-2 border bg-primary-container text-on-primary-container border-primary/30 group"
+                        >
+                          <span className="truncate max-w-[200px]">{brc.name}</span>
+                          <button 
+                            onClick={() => handleToggleBrc(brc.code)}
+                            className="w-5 h-5 rounded-full hover:bg-error/20 flex items-center justify-center text-secondary hover:text-error transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-[14px]">close</span>
+                          </button>
+                        </div>
+                      ))}
+                      {assignedCodes.length === 0 && (
+                        <p className="text-sm text-secondary italic">This expert has no hubs assigned. Use the search to add hubs.</p>
+                      )}
+                    </div>
                   </div>
 
                   {/* Attendance Log */}
