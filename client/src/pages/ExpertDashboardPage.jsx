@@ -13,7 +13,6 @@ import NotificationBar from "../components/ui/NotificationBar";
 
 const EXPERT_NAV = [
   { label: "Dashboard", icon: "dashboard", active: true },
-  { label: "Session Logs", icon: "history" },
 ];
 
 const TOOLSET = [
