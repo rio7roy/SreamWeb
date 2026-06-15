@@ -17,7 +17,7 @@ build/
 server/prisma/migrations/
 
 # Uploads
-server/uploads/*
+# (Removed to allow tracking of uploaded images for persistence on Render)
 !server/uploads/.gitkeep
 
 # Logs
