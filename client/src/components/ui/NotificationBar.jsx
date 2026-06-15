@@ -34,6 +34,16 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
     }
   }, [storageKey]);
 
+  // Persisted read IDs
+  const [readIds, setReadIds] = useState(() => {
+    try {
+      const stored = localStorage.getItem('read_notifications');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
   // IDs the user has already "seen" as a toast (so we don't re-toast on re-render)
   const [seenToastIds, setSeenToastIds] = useState(() => {
     try {
@@ -87,6 +97,10 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }, [relevantMessages, dismissedIds]);
 
+  const unreadMessagesCount = useMemo(() => {
+    return bellMessages.filter(m => !readIds.includes(m.id)).length;
+  }, [bellMessages, readIds]);
+
   // Handle TOAST popups for completely NEW messages
   useEffect(() => {
     const newMsgs = relevantMessages.filter(m => 
@@ -135,6 +149,15 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
     }
   }, [storageKey]);
 
+  const markAsRead = useCallback((id) => {
+    setReadIds(prev => {
+      if (prev.includes(id)) return prev;
+      const updated = [...prev, id];
+      localStorage.setItem('read_notifications', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
   const dismissToast = useCallback((id, e) => {
     if (e) e.stopPropagation();
     setActiveToasts(prev => prev.filter(t => t.id !== id));
@@ -179,9 +202,9 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
           >
             notifications
           </span>
-          {bellMessages.length > 0 && (
+          {unreadMessagesCount > 0 && (
             <span className="absolute -top-1 -right-1 w-5 h-5 bg-error text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
-              {bellMessages.length}
+              {unreadMessagesCount}
             </span>
           )}
         </button>
@@ -190,7 +213,10 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
       {/* ── Toast Popups for NEW Messages ── */}
       {activeToasts.length > 0 && createPortal(
         <div className="fixed top-16 right-4 z-[60] flex flex-col gap-3 max-w-sm w-full pointer-events-none">
-          {activeToasts.map(toast => {
+          {(() => {
+            // Pick the latest message among active toasts
+            const toast = [...activeToasts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+            
             // Determine target label
             let targetLabel = 'ALL';
             if (toast.to && Array.isArray(toast.to)) {
@@ -200,34 +226,48 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
               }
             }
 
+            // Unread left (excluding this one we are showing, if we consider this one "toast-read" vs fully read)
+            // The user wants "number of unread messages left".
+            const unreadLeft = Math.max(0, unreadMessagesCount - 1);
+
             return (
               <div
                 key={toast.id}
                 onClick={() => handleToastClick(toast)}
                 className="pointer-events-auto bg-white border border-primary/20 rounded-xl shadow-xl p-4 animate-fade-in-up flex items-start gap-3 cursor-pointer hover:bg-surface-container-low transition-colors"
-                style={{
-                  animation: 'slideInRight 0.4s ease-out',
-                }}
+                style={{ animation: 'slideInRight 0.4s ease-out' }}
               >
                 <div className="w-8 h-8 bg-primary-container rounded-lg flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-primary text-lg">campaign</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">New Message <span className="text-secondary ml-1 lowercase font-medium">to {targetLabel}</span></p>
-                  <p className="text-sm font-semibold text-on-surface leading-snug">{toast.content}</p>
-                  <p className="text-[10px] text-secondary mt-1">
-                    {new Date(toast.createdAt).toLocaleString()}
+                  <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">
+                    New Message <span className="text-secondary ml-1 lowercase font-medium">to {targetLabel}</span>
                   </p>
+                  <p className="text-sm font-semibold text-on-surface leading-snug">{toast.content}</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="text-[10px] text-secondary">
+                      {new Date(toast.createdAt).toLocaleString()}
+                    </p>
+                    {unreadLeft > 0 && (
+                      <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                        +{unreadLeft} unread
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <button
-                  onClick={(e) => dismissToast(toast.id, e)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    activeToasts.forEach(t => dismissToast(t.id, e));
+                  }}
                   className="shrink-0 w-6 h-6 rounded-full hover:bg-surface-container flex items-center justify-center text-secondary hover:text-on-surface transition-colors"
                 >
                   <span className="material-symbols-outlined text-sm">close</span>
                 </button>
               </div>
             );
-          })}
+          })()}
         </div>,
         document.body
       )}
@@ -260,28 +300,47 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
                   <p className="text-sm mt-1">You're all caught up!</p>
                 </div>
               )}
-              {bellMessages.map(msg => (
-                <div key={msg.id} className="p-4 bg-surface-container-low rounded-xl border border-outline/5 relative overflow-hidden group">
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+              {bellMessages.map(msg => {
+                const isUnread = !readIds.includes(msg.id);
+                return (
+                  <div 
+                    key={msg.id} 
+                    onClick={() => {
+                      if (isUnread) markAsRead(msg.id);
+                    }}
+                    className={`p-4 rounded-xl border relative overflow-hidden group transition-colors ${
+                      isUnread 
+                        ? 'bg-surface-container-low border-primary/20 hover:border-primary/40 cursor-pointer' 
+                        : 'bg-surface border-outline/5 opacity-70'
+                    }`}
+                  >
+                    {isUnread && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>}
 
-                  <div className="flex justify-between items-start gap-4">
-                    <div className="pl-2">
-                      <p className="font-bold text-sm mb-2">{msg.content}</p>
-                      <p className="text-[11px] text-secondary font-semibold tracking-wider uppercase">
-                        {new Date(msg.createdAt).toLocaleString()}
-                      </p>
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="pl-2 flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          {isUnread && <div className="w-2 h-2 rounded-full bg-error animate-pulse shrink-0"></div>}
+                          <p className={`text-sm ${isUnread ? 'font-bold' : 'font-medium'}`}>{msg.content}</p>
+                        </div>
+                        <p className="text-[11px] text-secondary font-semibold tracking-wider uppercase">
+                          {new Date(msg.createdAt).toLocaleString()}
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDismissMessage(msg.id);
+                        }}
+                        className="shrink-0 w-8 h-8 rounded-lg bg-surface-container hover:bg-error/10 hover:text-error text-secondary transition-colors flex items-center justify-center"
+                        title="Dismiss notification (won't reappear)"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">close</span>
+                      </button>
                     </div>
-
-                    <button
-                      onClick={() => handleDismissMessage(msg.id)}
-                      className="shrink-0 w-8 h-8 rounded-lg bg-surface-container hover:bg-error/10 hover:text-error text-secondary transition-colors flex items-center justify-center"
-                      title="Dismiss notification (won't reappear)"
-                    >
-                      <span className="material-symbols-outlined text-[18px]">close</span>
-                    </button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
           </div>
