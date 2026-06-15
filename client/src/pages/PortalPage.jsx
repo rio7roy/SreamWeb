@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
 import Header from '../components/layout/Header';
@@ -26,11 +26,12 @@ export default function PortalPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Redirect if already authenticated
-  if (isAuthenticated) {
-    const dest = user?.role === 'EXPERT' ? '/expert' : user?.role === 'ADMIN' ? '/admin' : '/dashboard';
-    return <Navigate to={dest} replace />;
-  }
+  // Automatically logout if arriving at the portal page while authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      logout();
+    }
+  }, [isAuthenticated, logout]);
 
   const openLoginModal = (portal) => {
     setSelectedPortal(portal);
