@@ -126,5 +126,14 @@
     "priority": "NORMAL",
     "createdAt": "2026-06-12T09:59:18.645Z",
     "read": false
+  },
+  {
+    "id": "d930e06c-41a6-49b7-b485-1e73a9077320",
+    "to": [
+      "BRC:32110100105SH"
+    ],
+    "content": "were",
+    "scheduledFor": null,
+    "createdAt": "2026-06-15T06:42:18.290Z"
   }
 ]

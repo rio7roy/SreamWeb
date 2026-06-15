@@ -40,7 +40,9 @@ export default function BroadcastLogsTab() {
       if (filterTarget !== 'ALL_TARGETS') {
         if (!msg.to || !Array.isArray(msg.to)) return false;
         
-        if (!msg.to.includes(filterTarget)) return false;
+        const targetQuery = filterTarget.toLowerCase();
+        const matchesTarget = msg.to.some(t => t.toLowerCase().includes(targetQuery));
+        if (!matchesTarget) return false;
       }
 
       if (searchQuery) {
@@ -90,16 +92,25 @@ export default function BroadcastLogsTab() {
         </div>
         <div className="w-full md:w-64 shrink-0">
           <label className="block text-xs font-bold text-secondary uppercase tracking-wider mb-2">Target Audience</label>
-          <select
-            value={filterTarget}
-            onChange={(e) => setFilterTarget(e.target.value)}
-            className="w-full px-4 py-3 bg-surface-container-low border border-outline/20 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-medium"
-          >
-            <option value="ALL_TARGETS">All Broadcasts</option>
-            {uniqueTargets.map(t => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
+          <div className="relative">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary">my_location</span>
+            <input
+              list="target-options"
+              value={filterTarget === 'ALL_TARGETS' ? '' : filterTarget}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === '') setFilterTarget('ALL_TARGETS');
+                else setFilterTarget(val);
+              }}
+              placeholder="All Broadcasts"
+              className="w-full pl-10 pr-4 py-3 bg-surface-container-low border border-outline/20 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-medium"
+            />
+            <datalist id="target-options">
+              {uniqueTargets.map(t => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </datalist>
+          </div>
         </div>
       </div>
 
