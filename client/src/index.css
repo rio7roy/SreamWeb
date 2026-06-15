@@ -152,6 +152,14 @@
   .animate-marquee:hover {
     animation-play-state: paused;
   }
+
+  @keyframes breathe {
+    0%, 100% { opacity: 1; text-shadow: 0 0 0px rgba(255,255,255,0); }
+    50% { opacity: 0.9; text-shadow: 0 0 5px rgba(255,255,255,0.4); }
+  }
+  .animate-breathe {
+    animation: breathe 3s ease-in-out infinite;
+  }
 }
 
 /* ── Scrollbar ── */

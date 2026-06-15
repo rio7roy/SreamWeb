@@ -47,7 +47,7 @@ export default function NotificationBar() {
         >
 
           
-          <div className="flex-1 min-w-0 pr-4">
+          <div className="flex-1 min-w-0 pr-4 animate-breathe">
             <p 
               key={fadeKey} // Forces re-render for fade-in animation
               className="font-bold truncate text-sm animate-fade-in"
