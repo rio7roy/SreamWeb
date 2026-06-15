@@ -22,7 +22,7 @@ export default function ExpertAttendanceTab({ user }) {
         url += `&month=${selectedMonth}`;
       }
       const res = await api.get(url);
-      setEvents(res.data || []);
+      setEvents(Array.isArray(res.data) ? res.data : (res.data?.data || []));
     } catch (err) {
       console.error("Failed to fetch events", err);
     } finally {
