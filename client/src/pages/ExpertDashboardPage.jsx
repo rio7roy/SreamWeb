@@ -59,6 +59,7 @@ export default function ExpertDashboardPage() {
   const dropdownRef = useRef(null);
 
   const [brcData, setBrcData] = useState([]);
+  const [messages, setMessages] = useState([]);
 
   const [showEventModal, setShowEventModal] = useState(false);
   const [showPdfModal, setShowPdfModal] = useState(false);
@@ -118,8 +119,12 @@ export default function ExpertDashboardPage() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [brcsRes] = await Promise.all([api.get("/brcs")]);
-        setBrcData(brcsRes.data);
+        const [brcsRes, messagesRes] = await Promise.all([
+          api.get("/brcs"),
+          api.get("/users/me/messages").catch(() => ({ data: { data: [] } }))
+        ]);
+        setBrcData(brcsRes.data?.data || brcsRes.data || []);
+        setMessages(messagesRes.data?.data || messagesRes.data || []);
       } catch (err) {
         console.error("Failed to fetch dashboard data", err);
       }
