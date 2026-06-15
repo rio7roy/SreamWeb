@@ -45,7 +45,7 @@ export default function NotificationBar() {
           className="flex-1 flex items-center gap-3 cursor-pointer group"
           title="Click to view all notifications"
         >
-          <span className="material-symbols-outlined shrink-0 animate-pulse">mic</span>
+          <span className="material-symbols-outlined shrink-0 animate-pulse">campaign</span>
           
           <div className="flex-1 min-w-0 pr-4 animate-breathe">
             <p 
