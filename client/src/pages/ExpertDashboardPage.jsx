@@ -61,6 +61,27 @@ export default function ExpertDashboardPage() {
   const [brcData, setBrcData] = useState([]);
   const [messages, setMessages] = useState([]);
 
+  const [clearedMessages, setClearedMessages] = useState(() => {
+    try {
+      const stored = localStorage.getItem(`clearedMessages_${user?.id}`);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const handleClearMessage = (msgId) => {
+    setClearedMessages(prev => {
+      const updated = [...prev, msgId];
+      try {
+        localStorage.setItem(`clearedMessages_${user?.id}`, JSON.stringify(updated));
+      } catch (e) {
+        console.error("Failed to save cleared messages", e);
+      }
+      return updated;
+    });
+  };
+
   const [showEventModal, setShowEventModal] = useState(false);
   const [showPdfModal, setShowPdfModal] = useState(false);
   const [showStockModal, setShowStockModal] = useState(false);
