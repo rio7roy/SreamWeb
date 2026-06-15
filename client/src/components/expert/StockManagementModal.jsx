@@ -180,8 +180,8 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
 
   const sendLowStockAlert = async (stock) => {
     setAlertSending(stock.id);
-    const available = stock.availableQty || 0;
-    const original = stock.newQty || stock.quantity || 0;
+    const available = Number(stock.availableQty || 0);
+    const original = Number(stock.newQty || stock.quantity || 0);
     const isOutOfStock = available === 0 && original > 0;
     const alertContent = isOutOfStock
       ? `🚨 OUT OF STOCK: "${stock.itemName}" (${stock.uniqueId}) at ${brcName}. Available: 0 / Original: ${original}`
@@ -403,8 +403,8 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
                   {filteredStocks.map((stock, idx) => {
                 const catStyle = getCatStyle(stock.category);
                 const statusStyle = getStatusStyle(stock.status);
-                const isLow = (stock.availableQty || 0) <= LOW_STOCK_THRESHOLD && (stock.newQty || stock.quantity || 0) > LOW_STOCK_THRESHOLD;
-                const isOutOfStock = (stock.availableQty || 0) === 0 && (stock.newQty || stock.quantity || 0) > 0;
+                const isLow = Number(stock.availableQty || 0) <= LOW_STOCK_THRESHOLD && Number(stock.newQty || stock.quantity || 0) > LOW_STOCK_THRESHOLD;
+                const isOutOfStock = Number(stock.availableQty || 0) === 0 && Number(stock.newQty || stock.quantity || 0) > 0;
 
                 return (
                   <div key={stock.id}
@@ -419,13 +419,16 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
 
                       {/* IMG */}
                       {stock.img && stock.img !== '' ? (
-                        <div className="w-8 h-8 rounded-md overflow-hidden border border-gray-200 flex-shrink-0">
+                        <div className="w-8 h-8 rounded-md overflow-hidden border border-gray-200 flex-shrink-0 relative">
                           <img 
                             src={resolveImgUrl(stock.img)} 
                             alt={stock.itemName} 
-                            className="w-full h-full object-cover bg-white"
-                            onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = `<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-sm" style="color:${catStyle.accent}">${catStyle.icon}</span></div>`; }}
+                            className="w-full h-full object-cover bg-white absolute inset-0 z-10"
+                            onError={(e) => { e.target.style.display = 'none'; }}
                           />
+                          <div className="w-full h-full flex items-center justify-center bg-white absolute inset-0 z-0">
+                            <span className="material-symbols-outlined text-sm" style={{color: catStyle.accent}}>{catStyle.icon}</span>
+                          </div>
                         </div>
                       ) : (
                         <div className="w-8 h-8 rounded-md flex items-center justify-center border flex-shrink-0 bg-white"
