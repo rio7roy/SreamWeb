@@ -314,7 +314,7 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
               </button>
             </div>
 
-            <div className="overflow-y-auto p-4 flex flex-col gap-3 bg-surface text-on-surface">
+            <div className="overflow-y-auto flex-1 min-h-0 p-4 flex flex-col gap-3 bg-surface text-on-surface">
               {bellMessages.length === 0 && (
                 <div className="text-center p-8 text-secondary">
                   <span className="material-symbols-outlined text-4xl text-secondary/40 mb-3 block">notifications_off</span>

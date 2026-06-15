@@ -115,8 +115,8 @@ export default function BroadcastLogsTab() {
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-outline/10 rounded-2xl overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
+      <div className="bg-white border border-outline/10 rounded-2xl overflow-hidden shadow-sm flex flex-col max-h-[600px]">
+        <div className="overflow-x-auto overflow-y-auto flex-1 min-h-0">
           <table className="w-full text-sm text-left">
             <thead className="bg-surface-container-low text-secondary text-xs uppercase tracking-wider font-bold">
               <tr>
