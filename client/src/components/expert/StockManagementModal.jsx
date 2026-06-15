@@ -29,6 +29,25 @@ const STATUS_CONFIG = {
 
 const LOW_STOCK_THRESHOLD = 3;
 
+// Helper: build the correct absolute URL for a stock image
+const resolveImgUrl = (img) => {
+  if (!img || img === '') return null;
+  // Already an absolute URL
+  if (img.startsWith('http')) return img;
+  // Strip leading /api prefix — images are served at /api/uploads/...
+  const apiBase = import.meta.env.VITE_API_URL || '/api';
+  // If the img path starts with /api/, replace that prefix with the actual API base
+  if (img.startsWith('/api/')) {
+    return `${apiBase}${img.slice(4)}`; // /api/uploads/x.jpg → {base}/uploads/x.jpg
+  }
+  // If it starts with /uploads/ or just a filename
+  if (img.startsWith('/uploads/') || img.startsWith('uploads/')) {
+    return `${apiBase}/${img.replace(/^\//, '')}`;
+  }
+  // Fallback: prepend apiBase
+  return `${apiBase}/${img}`;
+};
+
 export default function StockManagementModal({ brcCode, brcName, onClose }) {
   const [stocks, setStocks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -161,12 +180,21 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
 
   const sendLowStockAlert = async (stock) => {
     setAlertSending(stock.id);
+    const available = stock.availableQty || 0;
+    const original = stock.newQty || stock.quantity || 0;
+    const isOutOfStock = available === 0 && original > 0;
+    const alertContent = isOutOfStock
+      ? `🚨 OUT OF STOCK: "${stock.itemName}" (${stock.uniqueId}) at ${brcName}. Available: 0 / Original: ${original}`
+      : `⚠️ Low Stock: "${stock.itemName}" (${stock.uniqueId}) at ${brcName}. Available: ${available} / Original: ${original}`;
     try {
       await api.post('/messages', {
-        type: 'LOW_STOCK_ALERT',
-        title: `⚠️ Low Stock: ${stock.itemName}`,
-        message: `"${stock.itemName}" (${stock.uniqueId}) at ${brcName} is critically low. Available: ${stock.availableQty || 0} / Original: ${stock.newQty || stock.quantity}`,
-        brc: brcCode, priority: 'HIGH',
+        type: isOutOfStock ? 'OUT_OF_STOCK_ALERT' : 'LOW_STOCK_ALERT',
+        title: isOutOfStock ? `🚨 Out of Stock: ${stock.itemName}` : `⚠️ Low Stock: ${stock.itemName}`,
+        content: alertContent,
+        to: ['ADMIN'],
+        message: alertContent,
+        brc: brcCode,
+        priority: isOutOfStock ? 'CRITICAL' : 'HIGH',
       });
       showFeedback('success', `Alert sent to admin for "${stock.itemName}"`);
     } catch { showFeedback('success', `Alert sent for "${stock.itemName}"`); }
@@ -376,10 +404,11 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
                 const catStyle = getCatStyle(stock.category);
                 const statusStyle = getStatusStyle(stock.status);
                 const isLow = (stock.availableQty || 0) <= LOW_STOCK_THRESHOLD && (stock.newQty || stock.quantity || 0) > LOW_STOCK_THRESHOLD;
+                const isOutOfStock = (stock.availableQty || 0) === 0 && (stock.newQty || stock.quantity || 0) > 0;
 
                 return (
                   <div key={stock.id}
-                    className={`px-6 py-2 border-b border-gray-100 hover:bg-amber-50/40 transition-colors ${isLow ? 'bg-red-50/60' : ''}`}>
+                    className={`px-6 py-2 border-b border-gray-100 hover:bg-amber-50/40 transition-colors ${isOutOfStock ? 'bg-red-100/80' : isLow ? 'bg-red-50/60' : ''}`}>
                     <div className="grid items-center gap-2" style={{ gridTemplateColumns: gridCols }}>
 
                       {/* # */}
@@ -392,13 +421,10 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
                       {stock.img && stock.img !== '' ? (
                         <div className="w-8 h-8 rounded-md overflow-hidden border border-gray-200 flex-shrink-0">
                           <img 
-                            src={stock.img.startsWith('/api') 
-                                  ? stock.img.replace('/api', import.meta.env.VITE_API_URL || '/api') 
-                                  : stock.img.startsWith('http') 
-                                      ? stock.img 
-                                      : `${import.meta.env.VITE_API_URL || '/api'}${stock.img.startsWith('/') ? '' : '/'}${stock.img}`} 
+                            src={resolveImgUrl(stock.img)} 
                             alt={stock.itemName} 
-                            className="w-full h-full object-cover bg-white" 
+                            className="w-full h-full object-cover bg-white"
+                            onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = `<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-sm" style="color:${catStyle.accent}">${catStyle.icon}</span></div>`; }}
                           />
                         </div>
                       ) : (
@@ -476,10 +502,10 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
                       <div className="flex justify-center gap-1">
                         <button onClick={() => sendLowStockAlert(stock)} disabled={alertSending === stock.id}
                           className={`flex items-center justify-center p-1.5 rounded-lg text-xs font-bold transition-all ${
-                            isLow ? 'bg-red-600 text-white hover:bg-red-700 shadow-sm' : 'bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600'
-                          }`} title="Send low stock alert to admin">
+                            isOutOfStock ? 'bg-red-700 text-white hover:bg-red-800 shadow-md ring-2 ring-red-300 animate-pulse' : isLow ? 'bg-red-600 text-white hover:bg-red-700 shadow-sm' : 'bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600'
+                          }`} title={isOutOfStock ? 'OUT OF STOCK — Send urgent alert to admin' : 'Send low stock alert to admin'}>
                           <span className="material-symbols-outlined text-[14px]">
-                            {alertSending === stock.id ? 'hourglass_top' : 'notification_important'}
+                            {alertSending === stock.id ? 'hourglass_top' : isOutOfStock ? 'error' : 'notification_important'}
                           </span>
                         </button>
                         {stock.source === 'MANUAL' && (
