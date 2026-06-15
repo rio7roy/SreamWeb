@@ -9,7 +9,7 @@ import Button from '../components/ui/Button';
 
 const PORTALS = [
   { role: 'ADMIN', label: 'Admin', icon: 'admin_panel_settings', defaultEmail: 'admin@stream.edu', defaultPassword: 'Admin@123' },
-  { role: 'EXPERT', label: 'STREAM Expert', icon: 'school', defaultEmail: 'expert@stream.edu', defaultPassword: 'Demo@123' },
+  { role: 'EXPERT', label: 'STREAM Expert', icon: 'school', defaultEmail: '', defaultPassword: '' },
   { role: 'STREAM_LAB', label: 'STREAM Hub', icon: 'biotech', defaultEmail: 'lab@stream.edu', defaultPassword: 'Demo@123' },
   { role: 'ILAB', label: 'iLab Corner', icon: 'computer', defaultEmail: 'ilab@stream.edu', defaultPassword: 'Demo@123' },
   { role: 'CREATIVE_CORNER', label: 'Creative Corner', icon: 'auto_awesome', defaultEmail: 'creative@stream.edu', defaultPassword: 'Demo@123' },
