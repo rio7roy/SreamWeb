@@ -49,19 +49,7 @@ async function seedDatabase() {
       createdAt: new Date(),
       updatedAt: new Date(),
     },
-    {
-      id: 'mock-expert',
-      email: 'expert@stream.edu',
-      username: 'expert_demo',
-      password: demoPassword,
-      name: 'Dr. Sarah Chen',
-      role: 'EXPERT',
-      avatar: null,
-      isActive: true,
-      lastLoginAt: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
+
     {
       id: 'mock-lab',
       email: 'lab@stream.edu',
