@@ -12,15 +12,27 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
   const [allMessages, setAllMessages] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
-  // Persisted dismissed IDs — once dismissed, never shown again (even after re-login)
+  // Persisted dismissed IDs — scoped to the current context (global vs specific BRC)
+  const storageKey = selectedBrc ? `dismissed_notifications_${selectedBrc.code}` : 'dismissed_notifications_global';
+  
   const [dismissedIds, setDismissedIds] = useState(() => {
     try {
-      const stored = localStorage.getItem('dismissed_notifications');
+      const stored = localStorage.getItem(selectedBrc ? `dismissed_notifications_${selectedBrc.code}` : 'dismissed_notifications_global');
       return stored ? JSON.parse(stored) : [];
     } catch {
       return [];
     }
   });
+
+  // Reload dismissed IDs when context changes
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(storageKey);
+      setDismissedIds(stored ? JSON.parse(stored) : []);
+    } catch {
+      setDismissedIds([]);
+    }
+  }, [storageKey]);
 
   // IDs the user has already "seen" as a toast (so we don't re-toast on re-render)
   const [seenToastIds, setSeenToastIds] = useState(() => {
@@ -112,7 +124,7 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
   const handleDismissMessage = useCallback((id) => {
     setDismissedIds(prev => {
       const updated = [...new Set([...prev, id])];
-      localStorage.setItem('dismissed_notifications', JSON.stringify(updated));
+      localStorage.setItem(storageKey, JSON.stringify(updated));
       return updated;
     });
     // Also remove from active toasts if present
@@ -121,7 +133,7 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
       clearTimeout(toastTimers.current[id]);
       delete toastTimers.current[id];
     }
-  }, []);
+  }, [storageKey]);
 
   const dismissToast = useCallback((id, e) => {
     if (e) e.stopPropagation();

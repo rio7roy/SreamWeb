@@ -454,7 +454,13 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
                         <input type="number" min="0" max={stock.newQty || stock.quantity}
                           defaultValue={stock.availableQty ?? stock.newQty ?? stock.quantity ?? 0}
                           className="w-10 text-center text-[11px] font-bold border rounded py-0.5 outline-none focus:border-green-500 focus:bg-green-50"
-                          onBlur={(e) => updateStockField(stock.id, { availableQty: parseInt(e.target.value) || 0 })}
+                          onBlur={(e) => {
+                            let val = parseInt(e.target.value) || 0;
+                            const maxVal = stock.newQty || stock.quantity || 0;
+                            if (val > maxVal) val = maxVal;
+                            e.target.value = val;
+                            updateStockField(stock.id, { availableQty: val });
+                          }}
                           onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
                       </div>
 

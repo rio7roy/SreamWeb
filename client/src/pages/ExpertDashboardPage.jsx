@@ -250,17 +250,17 @@ export default function ExpertDashboardPage() {
           className="mb-4 p-3 bg-white/50 rounded-xl border border-on-surface/10 cursor-pointer hover:bg-white/80 transition-colors group"
         >
           <div className="flex items-center gap-3 mb-2">
-            <div className="h-10 w-10 rounded-full bg-primary-fixed overflow-hidden border border-outline/10 flex items-center justify-center">
-              {user?.avatar ? (
+            <div className="h-10 w-10 rounded-full bg-primary-fixed overflow-hidden border border-outline/10 flex items-center justify-center relative">
+              <span className="text-on-primary-container font-bold text-sm z-0">
+                {user?.name?.charAt(0)?.toUpperCase()}
+              </span>
+              {user?.avatar && (
                 <img
                   src={`${import.meta.env.VITE_API_URL || "/api"}/uploads/${user.avatar}`}
                   alt="Profile"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover absolute inset-0 z-10 bg-surface"
+                  onError={(e) => { e.target.style.display = 'none'; }}
                 />
-              ) : (
-                <span className="text-on-primary-container font-bold text-sm">
-                  {user?.name?.charAt(0)?.toUpperCase()}
-                </span>
               )}
             </div>
             <div>

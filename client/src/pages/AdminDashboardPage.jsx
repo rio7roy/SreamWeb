@@ -130,13 +130,12 @@ export default function AdminDashboardPage() {
           className="mb-8 p-4 bg-white/50 rounded-xl border border-on-surface/10 cursor-pointer hover:bg-white/80 transition-colors group"
         >
           <div className="flex items-center gap-3 mb-3">
-            <div className="h-10 w-10 rounded-full bg-error/10 border border-error/20 flex items-center justify-center overflow-hidden shrink-0">
-              {user?.avatar ? (
-                <img src={`${import.meta.env.VITE_API_URL || '/api'}/uploads/${user.avatar}`} alt="Admin" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-error font-bold text-sm">
-                  {user?.name?.charAt(0)?.toUpperCase() || 'A'}
-                </span>
+            <div className="h-10 w-10 rounded-full bg-error/10 border border-error/20 flex items-center justify-center overflow-hidden shrink-0 relative">
+              <span className="text-on-primary-container font-bold text-sm z-0">
+                {user?.name?.charAt(0)?.toUpperCase()}
+              </span>
+              {user?.avatar && (
+                <img src={`${import.meta.env.VITE_API_URL || '/api'}/uploads/${user.avatar}`} alt="Admin" className="w-full h-full object-cover absolute inset-0 z-10 bg-surface" onError={(e) => { e.target.style.display = 'none'; }} />
               )}
             </div>
             <div className="flex-1 min-w-0">

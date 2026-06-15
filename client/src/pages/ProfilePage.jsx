@@ -141,10 +141,9 @@ export default function ProfilePage() {
             <div className="bg-white border border-on-surface/10 rounded-3xl p-8 flex flex-col items-center justify-center text-center shadow-sm">
               <div className="relative group mb-6">
                 <div className="w-40 h-40 rounded-full border-4 border-surface-container overflow-hidden shadow-xl bg-surface-container flex items-center justify-center relative">
-                  {avatarPreview ? (
-                    <img src={avatarPreview} alt="Profile" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-6xl text-primary font-bold">{user?.name?.charAt(0)?.toUpperCase()}</span>
+                  <span className="text-6xl text-primary font-bold z-0">{user?.name?.charAt(0)?.toUpperCase()}</span>
+                  {avatarPreview && (
+                    <img src={avatarPreview} alt="Profile" className="w-full h-full object-cover absolute inset-0 z-10 bg-surface-container" onError={(e) => { e.target.style.display = 'none'; }} />
                   )}
                   
                   {uploadingPhoto && (
