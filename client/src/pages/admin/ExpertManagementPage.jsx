@@ -130,31 +130,73 @@ export default function ExpertManagementPage() {
 
           {expert && (
             <>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              {/* Assigned BRCs Section */}
-              <div>
-                <h4 className="text-sm font-bold text-secondary uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-amber-500">school</span>
-                  Assigned BRCs ({assignedBrcs.length})
-                </h4>
-                
+              <div className="flex flex-col gap-8">
+                {/* Header with Search */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <h4 className="text-sm font-bold text-secondary uppercase tracking-wider flex items-center gap-2">
+                    <span className="material-symbols-outlined text-amber-500">school</span>
+                    Assigned BRCs ({assignedBrcs.length})
+                  </h4>
+                  
+                  <div className="relative w-full md:w-96 z-20">
+                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-secondary pointer-events-none">search</span>
+                    <input 
+                      type="text" 
+                      value={brcSearch}
+                      onChange={(e) => setBrcSearch(e.target.value)}
+                      placeholder="Assign additional hubs..."
+                      className="w-full bg-surface-container-low border border-outline/20 rounded-2xl pl-12 pr-4 py-3 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all text-sm font-medium"
+                    />
+                    
+                    {/* Dropdown Overlay */}
+                    {brcSearch && (
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-outline/10 overflow-hidden z-50 max-h-[300px] flex flex-col">
+                        {searchResults.length > 0 ? (
+                          <div className="overflow-y-auto p-2 space-y-1 custom-scrollbar">
+                            {searchResults.map(brc => (
+                              <button
+                                key={brc.code}
+                                onClick={() => handleAddBrc(brc.code)}
+                                className="w-full text-left px-4 py-3 rounded-xl hover:bg-amber-50 flex items-center justify-between group transition-all"
+                              >
+                                <div>
+                                  <p className="font-bold text-on-surface">{brc.name}</p>
+                                  <p className="text-xs text-secondary mt-0.5">{brc.code} • {brc.district}</p>
+                                </div>
+                                <span className="material-symbols-outlined text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity">add_circle</span>
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="p-4 text-center text-sm text-secondary">
+                            No matching unassigned BRCs found.
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Assigned BRCs List */}
                 {assignedBrcs.length === 0 ? (
                   <div className="p-8 rounded-2xl bg-surface-container-low border border-dashed border-outline/30 text-center text-secondary">
                     <span className="material-symbols-outlined text-4xl mb-3 opacity-30">map</span>
                     <p className="font-medium">No BRCs currently assigned to this expert.</p>
-                    <p className="text-xs opacity-70 mt-1">Use the search panel to assign hubs.</p>
                   </div>
                 ) : (
-                  <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {assignedBrcs.map(brc => (
-                      <div key={brc.code} className="flex items-center justify-between p-5 bg-white rounded-2xl shadow-sm border border-outline/10 group hover:border-amber-300 transition-colors animate-fade-in-up">
-                        <div>
-                          <p className="font-bold text-on-surface text-lg">{brc.name}</p>
-                          <p className="text-sm text-secondary mt-1">{brc.code} • {brc.district}</p>
+                      <div key={brc.code} className="flex flex-col p-5 bg-white rounded-2xl shadow-sm border border-outline/10 group hover:border-amber-300 transition-colors animate-fade-in-up relative overflow-hidden">
+                        <div className="flex-grow pr-10">
+                          <p className="font-bold text-on-surface text-lg leading-tight mb-3">{brc.name}</p>
+                          <div className="flex flex-wrap gap-2 mt-auto">
+                            <span className="px-2 py-1 bg-surface-container text-secondary rounded-lg text-[10px] font-bold uppercase tracking-wider">{brc.code}</span>
+                            <span className="px-2 py-1 bg-amber-50 text-amber-700 rounded-lg text-[10px] font-bold uppercase tracking-wider">{brc.district}</span>
+                          </div>
                         </div>
                         <button 
                           onClick={() => handleRemoveBrc(brc.code)}
-                          className="p-3 text-secondary hover:text-error hover:bg-error/10 rounded-xl transition-colors opacity-50 group-hover:opacity-100 focus:opacity-100 bg-surface-container"
+                          className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-secondary hover:text-error hover:bg-error/10 rounded-xl transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 bg-surface-container"
                           title="Remove BRC"
                         >
                           <span className="material-symbols-outlined">delete</span>
@@ -164,55 +206,6 @@ export default function ExpertManagementPage() {
                   </div>
                 )}
               </div>
-
-              {/* Add New BRC Section */}
-              <div className="flex flex-col">
-                <h4 className="text-sm font-bold text-secondary uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-amber-500">add_circle</span>
-                  Assign Additional Hubs
-                </h4>
-                <div className="relative mb-4">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-secondary pointer-events-none">search</span>
-                  <input 
-                    type="text" 
-                    value={brcSearch}
-                    onChange={(e) => setBrcSearch(e.target.value)}
-                    placeholder="Search by name, code, or district..."
-                    className="w-full bg-surface-container-low border border-outline/20 rounded-2xl pl-12 pr-4 py-4 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all text-lg"
-                  />
-                </div>
-
-                {/* Search Results */}
-                <div className="flex-grow bg-surface-container-low rounded-2xl border border-outline/10 overflow-hidden flex flex-col min-h-[300px]">
-                  {searchResults.length > 0 ? (
-                    <div className="overflow-y-auto p-2 space-y-1">
-                      {searchResults.map(brc => (
-                        <button
-                          key={brc.code}
-                          onClick={() => handleAddBrc(brc.code)}
-                          className="w-full text-left px-4 py-3 rounded-xl hover:bg-white hover:shadow-sm flex items-center justify-between group transition-all"
-                        >
-                          <div>
-                            <p className="font-bold text-on-surface">{brc.name}</p>
-                            <p className="text-xs text-secondary mt-0.5">{brc.code} • {brc.district}</p>
-                          </div>
-                          <span className="material-symbols-outlined text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity">add_circle</span>
-                        </button>
-                      ))}
-                    </div>
-                  ) : brcSearch ? (
-                    <div className="flex-grow flex items-center justify-center text-secondary p-8 text-center">
-                      <p>No matching unassigned BRCs found.</p>
-                    </div>
-                  ) : (
-                    <div className="flex-grow flex items-center justify-center text-secondary/60 p-8 text-center flex-col gap-2">
-                      <span className="material-symbols-outlined text-4xl">search</span>
-                      <p>Type to search hubs...</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
             
             {/* Attendance Log */}
             <div className="mt-12 bg-white rounded-2xl shadow-sm border border-outline/10 flex flex-col min-h-[300px]">
