@@ -5,17 +5,25 @@ import { useAuth } from '../../features/auth/AuthContext';
 export default function ReportsPage() {
   const { user } = useAuth();
   const [brcs, setBrcs] = useState([]);
+  const [experts, setExperts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedBrc, setSelectedBrc] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
+  const [selectedExpert, setSelectedExpert] = useState('');
   const [previewEvents, setPreviewEvents] = useState([]);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
-    api.get('/brcs')
-      .then(res => setBrcs(res.data || []))
+    Promise.all([
+      api.get('/brcs'),
+      api.get('/admin/users/experts').catch(() => ({ data: [] })) // Fallback if not authorized
+    ])
+      .then(([brcsRes, expertsRes]) => {
+        setBrcs(brcsRes.data || []);
+        setExperts(expertsRes.data || []);
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
@@ -39,6 +47,7 @@ export default function ReportsPage() {
         if (selectedDistrict) params.append('district', selectedDistrict);
         if (selectedBrc) params.append('brcCode', selectedBrc);
         if (selectedMonth) params.append('month', selectedMonth);
+        if (selectedExpert) params.append('expertId', selectedExpert);
         
         if (params.toString()) {
           url += '?' + params.toString();
@@ -53,7 +62,7 @@ export default function ReportsPage() {
       }
     };
     fetchPreview();
-  }, [selectedDistrict, selectedBrc, selectedMonth]);
+  }, [selectedDistrict, selectedBrc, selectedMonth, selectedExpert]);
 
   const handleDownload = (type) => {
     let url = `${import.meta.env.VITE_API_URL || '/api'}/events/export/${type}`;
@@ -61,6 +70,7 @@ export default function ReportsPage() {
     if (selectedDistrict) params.append('district', selectedDistrict);
     if (selectedBrc) params.append('brcCode', selectedBrc);
     if (selectedMonth) params.append('month', selectedMonth);
+    if (selectedExpert) params.append('expertId', selectedExpert);
     
     if (params.toString()) {
       url += '?' + params.toString();
@@ -109,7 +119,7 @@ export default function ReportsPage() {
           Events Report
         </h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">Filter by District</label>
             <select 
@@ -138,6 +148,20 @@ export default function ReportsPage() {
               <option value="">All Hubs</option>
               {filteredBrcs.map(b => (
                 <option key={b.code} value={b.code}>{b.name} ({b.code})</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">Filter by Expert</label>
+            <select 
+              className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 text-on-surface focus:border-primary outline-none"
+              value={selectedExpert}
+              onChange={(e) => setSelectedExpert(e.target.value)}
+            >
+              <option value="">All Experts</option>
+              {experts.map(expert => (
+                <option key={expert.id} value={expert.id}>{expert.name || expert.email}</option>
               ))}
             </select>
           </div>

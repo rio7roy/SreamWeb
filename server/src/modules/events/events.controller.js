@@ -240,11 +240,15 @@ exports.updateEvent = (req, res) => {
 
 exports.getEvents = (req, res) => {
   try {
-    const { brcCode, district, month, mine } = req.query;
+    const { brcCode, district, month, mine, expertId } = req.query;
     let events = readEvents();
 
     if (mine === 'true') {
       events = events.filter(e => e.createdBy === req.user.id);
+    }
+
+    if (expertId) {
+      events = events.filter(e => e.createdBy === expertId);
     }
 
     // Clean up expired drafts while we're fetching events
@@ -304,7 +308,7 @@ exports.getEvents = (req, res) => {
 
 exports.exportEventsExcel = async (req, res) => {
   try {
-    const { brcCode, district, month, mine } = req.query;
+    const { brcCode, district, month, mine, expertId } = req.query;
     
     // Read BRCs to map BRC codes to Districts
     let brcs = [];
@@ -320,6 +324,10 @@ exports.exportEventsExcel = async (req, res) => {
 
     if (mine === 'true') {
       events = events.filter(e => e.createdBy === req.user.id);
+    }
+
+    if (expertId) {
+      events = events.filter(e => e.createdBy === expertId);
     }
 
     // Filter by District
@@ -400,8 +408,16 @@ exports.exportEventsExcel = async (req, res) => {
 
 exports.exportEventsPdf = async (req, res) => {
   try {
-    const { brcCode, district, month } = req.query;
+    const { brcCode, district, month, mine, expertId } = req.query;
     let events = readEvents().filter(e => e.status === 'SUBMITTED');
+
+    if (mine === 'true') {
+      events = events.filter(e => e.createdBy === req.user.id);
+    }
+
+    if (expertId) {
+      events = events.filter(e => e.createdBy === expertId);
+    }
 
     let brcs = [];
     try { brcs = JSON.parse(fs.readFileSync(BRCS_FILE, 'utf8')); } catch(e) {}
