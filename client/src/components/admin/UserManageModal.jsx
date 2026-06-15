@@ -157,10 +157,22 @@ export default function UserManageModal({ type, entityName, onClose, initialUser
                         <div>
                           <h4 className="font-bold text-on-surface group-hover:text-blue-700">{u.name || 'Unnamed'}</h4>
                           <p className="text-sm text-secondary">{u.email}</p>
+                          {type === 'experts' && (
+                            <p className="text-[10px] font-mono text-secondary mt-1 max-w-[250px] truncate">
+                              {(u.brcs && u.brcs.length > 0) ? u.brcs.join(', ') : 'No hubs assigned'}
+                            </p>
+                          )}
                         </div>
-                        <span className="material-symbols-outlined text-outline group-hover:text-blue-500">
-                          chevron_right
-                        </span>
+                        <div className="flex items-center gap-4">
+                          {type === 'experts' && (
+                            <span className="text-[10px] font-bold px-2 py-1 bg-blue-100 text-blue-700 rounded-lg whitespace-nowrap">
+                              {(u.brcs || []).length} Hubs
+                            </span>
+                          )}
+                          <span className="material-symbols-outlined text-outline group-hover:text-blue-500">
+                            chevron_right
+                          </span>
+                        </div>
                       </button>
                     );
                   })
