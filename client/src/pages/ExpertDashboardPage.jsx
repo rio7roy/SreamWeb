@@ -6,7 +6,6 @@ import EventReportModal from '../components/expert/EventReportModal';
 import ExpertProfileTab from '../components/expert/ExpertProfileTab';
 import ExpertSessionLogsTab from '../components/expert/ExpertSessionLogsTab';
 import PdfReportModal from '../components/expert/PdfReportModal';
-import NotificationBar from '../components/ui/NotificationBar';
 import StockManagementModal from '../components/expert/StockManagementModal';
 
 const EXPERT_NAV = [
@@ -329,7 +328,6 @@ export default function ExpertDashboardPage() {
       </aside>
 
       <main className="flex-grow overflow-y-auto flex flex-col relative z-10">
-        <NotificationBar />
         <header className="w-full h-16 bg-white/80 backdrop-blur-md flex items-center px-4 md:hidden border-b border-on-surface/10 shrink-0 sticky top-0 z-30">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -480,7 +478,7 @@ export default function ExpertDashboardPage() {
                               <span className="text-xs font-bold bg-error/10 text-error px-2 py-0.5 rounded-full ml-2">{displayMessages.length} New</span>
                             </h3>
                             <button 
-                              onClick={() => setShowNotifications(false)}
+                              onClick={(e) => { e.stopPropagation(); e.preventDefault(); setShowNotifications(false); }}
                               className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-highest text-secondary transition-colors"
                             >
                               <span className="material-symbols-outlined">close</span>
@@ -498,7 +496,7 @@ export default function ExpertDashboardPage() {
                                 {displayMessages.map(msg => (
                                   <div key={msg.__msgId} className="relative p-5 bg-white border border-outline/20 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                                     <button 
-                                      onClick={() => setClearedMessages(prev => [...prev, msg.__msgId])}
+                                      onClick={(e) => { e.stopPropagation(); e.preventDefault(); setClearedMessages(prev => [...prev, msg.__msgId]); }}
                                       className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-surface-container-lowest border border-outline/10 text-secondary hover:text-error hover:bg-error/10 transition-colors shadow-sm z-10"
                                       title="Clear message"
                                     >
