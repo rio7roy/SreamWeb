@@ -28,6 +28,8 @@ export default function BroadcastLogsTab() {
   const filteredMessages = useMemo(() => {
     return messages.filter(msg => {
       if (filterTarget !== 'ALL_TYPES') {
+        if (!msg.to || !Array.isArray(msg.to)) return false;
+        
         const matchesTarget = msg.to.some(target => {
           if (filterTarget === 'ALL' && target === 'ALL') return true;
           if (filterTarget === 'DISTRICT' && target.startsWith('DISTRICT:')) return true;
@@ -138,7 +140,7 @@ export default function BroadcastLogsTab() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1">
-                        {msg.to.map((t, idx) => (
+                        {(Array.isArray(msg.to) ? msg.to : []).map((t, idx) => (
                           <span key={idx} className="px-2 py-1 bg-primary-container text-on-primary-container text-[10px] font-bold rounded uppercase tracking-wider whitespace-nowrap">
                             {t}
                           </span>
