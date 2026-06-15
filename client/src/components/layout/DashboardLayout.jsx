@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
+import NotificationBar from '../ui/NotificationBar';
 
 const ROLE_LABELS = {
   ADMIN: 'Administrator',
@@ -120,6 +121,8 @@ export default function DashboardLayout() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-h-screen">
+        <NotificationBar />
+        
         {/* Top Bar */}
         <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-black/[0.03] px-6 py-4">
           <div className="flex items-center justify-between">

@@ -68,6 +68,7 @@ async function seedDatabase() {
       name: 'STREAM Hub Manager',
       role: 'STREAM_LAB',
       avatar: null,
+      assignedBrcs: ['32110100105SH'],
       isActive: true,
       lastLoginAt: null,
       createdAt: new Date(),

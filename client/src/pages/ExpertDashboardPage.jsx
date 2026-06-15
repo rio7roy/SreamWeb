@@ -6,6 +6,7 @@ import EventReportModal from '../components/expert/EventReportModal';
 import ExpertProfileTab from '../components/expert/ExpertProfileTab';
 import ExpertSessionLogsTab from '../components/expert/ExpertSessionLogsTab';
 import PdfReportModal from '../components/expert/PdfReportModal';
+import NotificationBar from '../components/ui/NotificationBar';
 
 const EXPERT_NAV = [
   { label: 'Dashboard', icon: 'dashboard', active: true },
@@ -317,6 +318,7 @@ export default function ExpertDashboardPage() {
       </aside>
 
       <main className="flex-grow overflow-y-auto flex flex-col relative z-10">
+        <NotificationBar />
         <header className="w-full h-16 bg-white/80 backdrop-blur-md flex items-center px-4 md:hidden border-b border-on-surface/10 shrink-0 sticky top-0 z-30">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
