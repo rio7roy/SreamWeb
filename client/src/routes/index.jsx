@@ -1,4 +1,4 @@
-import { createBrowserRouter, ScrollRestoration, Outlet } from 'react-router-dom';
+import { createBrowserRouter, ScrollRestoration, Outlet, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import PortalPage from '../pages/PortalPage';
@@ -9,8 +9,6 @@ import BrcManagementPage from '../pages/admin/BrcManagementPage';
 import ExpertManagementPage from '../pages/admin/ExpertManagementPage';
 import ReportsPage from '../pages/admin/ReportsPage';
 import ExpertOnboardingPage from '../pages/ExpertOnboardingPage';
-import NotFoundPage from '../pages/NotFoundPage';
-import ErrorPage from '../pages/ErrorPage';
 import ProfilePage from '../pages/ProfilePage';
 
 const RootLayout = () => (
@@ -23,7 +21,7 @@ const RootLayout = () => (
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
-    errorElement: <ErrorPage />,
+    errorElement: <Navigate to="/" replace />,
     children: [
       {
         path: '/',
@@ -108,7 +106,7 @@ const router = createBrowserRouter([
       },
       {
         path: '*',
-        element: <NotFoundPage />,
+        element: <Navigate to="/" replace />,
       },
     ]
   }

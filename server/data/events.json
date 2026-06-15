@@ -154,5 +154,34 @@
     "createdBy": "fb9fc04a-8328-40ab-beaa-a5c912a439ed",
     "updatedAt": "2026-06-10T08:52:02.678Z",
     "reportPdf": "/uploads/1781081522676-d601e634bba6da9d.pdf"
+  },
+  {
+    "id": "3dab55e3-d038-4ca1-a30c-fbc7c0ce3b63",
+    "brcCode": "32110100105SH",
+    "venueType": "SELECTED_BRC",
+    "venueValue": "32110100105SH",
+    "name": [
+      "",
+      ""
+    ],
+    "date": [
+      "",
+      ""
+    ],
+    "description": [
+      "",
+      ""
+    ],
+    "teachersCount": 0,
+    "studentsCount": 0,
+    "latitude": 10.045954,
+    "longitude": 76.328178,
+    "locationTimestamp": "1781085082249",
+    "tag": null,
+    "customTag": null,
+    "photos": [],
+    "status": "DRAFT",
+    "createdAt": "2026-06-10T09:51:26.355Z",
+    "createdBy": "fb9fc04a-8328-40ab-beaa-a5c912a439ed"
   }
 ]
