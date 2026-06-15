@@ -110,20 +110,16 @@ export default function ExpertDashboardPage() {
     }
   };
 
-  const [messages, setMessages] = useState([]);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [clearedMessages, setClearedMessages] = useState([]);
+
 
   // Fetch BRCs and Messages
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [brcsRes, msgsRes] = await Promise.all([
-          api.get('/brcs'),
-          api.get('/users/me/messages')
+        const [brcsRes] = await Promise.all([
+          api.get('/brcs')
         ]);
         setBrcData(brcsRes.data);
-        setMessages(msgsRes.data.data || []);
       } catch (err) {
         console.error('Failed to fetch dashboard data', err);
       }
@@ -185,15 +181,7 @@ export default function ExpertDashboardPage() {
         if (target === `BRC:${selectedBrc.code}`) return true;
         return false;
       });
-    });
-  }, [messages, sessionActive, selectedBrc]);
-
-  const displayMessages = useMemo(() => {
-    return activeMessages
-      .map((msg, idx) => ({ ...msg, __msgId: msg.id || `${msg.createdAt}-${idx}` }))
-      .filter(msg => !clearedMessages.includes(msg.__msgId))
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }, [activeMessages, clearedMessages]);
+  const displayMessages = [];
 
   // Filtered BRCs
   const filteredBrcs = allowedBrcs;
@@ -449,81 +437,6 @@ export default function ExpertDashboardPage() {
                 </div>
                 
                 <div className="relative z-10 flex items-center gap-3">
-                  {/* Notifications Bell */}
-                  <div>
-                    <button
-                      onClick={() => setShowNotifications(true)}
-                      className="p-3 bg-white border border-outline/20 hover:bg-surface-container rounded-xl transition-colors shadow-sm relative flex items-center justify-center"
-                      title="Announcements"
-                    >
-                      <span className="material-symbols-outlined text-secondary">notifications</span>
-                      {displayMessages.length > 0 && (
-                        <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-error rounded-full animate-pulse border-2 border-white"></span>
-                      )}
-                    </button>
-                    
-                    {/* Notifications Floating Window Modal */}
-                    {showNotifications && createPortal(
-                      <div 
-                        className="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
-                        onClick={() => setShowNotifications(false)}
-                      >
-                        <div 
-                          className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden animate-fade-in-up relative"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <div className="px-6 py-4 border-b border-outline/10 flex justify-between items-center bg-surface-container-low">
-                            <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
-                              <span className="material-symbols-outlined text-error text-xl">campaign</span> 
-                              Announcements
-                              <span className="text-xs font-bold bg-error/10 text-error px-2 py-0.5 rounded-full ml-2">{displayMessages.length} New</span>
-                            </h3>
-                            <button 
-                              onClick={(e) => { e.stopPropagation(); e.preventDefault(); setShowNotifications(false); }}
-                              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-highest text-secondary transition-colors"
-                            >
-                              <span className="material-symbols-outlined">close</span>
-                            </button>
-                          </div>
-                          
-                          <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-surface-container-lowest">
-                            {displayMessages.length === 0 ? (
-                              <div className="py-20 text-center text-secondary flex flex-col items-center">
-                                <span className="material-symbols-outlined text-6xl mb-4 opacity-20">notifications_off</span>
-                                <p className="text-lg font-medium">No new announcements</p>
-                              </div>
-                            ) : (
-                              <div className="flex flex-col gap-3">
-                                {displayMessages.map(msg => (
-                                  <div key={msg.__msgId} className="relative p-5 bg-white border border-outline/20 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                                    <button 
-                                      onClick={(e) => { e.stopPropagation(); e.preventDefault(); setClearedMessages(prev => [...prev, msg.__msgId]); }}
-                                      className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-surface-container-lowest border border-outline/10 text-secondary hover:text-error hover:bg-error/10 transition-colors shadow-sm z-10"
-                                      title="Clear message"
-                                    >
-                                      <span className="material-symbols-outlined text-sm">close</span>
-                                    </button>
-                                    <div className="flex flex-col gap-2 pr-8">
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-bold uppercase tracking-wider text-error/80 bg-error/10 px-2 py-0.5 rounded">
-                                          {msg.to.some(t => t === 'ALL') ? 'Global' : 'Targeted'}
-                                        </span>
-                                        <span className="text-xs font-medium text-secondary">
-                                          {new Date(msg.createdAt).toLocaleDateString()} at {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </span>
-                                      </div>
-                                      <p className="text-sm text-on-surface leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>,
-                      document.body
-                    )}
-                  </div>
 
                   <button
                     onClick={handleChangeBrc}
