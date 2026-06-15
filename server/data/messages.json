@@ -2,8 +2,8 @@
   {
     "id": "a229839c-e38f-4540-a56e-c2aeff42ba67",
     "to": [
-      "GOVT SANSKRIT HSS THRIPUNITHURA (32081300407SH)",
-      "All BRCs in ERNAKULAM"
+      "BRC:32081300407SH",
+      "DISTRICT:ERNAKULAM"
     ],
     "content": "hj",
     "scheduledFor": "2026-06-16T09:15:00.000Z",
@@ -12,10 +12,10 @@
   {
     "id": "7f2452ba-f3c9-4481-8c76-cc5ecbc37cbc",
     "to": [
-      "GOVT VHSS ARYAD (32110100105SH)",
-      "GHSS VALIYAZHEECKAL (32110200809SH)",
-      "GHSS PULIYOOR (32110300803SH)",
-      "GHS THEKKEKKARA (32110800102SH)"
+      "BRC:32110100105SH",
+      "BRC:32110200809SH",
+      "BRC:32110300803SH",
+      "BRC:32110800102SH"
     ],
     "content": "Test 1",
     "scheduledFor": null,
@@ -38,5 +38,93 @@
     "content": "aysheri",
     "scheduledFor": null,
     "createdAt": "2026-06-09T09:12:44.263Z"
+  },
+  {
+    "id": "5c353d65-16d5-4b54-a541-b96653f636a4",
+    "to": [
+      "ALL"
+    ],
+    "content": "hi",
+    "scheduledFor": null,
+    "createdAt": "2026-06-11T05:08:14.430Z"
+  },
+  {
+    "id": "fade3556-0c85-4ed2-9e75-5bd1d8b0018c",
+    "to": [
+      "ALL"
+    ],
+    "content": "bye",
+    "scheduledFor": null,
+    "createdAt": "2026-06-11T07:24:47.367Z"
+  },
+  {
+    "id": "df556fe1-2e3e-45c4-a427-384847495977",
+    "type": "LOW_STOCK_ALERT",
+    "title": "⚠️ Low Stock: Digital Vernier Calliper",
+    "message": "\"Digital Vernier Calliper\" (LI20-T) at GHSS VALIYAZHEECKAL is critically low. Available: 1 / Original: 1",
+    "brc": "32110200809SH",
+    "priority": "HIGH",
+    "createdAt": "2026-06-12T05:57:43.878Z",
+    "read": false
+  },
+  {
+    "id": "3781b435-1b61-4088-b40b-743d15af2fbe",
+    "type": "LOW_STOCK_ALERT",
+    "title": "⚠️ Low Stock: Sewing Thread Cutter",
+    "message": "\"Sewing Thread Cutter\" (SW05-T) at GHSS VALIYAZHEECKAL is critically low. Available: 5 / Original: 5",
+    "brc": "32110200809SH",
+    "priority": "HIGH",
+    "createdAt": "2026-06-12T06:11:26.950Z",
+    "read": false
+  },
+  {
+    "id": "3d933696-2a84-4422-99cd-e1d62433c87b",
+    "type": "LOW_STOCK_ALERT",
+    "title": "⚠️ Low Stock: Digital Vernier Calliper",
+    "message": "\"Digital Vernier Calliper\" (LI20-T) at GHSS VALIYAZHEECKAL is critically low. Available: 1 / Original: 1",
+    "brc": "32110200809SH",
+    "priority": "HIGH",
+    "createdAt": "2026-06-12T07:21:09.668Z",
+    "read": false
+  },
+  {
+    "id": "99ba3347-1dcd-464e-a6bf-e8c585f88948",
+    "type": "LOW_STOCK_ALERT",
+    "title": "⚠️ Low Stock: Sewing Thread Cutter",
+    "message": "\"Sewing Thread Cutter\" (SW05-T) at GHSS VALIYAZHEECKAL is critically low. Available: 1 / Original: 5",
+    "brc": "32110200809SH",
+    "priority": "HIGH",
+    "createdAt": "2026-06-12T07:22:12.843Z",
+    "read": false
+  },
+  {
+    "id": "05261d3d-9a0c-4925-840a-c330e896eb48",
+    "type": "LOW_STOCK_ALERT",
+    "title": "⚠️ Low Stock: Sewing Thread Cutter",
+    "message": "\"Sewing Thread Cutter\" (SW05-T) at GOVT VHSS ARYAD is critically low. Available: 2 / Original: 5",
+    "brc": "32110100105SH",
+    "priority": "HIGH",
+    "createdAt": "2026-06-12T07:24:07.717Z",
+    "read": false
+  },
+  {
+    "id": "acd9c36b-bcda-4751-9d79-e7497510f897",
+    "type": "NEW_ITEM_ALERT",
+    "title": "✨ New Item Added: MAC",
+    "message": "Expert manually added \"MAC\" (1234) with quantity 3 at GHSS VALIYAZHEECKAL.",
+    "brc": "32110200809SH",
+    "priority": "NORMAL",
+    "createdAt": "2026-06-12T09:50:30.763Z",
+    "read": false
+  },
+  {
+    "id": "dfa6c79e-0ad3-4a46-984c-92bf7b8f4605",
+    "type": "NEW_ITEM_ALERT",
+    "title": "✨ New Item Added: mac",
+    "message": "Expert manually added \"mac\" (123) with quantity 0 at GHSS VALIYAZHEECKAL.",
+    "brc": "32110200809SH",
+    "priority": "NORMAL",
+    "createdAt": "2026-06-12T09:59:18.645Z",
+    "read": false
   }
 ]

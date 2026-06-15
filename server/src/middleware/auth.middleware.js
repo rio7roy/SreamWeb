@@ -28,6 +28,7 @@ async function authenticate(req, res, next) {
         role: true,
         avatar: true,
         isActive: true,
+        assignedBrcs: true,
       },
     });
 

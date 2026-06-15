@@ -14,6 +14,7 @@ const reportsRoutes = require('./modules/reports/reports.routes');
 const adminRoutes = require('./modules/admin/admin.routes');
 const eventsRoutes = require('./modules/events/events.routes');
 const brcsRoutes = require('./modules/brcs/brcs.routes');
+const stocksRoutes = require('./modules/stocks/stocks.routes');
 
 const app = express();
 
@@ -60,6 +61,28 @@ app.use('/api/reports', reportsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/brcs', brcsRoutes);
+app.use('/api/stocks', stocksRoutes);
+
+// ── Quick Messages Endpoint (for stock alerts) ──
+const fs = require('fs');
+const messagesPath = path.resolve(__dirname, '../data/messages.json');
+app.post('/api/messages', (req, res) => {
+  try {
+    const msg = {
+      id: require('crypto').randomUUID(),
+      ...req.body,
+      createdAt: new Date().toISOString(),
+      read: false,
+    };
+    let messages = [];
+    try { messages = JSON.parse(fs.readFileSync(messagesPath, 'utf8')); } catch {}
+    messages.push(msg);
+    fs.writeFileSync(messagesPath, JSON.stringify(messages, null, 2));
+    res.json({ success: true, data: msg, message: 'Alert sent successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Failed to save message' });
+  }
+});
 
 // ── 404 Handler ──
 app.use('/api/*', (_req, res) => {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
 import Header from '../components/layout/Header';
@@ -25,6 +25,7 @@ export default function PortalPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const portalGridRef = useRef(null);
 
   // Automatically logout if arriving at the portal page while authenticated
   useEffect(() => {
@@ -93,9 +94,12 @@ export default function PortalPage() {
           isModalOpen ? 'blur-[10px] scale-[0.98]' : ''
         }`}
       >
-        <Header transparent />
+        <Header
+          transparent
+          onSignInClick={() => portalGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+        />
 
-        <main className="flex-grow pt-28 lg:pt-0 pb-12 px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto flex flex-col items-center justify-center w-full min-h-[calc(100vh-80px)]">
+        <main className="flex-grow pt-24 pb-12 px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto flex flex-col items-center justify-center w-full min-h-screen">
           {/* Hero Section */}
           <section className="text-center mb-8 md:mb-12 animate-fade-in-up">
             <h1
@@ -110,7 +114,7 @@ export default function PortalPage() {
           </section>
 
           {/* Portal Grid */}
-          <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6 mb-8 md:mb-12" id="portal-selector">
+          <div ref={portalGridRef} className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6 mb-8 md:mb-12" id="portal-selector">
             {PORTALS.map((portal, index) => (
               <button
                 key={portal.role}

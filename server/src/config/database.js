@@ -21,8 +21,9 @@ function generateId() {
   return require('crypto').randomUUID();
 }
 
-// In-memory users array — seeded on startup
+// In-memory arrays — seeded on startup
 let users = [];
+let stocks = [];
 
 /**
  * Seed initial demo users.
@@ -31,6 +32,7 @@ let users = [];
 async function seedDatabase() {
   const adminPassword = await bcrypt.hash('Admin@123', 12);
   const demoPassword = await bcrypt.hash('Demo@123', 12);
+  const rioPassword = await bcrypt.hash('123rio', 12);
 
   users = [
     {
@@ -118,8 +120,34 @@ async function seedDatabase() {
 
   const activeExperts = loadJSON('experts.json');
   const activeAdmins = loadJSON('admins.json');
+  const initialStocks = loadJSON('stocks.json');
 
   users.push(...activeExperts, ...activeAdmins);
+  const allBrcs = loadJSON('brcs.json');
+
+  if (initialStocks && initialStocks.length > 0) {
+    // If no brcs.json, just push the defaults
+    if (!allBrcs || allBrcs.length === 0) {
+      stocks.push(...initialStocks.map(s => ({
+        id: generateId(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        ...s
+      })));
+    } else {
+      // Seed the items for every single BRC so they show up everywhere
+      allBrcs.forEach(b => {
+        stocks.push(...initialStocks.map(s => ({
+          id: generateId(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          ...s,
+          brc: b.code,
+          district: b.district
+        })));
+      });
+    }
+  }
 
   console.log('✅ In-memory database seeded with demo users and persisted JSON users:');
   users.forEach((u) => console.log(`   ${u.role.padEnd(16)} → ${u.email}`));
@@ -312,6 +340,102 @@ const db = {
       return result.length;
     },
   },
+  stocks: {
+    findMany: ({ where = {}, skip = 0, take, orderBy, select } = {}) => {
+      let result = [...stocks];
+
+      if (where.district) result = result.filter(s => s.district === where.district);
+      if (where.brc) result = result.filter(s => s.brc === where.brc);
+      if (where.status) result = result.filter(s => s.status === where.status);
+      if (where.category) result = result.filter(s => s.category === where.category);
+      if (where.search) {
+        const search = where.search.toLowerCase();
+        result = result.filter(s => 
+          (s.itemName && s.itemName.toLowerCase().includes(search)) || 
+          (s.serialNumber && s.serialNumber.toLowerCase().includes(search)) ||
+          (s.spaceCode && s.spaceCode.toLowerCase().includes(search)) ||
+          (s.uniqueId && s.uniqueId.toLowerCase().includes(search))
+        );
+      }
+
+      if (orderBy) {
+        const [field, dir] = Object.entries(orderBy)[0];
+        result.sort((a, b) => {
+          if (dir === 'desc') return b[field] > a[field] ? 1 : -1;
+          return a[field] > b[field] ? 1 : -1;
+        });
+      }
+
+      const total = result.length;
+      if (skip) result = result.slice(skip);
+      if (take) result = result.slice(0, take);
+
+      if (select) {
+        result = result.map((s) => {
+          const selected = {};
+          Object.keys(select).forEach((key) => { if (select[key]) selected[key] = s[key]; });
+          return selected;
+        });
+      }
+
+      return { data: result, total };
+    },
+
+    create: ({ data } = {}) => {
+      const newStock = {
+        id: generateId(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        ...data,
+      };
+      stocks.push(newStock);
+      return { ...newStock };
+    },
+
+    createMany: ({ data } = {}) => {
+      const newStocks = data.map(item => ({
+        id: generateId(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        ...item
+      }));
+      stocks.push(...newStocks);
+      return { count: newStocks.length };
+    },
+
+    update: ({ where, data } = {}) => {
+      const index = stocks.findIndex(s => s.id === where.id);
+      if (index === -1) {
+        const err = new Error('Record not found');
+        err.code = 'P2025';
+        throw err;
+      }
+      stocks[index] = { ...stocks[index], ...data, updatedAt: new Date() };
+      return { ...stocks[index] };
+    },
+    
+    updateMany: ({ data } = {}) => {
+      // In a real DB this would be an updateMany query. 
+      // For mock DB, we'll assume we iterate and update all.
+      let count = 0;
+      stocks = stocks.map(stock => {
+        count++;
+        return { ...stock, ...data, updatedAt: new Date() };
+      });
+      return { count };
+    },
+
+    delete: ({ where } = {}) => {
+      const index = stocks.findIndex(s => s.id === where.id);
+      if (index === -1) {
+        const err = new Error('Record not found');
+        err.code = 'P2025';
+        throw err;
+      }
+      stocks.splice(index, 1);
+      return true;
+    }
+  }
 };
 
 module.exports = { db, seedDatabase };

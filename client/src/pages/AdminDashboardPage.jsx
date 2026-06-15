@@ -5,12 +5,14 @@ import api from '../lib/api';
 import MessageComposer from '../components/admin/MessageComposer';
 import UserManagementTab from '../components/admin/UserManagementTab';
 import ReportsPage from './admin/ReportsPage';
+import StockAdministrationPage from './admin/StockAdministrationPage';
 import ProfilePage from './ProfilePage';
 
 const ADMIN_NAV = [
   { label: 'Overview', icon: 'dashboard' },
   { label: 'User Management', icon: 'group_add' },
   { label: 'Program Reports', icon: 'analytics' },
+  { label: 'Stock Administration', icon: 'inventory_2' },
   { label: 'System Settings', icon: 'settings' },
 ];
 
@@ -378,6 +380,10 @@ export default function AdminDashboardPage() {
         ) : activeNav === 'Program Reports' ? (
           <div className="p-4 md:p-8 md:px-12 w-full h-full animate-fade-in-up">
             <ReportsPage />
+          </div>
+        ) : activeNav === 'Stock Administration' ? (
+          <div className="p-4 md:p-8 md:px-12 w-full h-full animate-fade-in-up">
+            <StockAdministrationPage />
           </div>
         ) : activeNav === 'My Profile' ? (
           <div className="w-full h-full overflow-y-auto">

@@ -7,6 +7,7 @@ import ExpertProfileTab from '../components/expert/ExpertProfileTab';
 import ExpertSessionLogsTab from '../components/expert/ExpertSessionLogsTab';
 import PdfReportModal from '../components/expert/PdfReportModal';
 import NotificationBar from '../components/ui/NotificationBar';
+import StockManagementModal from '../components/expert/StockManagementModal';
 
 const EXPERT_NAV = [
   { label: 'Dashboard', icon: 'dashboard', active: true },
@@ -57,6 +58,7 @@ export default function ExpertDashboardPage() {
 
   const [showEventModal, setShowEventModal] = useState(false);
   const [showPdfModal, setShowPdfModal] = useState(false);
+  const [showStockModal, setShowStockModal] = useState(false);
   const [selectedDraft, setSelectedDraft] = useState(null);
   const [drafts, setDrafts] = useState([]);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -109,6 +111,8 @@ export default function ExpertDashboardPage() {
   };
 
   const [messages, setMessages] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [clearedMessages, setClearedMessages] = useState([]);
 
   // Fetch BRCs and Messages
   useEffect(() => {
@@ -183,6 +187,13 @@ export default function ExpertDashboardPage() {
       });
     });
   }, [messages, sessionActive, selectedBrc]);
+
+  const displayMessages = useMemo(() => {
+    return activeMessages
+      .map((msg, idx) => ({ ...msg, __msgId: msg.id || `${msg.createdAt}-${idx}` }))
+      .filter(msg => !clearedMessages.includes(msg.__msgId))
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [activeMessages, clearedMessages]);
 
   // Filtered BRCs
   const filteredBrcs = allowedBrcs;
@@ -438,42 +449,91 @@ export default function ExpertDashboardPage() {
                   </p>
                 </div>
                 
-                <button
-                  onClick={handleChangeBrc}
-                  className="relative z-10 px-6 py-3 border border-outline/20 bg-white hover:bg-surface-container rounded-xl text-sm font-bold text-on-surface transition-colors shadow-sm flex items-center gap-2"
-                >
-                  <span className="material-symbols-outlined text-sm">swap_horiz</span>
-                  Change Hub
-                </button>
-              </div>
-
-              {activeMessages.length > 0 && (
-                <section className="mb-4 animate-fade-in-up">
-                  <h2 className="text-xl border-l-4 border-error pl-4 tracking-wide text-on-surface mb-4 flex items-center gap-2" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
-                    <span className="material-symbols-outlined text-error">campaign</span>
-                    Official Announcements
-                  </h2>
-                  <div className="flex flex-col gap-4">
-                    {activeMessages.map((msg, idx) => (
-                      <div key={msg.id || idx} className="bg-error/5 border border-error/20 rounded-xl p-5 md:p-6 flex gap-4 items-start shadow-sm hover:shadow-md transition-shadow expert-brutalist-hover relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-16 h-16 bg-error/10 rounded-bl-full -z-0"></div>
-                        <div className="w-12 h-12 rounded-full bg-error/10 text-error flex items-center justify-center shrink-0 z-10 hidden md:flex">
-                          <span className="material-symbols-outlined text-2xl">notifications_active</span>
-                        </div>
-                        <div className="flex-grow z-10">
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
-                            <span className="text-xs font-bold uppercase tracking-wider text-error/80 bg-error/10 px-2 py-1 rounded w-fit">
-                              {msg.to.some(t => t === 'ALL') ? 'Global Broadcast' : 'Targeted Broadcast'}
-                            </span>
-                            <span className="text-xs font-bold text-secondary">{new Date(msg.createdAt).toLocaleDateString()} at {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                <div className="relative z-10 flex items-center gap-3">
+                  {/* Notifications Bell */}
+                  <div>
+                    <button
+                      onClick={() => setShowNotifications(true)}
+                      className="p-3 bg-white border border-outline/20 hover:bg-surface-container rounded-xl transition-colors shadow-sm relative flex items-center justify-center"
+                      title="Announcements"
+                    >
+                      <span className="material-symbols-outlined text-secondary">notifications</span>
+                      {displayMessages.length > 0 && (
+                        <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-error rounded-full animate-pulse border-2 border-white"></span>
+                      )}
+                    </button>
+                    
+                    {/* Notifications Floating Window Modal */}
+                    {showNotifications && (
+                      <div 
+                        className="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+                        onClick={() => setShowNotifications(false)}
+                      >
+                        <div 
+                          className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden animate-fade-in-up relative"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <div className="px-6 py-4 border-b border-outline/10 flex justify-between items-center bg-surface-container-low">
+                            <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
+                              <span className="material-symbols-outlined text-error text-xl">campaign</span> 
+                              Announcements
+                              <span className="text-xs font-bold bg-error/10 text-error px-2 py-0.5 rounded-full ml-2">{displayMessages.length} New</span>
+                            </h3>
+                            <button 
+                              onClick={() => setShowNotifications(false)}
+                              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-highest text-secondary transition-colors"
+                            >
+                              <span className="material-symbols-outlined">close</span>
+                            </button>
                           </div>
-                          <p className="text-on-surface text-base leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                          
+                          <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-surface-container-lowest">
+                            {displayMessages.length === 0 ? (
+                              <div className="py-20 text-center text-secondary flex flex-col items-center">
+                                <span className="material-symbols-outlined text-6xl mb-4 opacity-20">notifications_off</span>
+                                <p className="text-lg font-medium">No new announcements</p>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col gap-3">
+                                {displayMessages.map(msg => (
+                                  <div key={msg.__msgId} className="relative p-5 bg-white border border-outline/20 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                                    <button 
+                                      onClick={() => setClearedMessages(prev => [...prev, msg.__msgId])}
+                                      className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-surface-container-lowest border border-outline/10 text-secondary hover:text-error hover:bg-error/10 transition-colors shadow-sm z-10"
+                                      title="Clear message"
+                                    >
+                                      <span className="material-symbols-outlined text-sm">close</span>
+                                    </button>
+                                    <div className="flex flex-col gap-2 pr-8">
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-error/80 bg-error/10 px-2 py-0.5 rounded">
+                                          {msg.to.some(t => t === 'ALL') ? 'Global' : 'Targeted'}
+                                        </span>
+                                        <span className="text-xs font-medium text-secondary">
+                                          {new Date(msg.createdAt).toLocaleDateString()} at {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                      </div>
+                                      <p className="text-sm text-on-surface leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    ))}
+                    )}
                   </div>
-                </section>
-              )}
+
+                  <button
+                    onClick={handleChangeBrc}
+                    className="px-6 py-3 border border-outline/20 bg-white hover:bg-surface-container rounded-xl text-sm font-bold text-on-surface transition-colors shadow-sm flex items-center gap-2"
+                  >
+                    <span className="material-symbols-outlined text-sm">swap_horiz</span>
+                    Change Hub
+                  </button>
+                </div>
+              </div>
 
               <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-white border border-on-surface/10 rounded-xl p-4 md:p-5 flex flex-col justify-center shadow-sm">
@@ -521,6 +581,8 @@ export default function ExpertDashboardPage() {
                           setShowEventModal(true);
                         } else if (tool.title === 'Upload Event Report') {
                           setShowPdfModal(true);
+                        } else if (tool.title === 'Stock Management') {
+                          setShowStockModal(true);
                         }
                       }}
                       className="group bg-white border border-on-surface/10 rounded-xl p-5 flex flex-col shadow-sm hover:-translate-y-1 hover:shadow-md transition-all cursor-pointer"
@@ -648,6 +710,14 @@ export default function ExpertDashboardPage() {
           brcCode={selectedBrc.code}
           onClose={() => setShowPdfModal(false)}
           onRefresh={() => fetchStatsAndDrafts(selectedBrc.code)}
+        />
+      )}
+
+      {showStockModal && selectedBrc && (
+        <StockManagementModal
+          brcCode={selectedBrc.code}
+          brcName={selectedBrc.name}
+          onClose={() => setShowStockModal(false)}
         />
       )}
     </div>
