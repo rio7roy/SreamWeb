@@ -9,7 +9,9 @@ export default function ExpertManagementPage() {
   const [expert, setExpert] = useState(null);
   const [allBrcs, setAllBrcs] = useState([]);
   const [assignedCodes, setAssignedCodes] = useState([]);
+  const [expertEvents, setExpertEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [eventsLoading, setEventsLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [brcSearch, setBrcSearch] = useState('');
   const [feedback, setFeedback] = useState(null);
@@ -17,9 +19,10 @@ export default function ExpertManagementPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [expertsRes, brcsRes] = await Promise.all([
+        const [expertsRes, brcsRes, eventsRes] = await Promise.all([
           api.get('/admin/users/experts'),
-          api.get('/brcs')
+          api.get('/brcs'),
+          api.get(`/events?expertId=${id}`)
         ]);
         
         const foundExpert = expertsRes.data.find(e => e.id === id);
@@ -31,11 +34,13 @@ export default function ExpertManagementPage() {
         }
         
         setAllBrcs(brcsRes.data);
+        setExpertEvents(eventsRes.data || []);
       } catch (err) {
         console.error(err);
         setFeedback({ type: 'error', text: 'Failed to fetch data' });
       } finally {
         setLoading(false);
+        setEventsLoading(false);
       }
     };
     fetchData();
@@ -124,7 +129,8 @@ export default function ExpertManagementPage() {
           )}
 
           {expert && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               {/* Assigned BRCs Section */}
               <div>
                 <h4 className="text-sm font-bold text-secondary uppercase tracking-wider mb-4 flex items-center gap-2">
@@ -207,8 +213,62 @@ export default function ExpertManagementPage() {
                 </div>
               </div>
             </div>
-          )}
-        </div>
+            
+            {/* Attendance Log */}
+            <div className="mt-12 bg-white rounded-2xl shadow-sm border border-outline/10 flex flex-col min-h-[300px]">
+              <div className="px-6 py-4 border-b border-outline/10">
+                <h4 className="text-sm font-bold uppercase tracking-wider text-secondary flex items-center gap-2">
+                  <span className="material-symbols-outlined text-amber-500">event_available</span>
+                  Attendance & Submissions
+                </h4>
+              </div>
+              
+              <div className="p-6">
+                {eventsLoading ? (
+                  <div className="flex justify-center py-8">
+                    <span className="material-symbols-outlined animate-spin text-amber-500 text-4xl">refresh</span>
+                  </div>
+                ) : expertEvents.length === 0 ? (
+                  <div className="text-center py-12 text-secondary bg-surface-container-low rounded-xl border border-dashed border-outline/30">
+                    <span className="material-symbols-outlined text-4xl mb-3 opacity-30">pending_actions</span>
+                    <p className="font-medium">No events submitted yet.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto rounded-xl border border-outline/10">
+                    <table className="w-full text-left text-sm whitespace-nowrap">
+                      <thead className="bg-surface-container-low border-b border-outline/10 text-secondary uppercase text-[10px] tracking-wider font-bold">
+                        <tr>
+                          <th className="px-6 py-4">Date</th>
+                          <th className="px-6 py-4">Event Name</th>
+                          <th className="px-6 py-4">Hub Code</th>
+                          <th className="px-6 py-4 text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-outline/5">
+                        {expertEvents.map(e => (
+                          <tr key={e.id} className="hover:bg-amber-50 transition-colors">
+                            <td className="px-6 py-4 font-medium text-on-surface">{new Date(e.date || e.createdAt).toLocaleDateString()}</td>
+                            <td className="px-6 py-4 max-w-[250px] truncate" title={e.name}>{e.name || 'Untitled'}</td>
+                            <td className="px-6 py-4 font-mono text-xs text-secondary">{e.brcCode}</td>
+                            <td className="px-6 py-4 text-center">
+                              <span className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
+                                e.status === 'SUBMITTED' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-amber-100 text-amber-700 border border-amber-200'
+                              }`}>
+                                {e.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+          </>
+        )}
+      </div>
 
         {expert && (
           <div className="bg-surface-container-low px-8 py-6 flex justify-end gap-4 border-t border-outline/10">
