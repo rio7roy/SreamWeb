@@ -177,26 +177,6 @@ export default function ExpertDashboardPage() {
     }
   }, [sessionActive, selectedBrc, fetchStatsAndDrafts]);
 
-  // Filter messages for the currently active session BRC
-  const activeMessages = useMemo(() => {
-    if (!sessionActive || !selectedBrc) return [];
-    return messages.filter(msg => {
-      if (!msg.to || !Array.isArray(msg.to)) return false;
-      return msg.to.some(target => {
-        if (target === 'ALL') return true;
-        if (target === `DISTRICT:${selectedBrc.district}`) return true;
-        if (target === `BRC:${selectedBrc.code}`) return true;
-        return false;
-      });
-    });
-  }, [messages, sessionActive, selectedBrc]);
-
-  const displayMessages = useMemo(() => {
-    return activeMessages
-      .map((msg, idx) => ({ ...msg, __msgId: msg.id || `${msg.createdAt}-${idx}` }))
-      .filter(msg => !clearedMessages.includes(msg.__msgId))
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }, [activeMessages, clearedMessages]);
 
   // Filtered BRCs
   const filteredBrcs = allowedBrcs;
