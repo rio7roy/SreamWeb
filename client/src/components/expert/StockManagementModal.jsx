@@ -391,11 +391,19 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
                       {/* IMG */}
                       {stock.img && stock.img !== '' ? (
                         <div className="w-8 h-8 rounded-md overflow-hidden border border-gray-200 flex-shrink-0">
-                          <img src={stock.img} alt={stock.itemName} className="w-full h-full object-cover" />
+                          <img 
+                            src={stock.img.startsWith('/api') 
+                                  ? stock.img.replace('/api', import.meta.env.VITE_API_URL || '/api') 
+                                  : stock.img.startsWith('http') 
+                                      ? stock.img 
+                                      : `${import.meta.env.VITE_API_URL || '/api'}${stock.img.startsWith('/') ? '' : '/'}${stock.img}`} 
+                            alt={stock.itemName} 
+                            className="w-full h-full object-cover bg-white" 
+                          />
                         </div>
                       ) : (
-                        <div className="w-8 h-8 rounded-md flex items-center justify-center border flex-shrink-0"
-                          style={{ backgroundColor: catStyle.bg, borderColor: catStyle.border }}>
+                        <div className="w-8 h-8 rounded-md flex items-center justify-center border flex-shrink-0 bg-white"
+                          style={{ borderColor: catStyle.border }}>
                           <span className="material-symbols-outlined text-sm" style={{ color: catStyle.accent }}>{catStyle.icon}</span>
                         </div>
                       )}
