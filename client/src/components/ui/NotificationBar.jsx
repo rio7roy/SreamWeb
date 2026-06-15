@@ -302,6 +302,16 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
               )}
               {bellMessages.map(msg => {
                 const isUnread = !readIds.includes(msg.id);
+                
+                // Determine target label
+                let targetLabel = 'ALL';
+                if (msg.to && Array.isArray(msg.to)) {
+                  const specificTargets = msg.to.filter(t => t !== 'ALL').map(t => t.split(':')[1]);
+                  if (specificTargets.length > 0) {
+                    targetLabel = specificTargets.join(', ');
+                  }
+                }
+
                 return (
                   <div 
                     key={msg.id} 
@@ -333,6 +343,9 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
 
                     <div className="flex justify-between items-start gap-4">
                       <div className="pl-2 flex-1">
+                        <p className={`text-xs font-bold text-primary uppercase tracking-wider mb-1`}>
+                          To {targetLabel}
+                        </p>
                         <p className={`text-sm mb-2 ${isUnread ? 'font-bold text-on-surface' : 'font-medium text-secondary'}`}>
                           {msg.content}
                         </p>
