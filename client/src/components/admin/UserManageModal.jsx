@@ -316,7 +316,7 @@ export default function UserManageModal({ type, entityName, onClose, initialUser
                                 className="hover:bg-surface-container-low transition-colors cursor-pointer"
                                 onClick={() => setSelectedEventForView(e)}
                               >
-                                <td className="px-4 py-3 font-medium">{new Date(e.date || e.createdAt).toLocaleDateString()}</td>
+                                <td className="px-4 py-3 font-medium">{new Date(e.locationTimestamp && !isNaN(Number(e.locationTimestamp)) ? Number(e.locationTimestamp) : (e.locationTimestamp || e.createdAt)).toLocaleDateString()}</td>
                                 <td className="px-4 py-3 max-w-[200px] truncate" title={e.name}>{e.name || 'Untitled'}</td>
                                 <td className="px-4 py-3 font-mono text-xs">{e.brcCode}</td>
                                 <td className="px-4 py-3">

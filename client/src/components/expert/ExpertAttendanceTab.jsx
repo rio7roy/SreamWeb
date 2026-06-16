@@ -62,7 +62,11 @@ export default function ExpertAttendanceTab({ user }) {
   }, [events, searchQuery]);
 
   const uniqueDaysCount = useMemo(() => {
-    const dates = new Set(filteredEvents.map(e => new Date(e.date || e.createdAt).toLocaleDateString()));
+    const dates = new Set(filteredEvents.map(e => {
+      let timestamp = e.locationTimestamp || e.createdAt;
+      if (timestamp && !isNaN(Number(timestamp))) timestamp = Number(timestamp);
+      return new Date(timestamp).toLocaleDateString();
+    }));
     return dates.size;
   }, [filteredEvents]);
 
@@ -193,7 +197,9 @@ export default function ExpertAttendanceTab({ user }) {
                             onClick={() => setSelectedEvent(e)}
                             className="hover:bg-surface-container-low transition-colors cursor-pointer"
                           >
-                            <td className="px-6 py-4">{new Date(e.date || e.createdAt).toLocaleDateString()}</td>
+                            <td className="px-6 py-4">
+                              {new Date(e.locationTimestamp && !isNaN(Number(e.locationTimestamp)) ? Number(e.locationTimestamp) : (e.locationTimestamp || e.createdAt)).toLocaleDateString()}
+                            </td>
                             <td className="px-6 py-4 truncate max-w-[300px]" title={e.name}>{e.name}</td>
                             <td className="px-6 py-4 font-mono text-xs text-secondary">{e.brcName}</td>
                             <td className="px-6 py-4">
@@ -221,8 +227,14 @@ export default function ExpertAttendanceTab({ user }) {
                       {selectedEvent.name}
                     </h3>
                     <p className="text-sm text-secondary font-medium">
-                      {new Date(selectedEvent.date || selectedEvent.createdAt).toLocaleDateString()} &bull; Hub: {selectedEvent.brcName || selectedEvent.brcCode}
+                      {new Date(selectedEvent.locationTimestamp && !isNaN(Number(selectedEvent.locationTimestamp)) ? Number(selectedEvent.locationTimestamp) : (selectedEvent.locationTimestamp || selectedEvent.createdAt)).toLocaleDateString()} &bull; Hub: {selectedEvent.brcName || selectedEvent.brcCode}
                     </p>
+                    {(selectedEvent.locationTimestamp || selectedEvent.createdAt) && (
+                      <p className="text-xs text-primary/80 font-mono mt-1 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[14px]">location_on</span>
+                        GPS: {new Date(selectedEvent.locationTimestamp && !isNaN(Number(selectedEvent.locationTimestamp)) ? Number(selectedEvent.locationTimestamp) : (selectedEvent.locationTimestamp || selectedEvent.createdAt)).toLocaleString()}
+                      </p>
+                    )}
                   </div>
                   <button 
                     onClick={() => setSelectedEvent(null)}
