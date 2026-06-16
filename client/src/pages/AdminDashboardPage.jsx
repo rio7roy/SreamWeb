@@ -25,6 +25,7 @@ export default function AdminDashboardPage() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeNav, setActiveNav] = useState('Overview');
+  const [showFormsModal, setShowFormsModal] = useState(false);
 
   // Filters
   const [selectedDistrict, setSelectedDistrict] = useState('');
@@ -176,8 +177,13 @@ export default function AdminDashboardPage() {
             <button
               key={nav.label}
               onClick={() => {
-                setActiveNav(nav.label);
-                setSidebarOpen(false);
+                if (nav.label === 'Observation Forms') {
+                  setShowFormsModal(true);
+                  setSidebarOpen(false);
+                } else {
+                  setActiveNav(nav.label);
+                  setSidebarOpen(false);
+                }
               }}
               className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold ${
                 activeNav === nav.label
@@ -378,8 +384,6 @@ export default function AdminDashboardPage() {
           </div>
         ) : activeNav === 'User Management' ? (
           <UserManagementTab />
-        ) : activeNav === 'Observation Forms' ? (
-          <AdminFormDashboard />
         ) : activeNav === 'Program Reports' ? (
           <div className="p-4 md:p-8 md:px-12 w-full h-full animate-fade-in-up">
             <ReportsPage />
@@ -405,6 +409,10 @@ export default function AdminDashboardPage() {
       </main>
 
       {/* Modals */}
+      {showFormsModal && (
+        <AdminFormDashboard onClose={() => setShowFormsModal(false)} />
+      )}
+      
       {showExpertManageModal && (
         <UserManageModal
           type="experts"

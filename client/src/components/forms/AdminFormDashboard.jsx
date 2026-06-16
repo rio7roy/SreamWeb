@@ -3,7 +3,7 @@ import api from '../../lib/api';
 import FormBuilder from './FormBuilder';
 import FormAnalytics from './FormAnalytics';
 
-export default function AdminFormDashboard() {
+export default function AdminFormDashboard({ onClose }) {
   const [view, setView] = useState('list'); // 'list', 'builder', 'analytics'
   const [templates, setTemplates] = useState([]);
   const [forms, setForms] = useState([]);
@@ -93,21 +93,43 @@ export default function AdminFormDashboard() {
   };
 
   if (view === 'builder') {
-    return <FormBuilder initialData={currentForm} onSave={handleSaveForm} onCancel={() => setView('list')} />;
+    return (
+      <div className="fixed inset-0 z-[110] bg-surface overflow-y-auto animate-fade-in">
+        <div className="p-4 md:p-8 max-w-7xl mx-auto">
+          <FormBuilder initialData={currentForm} onSave={handleSaveForm} onCancel={() => setView('list')} />
+        </div>
+      </div>
+    );
   }
 
   if (view === 'analytics') {
-    return <FormAnalytics form={currentForm} responses={responses} onBack={() => setView('list')} />;
+    return (
+      <div className="fixed inset-0 z-[110] bg-surface overflow-y-auto animate-fade-in">
+        <div className="p-4 md:p-8 max-w-7xl mx-auto">
+          <FormAnalytics form={currentForm} responses={responses} onBack={() => setView('list')} />
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="p-4 md:p-8 space-y-8 animate-fade-in-up max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-outline/20 pb-4 gap-4">
-        <div>
-          <h2 className="text-3xl font-bold font-hanken">Observation Forms Management</h2>
-          <p className="text-secondary text-sm mt-1">Create templates, assign forms to experts, and view analytics.</p>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8 animate-fade-in">
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" onClick={onClose}></div>
+      <div className="relative bg-surface rounded-3xl w-full max-w-7xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        
+        {/* Header */}
+        <div className="bg-primary px-8 py-6 flex items-center justify-between shrink-0">
+          <div>
+            <h2 className="text-3xl font-bold font-hanken text-on-primary">Observation Forms Management</h2>
+            <p className="text-on-primary/80 text-sm mt-1">Create templates, assign forms to BRCs, and view analytics.</p>
+          </div>
+          <button onClick={onClose} className="text-on-primary/80 hover:text-white transition-colors bg-white/10 p-2 rounded-full">
+            <span className="material-symbols-outlined">close</span>
+          </button>
         </div>
-        <div className="flex gap-3">
+
+        {/* Action Bar */}
+        <div className="bg-surface-container-lowest px-8 py-4 border-b border-outline/10 flex justify-end gap-3 shrink-0">
           <button onClick={handleCreateTemplate} className="px-6 py-2.5 rounded-xl border border-primary text-primary font-bold hover:bg-primary/5 transition-colors">
             + New Template
           </button>
@@ -115,7 +137,9 @@ export default function AdminFormDashboard() {
             + Blank Form
           </button>
         </div>
-      </div>
+
+        <div className="p-8 overflow-y-auto flex-grow bg-surface-container-lowest">
+
 
       {/* Templates Section */}
       <section>
@@ -187,25 +211,28 @@ export default function AdminFormDashboard() {
         </div>
       </section>
 
-      {/* Assign Modal */}
-      {showAssignModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
-            <h3 className="text-2xl font-bold mb-2">Assign Form</h3>
-            <p className="text-secondary mb-6 text-sm">Select a BRC to assign "{selectedFormToAssign?.title}" to.</p>
-            <form onSubmit={handleAssignSubmit} className="space-y-6">
-              <select name="brcCode" required className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 outline-none focus:border-primary">
-                <option value="">Select a BRC...</option>
-                {brcs.map(b => <option key={b.code} value={b.code}>{b.name} ({b.code})</option>)}
-              </select>
-              <div className="flex justify-end gap-3">
-                <button type="button" onClick={() => setShowAssignModal(false)} className="px-6 py-2 rounded-xl text-secondary hover:bg-surface-container font-bold">Cancel</button>
-                <button type="submit" className="px-6 py-2 rounded-xl bg-primary text-on-primary font-bold shadow-md hover:opacity-90">Assign</button>
-              </div>
-            </form>
-          </div>
         </div>
-      )}
+        
+        {/* Assign Modal */}
+        {showAssignModal && (
+          <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
+              <h3 className="text-2xl font-bold mb-2">Assign Form</h3>
+              <p className="text-secondary mb-6 text-sm">Select a BRC to assign "{selectedFormToAssign?.title}" to.</p>
+              <form onSubmit={handleAssignSubmit} className="space-y-6">
+                <select name="brcCode" required className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 outline-none focus:border-primary">
+                  <option value="">Select a BRC...</option>
+                  {brcs.map(b => <option key={b.code} value={b.code}>{b.name} ({b.code})</option>)}
+                </select>
+                <div className="flex justify-end gap-3">
+                  <button type="button" onClick={() => setShowAssignModal(false)} className="px-6 py-2 rounded-xl text-secondary hover:bg-surface-container font-bold">Cancel</button>
+                  <button type="submit" className="px-6 py-2 rounded-xl bg-primary text-on-primary font-bold shadow-md hover:opacity-90">Assign</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
