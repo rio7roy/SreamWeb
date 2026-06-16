@@ -31,19 +31,28 @@ export default function AdminDashboardPage() {
   const [selectedBrcCode, setSelectedBrcCode] = useState('');
 
   const [brcs, setBrcs] = useState([]);
+  const [events, setEvents] = useState([]);
   const [experts, setExperts] = useState([]);
   const [selectedExpertId, setSelectedExpertId] = useState('');
   const [showExpertManageModal, setShowExpertManageModal] = useState(false);
 
   // Fetch BRCs and Experts on mount
   useEffect(() => {
-    Promise.all([
-      api.get('/brcs'),
-      api.get('/admin/users/experts')
-    ]).then(([brcRes, expRes]) => {
-      setBrcs(brcRes.data);
-      setExperts(expRes.data);
-    }).catch(console.error);
+    const fetchData = async () => {
+      try {
+        const [brcsRes, eventsRes, expertsRes] = await Promise.all([
+          api.get('/brcs'),
+          api.get('/events'),
+          api.get('/admin/users/experts')
+        ]);
+        setBrcs(brcsRes.data || []);
+        setEvents(eventsRes.data || []);
+        setExperts(expertsRes.data || []);
+      } catch (err) {
+        console.error("Failed to load dashboard data", err);
+      }
+    };
+    fetchData();
   }, []);
 
   // Derived Data
@@ -61,16 +70,23 @@ export default function AdminDashboardPage() {
   const stats = useMemo(() => {
     const totalBrcs = selectedDistrict ? filteredBrcs.length : brcs.length;
     
-    // Mock metrics based on selection size
-    const multiplier = selectedDistrict ? (filteredBrcs.length / (brcs.length || 1)) : 1;
+    // Filter events by selected district if applicable
+    const validBrcCodes = new Set(filteredBrcs.map(b => b.code));
+    const filteredEvents = selectedDistrict 
+      ? events.filter(e => validBrcCodes.has(e.brcCode))
+      : events;
+
+    const programsConducted = filteredEvents.length;
+    const studentFootfall = filteredEvents.reduce((acc, e) => acc + (e.studentsCount || 0), 0);
+    const teacherFootfall = filteredEvents.reduce((acc, e) => acc + (e.teachersCount || 0), 0);
     
     return [
       { label: 'Total BRCs', value: totalBrcs, icon: 'account_balance', color: 'text-primary bg-primary-container/20' },
-      { label: 'Programs Conducted', value: Math.max(1, Math.floor(342 * multiplier)), icon: 'event_available', color: 'text-green-700 bg-green-100' },
-      { label: 'Student Footfall', value: Math.floor(45000 * multiplier).toLocaleString(), icon: 'groups', color: 'text-blue-700 bg-blue-100' },
-      { label: 'Teacher Footfall', value: Math.floor(1250 * multiplier).toLocaleString(), icon: 'school', color: 'text-amber-700 bg-amber-100' },
+      { label: 'Programs Conducted', value: programsConducted, icon: 'event_available', color: 'text-green-700 bg-green-100' },
+      { label: 'Student Footfall', value: studentFootfall.toLocaleString(), icon: 'groups', color: 'text-blue-700 bg-blue-100' },
+      { label: 'Teacher Footfall', value: teacherFootfall.toLocaleString(), icon: 'school', color: 'text-amber-700 bg-amber-100' },
     ];
-  }, [selectedDistrict, filteredBrcs.length]);
+  }, [selectedDistrict, filteredBrcs, brcs.length, events]);
 
   // Derived Issues
   const issuesList = useMemo(() => {
