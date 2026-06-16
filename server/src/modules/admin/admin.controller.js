@@ -69,7 +69,7 @@ exports.createUser = async (req, res) => {
     const filePath = path.join(DATA_DIR, fileName);
     const data = readData(filePath);
     const token = crypto.randomBytes(16).toString('hex');
-    const newUser = { id: crypto.randomUUID(), token, ...req.body, createdAt: new Date().toISOString() };
+    const newUser = { id: crypto.randomBytes(16).toString('hex'), token, ...req.body, createdAt: new Date().toISOString() };
     data.push(newUser);
     writeData(filePath, data);
     
@@ -94,7 +94,7 @@ exports.createUser = async (req, res) => {
   if (!filePath) return res.status(400).json({ message: 'Invalid user type' });
   
   const data = readData(filePath);
-  const newUser = { id: crypto.randomUUID(), ...req.body, createdAt: new Date().toISOString() };
+  const newUser = { id: crypto.randomBytes(16).toString('hex'), ...req.body, createdAt: new Date().toISOString() };
   data.push(newUser);
   writeData(filePath, data);
   
@@ -144,7 +144,7 @@ exports.softDeleteUser = (req, res) => {
 exports.broadcastMessage = (req, res) => {
   const messagesPath = getMessagesPath();
   const messages = readData(messagesPath);
-  const newMessage = { id: crypto.randomUUID(), ...req.body, createdAt: new Date().toISOString() };
+  const newMessage = { id: crypto.randomBytes(16).toString('hex'), ...req.body, createdAt: new Date().toISOString() };
   messages.push(newMessage);
   writeData(messagesPath, messages);
   

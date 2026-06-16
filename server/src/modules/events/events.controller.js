@@ -33,7 +33,7 @@ exports.createEvent = (req, res) => {
     const photos = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
 
     const newEvent = {
-      id: crypto.randomUUID(),
+      id: crypto.randomBytes(16).toString('hex'),
       brcCode,
       venueType: venueType || 'SELECTED_BRC',
       venueValue: venueValue || brcCode,
