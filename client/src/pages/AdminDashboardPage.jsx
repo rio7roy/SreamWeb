@@ -16,7 +16,6 @@ const ADMIN_NAV = [
   { label: 'Program Reports', icon: 'analytics' },
   { label: 'Stock Administration', icon: 'inventory_2' },
   { label: 'Broadcast Logs', icon: 'campaign' },
-  { label: 'System Settings', icon: 'settings' },
 ];
 
 export default function AdminDashboardPage() {

@@ -7,7 +7,6 @@ const ROLE_CONFIG = {
     cards: [
       { title: 'User Management', description: 'Create, edit, and manage user accounts across all portals.', icon: 'group', color: 'bg-primary-container/20 text-primary' },
       { title: 'Reports', description: 'Generate Excel and PDF reports for user data and system activity.', icon: 'assessment', color: 'bg-green-100 text-green-700' },
-      { title: 'System Settings', description: 'Configure platform settings and security policies.', icon: 'settings', color: 'bg-blue-100 text-blue-700' },
       { title: 'Activity Logs', description: 'View recent login activity and system events.', icon: 'history', color: 'bg-purple-100 text-purple-700' },
     ],
   },
