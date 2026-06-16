@@ -3,26 +3,38 @@ import api from '../../lib/api';
 
 export default function BroadcastLogsTab() {
   const [messages, setMessages] = useState([]);
+  const [allBrcs, setAllBrcs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterTarget, setFilterTarget] = useState('ALL_TARGETS');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    fetchMessages();
+    fetchData();
   }, []);
 
-  const fetchMessages = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/admin/messages');
-      if (res.data) {
-        setMessages(res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      const [msgRes, brcRes] = await Promise.all([
+        api.get('/admin/messages'),
+        api.get('/brcs').catch(() => ({ data: [] }))
+      ]);
+      if (msgRes.data) {
+        setMessages(msgRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      }
+      if (brcRes.data) {
+        setAllBrcs(brcRes.data);
       }
     } catch (err) {
-      console.error('Failed to fetch messages', err);
+      console.error('Failed to fetch data', err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const getDisplayName = (targetCode) => {
+    const brc = allBrcs.find(b => b.code === targetCode);
+    return brc ? brc.name : targetCode;
   };
 
   const uniqueTargets = useMemo(() => {
@@ -67,7 +79,7 @@ export default function BroadcastLogsTab() {
         </div>
 
         <button 
-          onClick={fetchMessages}
+          onClick={fetchData}
           className="flex items-center gap-2 px-4 py-2 bg-surface-container-low border border-outline/10 hover:bg-surface-container rounded-xl text-on-surface text-sm font-bold transition-colors"
         >
           <span className="material-symbols-outlined text-[18px]">refresh</span>
@@ -107,7 +119,7 @@ export default function BroadcastLogsTab() {
             />
             <datalist id="target-options">
               {uniqueTargets.map(t => (
-                <option key={t} value={t}>{t}</option>
+                <option key={t} value={t}>{getDisplayName(t)}</option>
               ))}
             </datalist>
           </div>
@@ -157,7 +169,7 @@ export default function BroadcastLogsTab() {
                       <div className="flex flex-wrap gap-1">
                         {(Array.isArray(msg.to) ? msg.to : []).map((t, idx) => (
                           <span key={idx} className="px-2 py-1 bg-primary-container text-on-primary-container text-[10px] font-bold rounded uppercase tracking-wider whitespace-nowrap">
-                            {t}
+                            {getDisplayName(t)}
                           </span>
                         ))}
                       </div>

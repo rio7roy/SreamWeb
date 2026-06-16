@@ -8,11 +8,11 @@ import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 
 const PORTALS = [
-  { role: 'ADMIN', label: 'Admin', icon: 'admin_panel_settings', defaultEmail: 'admin@stream.edu', defaultPassword: 'Admin@123' },
+  { role: 'ADMIN', label: 'Admin', icon: 'admin_panel_settings', defaultEmail: '', defaultPassword: '' },
   { role: 'EXPERT', label: 'STREAM Expert', icon: 'school', defaultEmail: '', defaultPassword: '' },
-  { role: 'STREAM_LAB', label: 'STREAM Hub', icon: 'biotech', defaultEmail: 'lab@stream.edu', defaultPassword: 'Demo@123' },
-  { role: 'ILAB', label: 'iLab Corner', icon: 'computer', defaultEmail: 'ilab@stream.edu', defaultPassword: 'Demo@123' },
-  { role: 'CREATIVE_CORNER', label: 'Creative Corner', icon: 'auto_awesome', defaultEmail: 'creative@stream.edu', defaultPassword: 'Demo@123' },
+  { role: 'STREAM_LAB', label: 'STREAM Hub', icon: 'biotech', defaultEmail: '', defaultPassword: '' },
+  { role: 'ILAB', label: 'iLab Corner', icon: 'computer', defaultEmail: '', defaultPassword: '' },
+  { role: 'CREATIVE_CORNER', label: 'Creative Corner', icon: 'auto_awesome', defaultEmail: '', defaultPassword: '' },
 ];
 
 export default function PortalPage() {
@@ -157,16 +157,7 @@ export default function PortalPage() {
           </button>
         </div>
 
-        {/* Demo Credentials Info Box for testing */}
-        {selectedPortal && (
-          <div className="bg-primary-container/10 border border-primary-container/20 rounded-xl px-4 py-3 text-xs text-secondary flex flex-col gap-1.5 mb-6">
-            <span className="font-bold text-on-surface uppercase tracking-wider text-[10px]">Demo Account Info</span>
-            <div className="flex flex-col gap-1">
-              <div>Email/Username: <code className="font-mono font-bold text-on-surface select-all">{selectedPortal.defaultEmail}</code></div>
-              <div>Password: <code className="font-mono font-bold text-on-surface select-all">{selectedPortal.defaultPassword}</code></div>
-            </div>
-          </div>
-        )}
+
 
         <form className="space-y-6" onSubmit={handleLogin}>
           <Input

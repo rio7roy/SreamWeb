@@ -8,13 +8,19 @@ const { db } = require('../config/database');
  */
 async function authenticate(req, res, next) {
   try {
+    let token;
     const authHeader = req.headers.authorization;
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    } else if (req.query.token) {
+      token = req.query.token;
+    }
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
       return error(res, 'Authentication required. Please provide a valid token.', 401);
     }
 
-    const token = authHeader.split(' ')[1];
     const decoded = verifyToken(token);
 
     // Fetch fresh user data to ensure account is still active

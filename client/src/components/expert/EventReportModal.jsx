@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import api from '../../lib/api';
 
-export default function EventReportModal({ brcCode, brcName, existingEvent, onClose, onRefresh }) {
+export default function EventReportModal({ brcCode, brcName, existingEvent, isReadOnly, onClose, onRefresh }) {
   const [allBrcs, setAllBrcs] = useState([]);
   const [venueType, setVenueType] = useState('SELECTED_BRC');
   const [venueValue, setVenueValue] = useState(brcCode);
@@ -29,7 +29,7 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, onCl
   };
 
   useEffect(() => {
-    if (!existingEvent && 'geolocation' in navigator) {
+    if (!isReadOnly && !existingEvent && 'geolocation' in navigator) {
       setLocationStatus('locating');
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -203,6 +203,7 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, onCl
           )}
 
           <form id="event-form" className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+            <fieldset disabled={isReadOnly} className="space-y-6">
             <div className={`p-4 rounded-xl border flex items-center justify-between ${
               locationStatus === 'captured' ? 'bg-green-50 border-green-200' :
               locationStatus === 'locating' ? 'bg-amber-50 border-amber-200' :
@@ -228,7 +229,7 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, onCl
                   </p>
                 </div>
               </div>
-              {locationStatus === 'error' && (
+              {locationStatus === 'error' && !isReadOnly && (
                 <button 
                   type="button"
                   onClick={() => {
@@ -347,7 +348,7 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, onCl
               </div>
               <div>
                 <label className="block text-sm font-bold text-secondary mb-1">Event Date</label>
-                <input required name="date" value={formData.date} onChange={handleChange} type="date" className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none" />
+                <input required name="date" value={formData.date} onChange={handleChange} type="date" max={new Date().toISOString().split('T')[0]} className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none" />
               </div>
             </div>
 
@@ -392,30 +393,39 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, onCl
                   )}
               </div>
             </div>
+            </fieldset>
           </form>
         </div>
 
         <div className="bg-surface-container-low px-8 py-5 flex justify-end gap-4 shrink-0 border-t border-outline/10">
-          <button type="button" onClick={(e) => handleSubmit(e, 'DRAFT')} disabled={loading} className="px-6 py-2 rounded-xl text-primary border border-primary hover:bg-primary/5 transition-colors font-bold disabled:opacity-50">
-            {loading ? 'Saving...' : 'Save as Draft'}
-          </button>
-          <button 
-            type="button"
-            onClick={(e) => handleSubmit(e, 'SUBMITTED')} 
-            disabled={
-              loading || 
-              locationStatus !== 'captured' || 
-              !formData.name || 
-              !formData.date || 
-              !formData.description || 
-              !formData.tag || 
-              (formData.tag === 'other event' && !formData.customTag) ||
-              (photos.length === 0 && (!existingEvent || !existingEvent.photos || existingEvent.photos.length === 0))
-            } 
-            className="px-8 py-2 rounded-xl bg-primary text-on-primary font-bold shadow-md hover:opacity-90 transition-all disabled:opacity-50"
-          >
-            {loading ? 'Processing...' : 'Submit Report'}
-          </button>
+          {isReadOnly ? (
+            <button type="button" onClick={handleClose} className="px-8 py-2 rounded-xl bg-primary text-on-primary font-bold shadow-md hover:opacity-90 transition-all">
+              Close
+            </button>
+          ) : (
+            <>
+              <button type="button" onClick={(e) => handleSubmit(e, 'DRAFT')} disabled={loading} className="px-6 py-2 rounded-xl text-primary border border-primary hover:bg-primary/5 transition-colors font-bold disabled:opacity-50">
+                {loading ? 'Saving...' : 'Save as Draft'}
+              </button>
+              <button 
+                type="button"
+                onClick={(e) => handleSubmit(e, 'SUBMITTED')} 
+                disabled={
+                  loading || 
+                  locationStatus !== 'captured' || 
+                  !formData.name || 
+                  !formData.date || 
+                  !formData.description || 
+                  !formData.tag || 
+                  (formData.tag === 'other event' && !formData.customTag) ||
+                  (photos.length === 0 && (!existingEvent || !existingEvent.photos || existingEvent.photos.length === 0))
+                } 
+                className="px-8 py-2 rounded-xl bg-primary text-on-primary font-bold shadow-md hover:opacity-90 transition-all disabled:opacity-50"
+              >
+                {loading ? 'Processing...' : 'Submit Report'}
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>,

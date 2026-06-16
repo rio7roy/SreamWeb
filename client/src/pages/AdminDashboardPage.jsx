@@ -118,9 +118,6 @@ export default function AdminDashboardPage() {
           >
             STREAM PORTAL
           </h1>
-          <p className="text-primary text-[10px] uppercase tracking-[0.2em] font-bold">
-            Admin Console
-          </p>
         </div>
 
         {/* User Identity Card */}

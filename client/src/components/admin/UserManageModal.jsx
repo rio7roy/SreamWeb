@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import api from '../../lib/api';
+import EventReportModal from '../expert/EventReportModal';
 
 export default function UserManageModal({ type, entityName, onClose, initialUserId = null }) {
   const [users, setUsers] = useState([]);
@@ -14,6 +15,7 @@ export default function UserManageModal({ type, entityName, onClose, initialUser
   const [allBrcs, setAllBrcs] = useState([]);
   const [expertEvents, setExpertEvents] = useState([]);
   const [eventsLoading, setEventsLoading] = useState(false);
+  const [selectedEventForView, setSelectedEventForView] = useState(null);
 
   useEffect(() => {
     // Fetch users of this type
@@ -309,7 +311,11 @@ export default function UserManageModal({ type, entityName, onClose, initialUser
                           </thead>
                           <tbody className="divide-y divide-outline/5">
                             {expertEvents.map(e => (
-                              <tr key={e.id} className="hover:bg-surface-container-low transition-colors">
+                              <tr 
+                                key={e.id} 
+                                className="hover:bg-surface-container-low transition-colors cursor-pointer"
+                                onClick={() => setSelectedEventForView(e)}
+                              >
                                 <td className="px-4 py-3 font-medium">{new Date(e.date || e.createdAt).toLocaleDateString()}</td>
                                 <td className="px-4 py-3 max-w-[200px] truncate" title={e.name}>{e.name || 'Untitled'}</td>
                                 <td className="px-4 py-3 font-mono text-xs">{e.brcCode}</td>
@@ -333,6 +339,18 @@ export default function UserManageModal({ type, entityName, onClose, initialUser
           )}
         </div>
       </div>
+      
+      {/* Event Overview Modal */}
+      {selectedEventForView && (
+        <EventReportModal
+          brcCode={selectedEventForView.brcCode}
+          brcName={allBrcs.find(b => b.code === selectedEventForView.brcCode)?.name || 'Unknown Hub'}
+          existingEvent={selectedEventForView}
+          isReadOnly={true}
+          onClose={() => setSelectedEventForView(null)}
+          onRefresh={() => {}}
+        />
+      )}
     </div>,
     document.body
   );
