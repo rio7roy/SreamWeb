@@ -94,7 +94,7 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="bg-[#fdfbf7] min-h-screen flex overflow-hidden">
+    <div className="bg-[#fdfbf7] min-h-screen flex">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -153,7 +153,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Navigation Links */}
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto min-h-0">
           {ADMIN_NAV.map(nav => (
             <button
               key={nav.label}

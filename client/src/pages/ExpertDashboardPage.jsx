@@ -214,7 +214,7 @@ export default function ExpertDashboardPage() {
   const cardRef = useRef([]);
 
   return (
-    <div className="bg-[#fdfbf7] min-h-screen flex overflow-hidden">
+    <div className="bg-[#fdfbf7] min-h-screen flex">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -291,7 +291,7 @@ export default function ExpertDashboardPage() {
           </div>
         </div>
 
-        <nav className="flex flex-col gap-1 flex-grow">
+        <nav className="flex flex-col gap-1 flex-grow overflow-y-auto min-h-0">
           {EXPERT_NAV.map((item) => (
             <button
               key={item.label}
