@@ -56,6 +56,7 @@ export default function ExpertDashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("Dashboard");
   const [showSupportModal, setShowSupportModal] = useState(false);
+  const [showFormsModal, setShowFormsModal] = useState(false);
   const [isClosingSupport, setIsClosingSupport] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -662,13 +663,14 @@ export default function ExpertDashboardPage() {
             )}
           </div>
         </main>
+      </div>
 
-        {/* Forms Management Modal */}
-        {showFormsModal && (
-          <ExpertFormDashboard onClose={() => setShowFormsModal(false)} />
-        )}
+      {/* Forms Management Modal */}
+      {showFormsModal && (
+        <ExpertFormDashboard onClose={() => setShowFormsModal(false)} />
+      )}
 
-        {/* Support Modal */}
+      {/* Support Modal */}
         {showSupportModal && (
           <div
             className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 ${isClosingSupport ? "animate-fade-out" : "animate-fade-in"}`}
@@ -731,7 +733,6 @@ export default function ExpertDashboardPage() {
           </div>
         )}
 
-        {/* Modals */}
         {showEventModal && selectedBrc && (
           <EventReportModal
           brcCode={otherBrcForReport ? otherBrcForReport.code : selectedBrc?.code}
@@ -819,11 +820,6 @@ export default function ExpertDashboardPage() {
             onClose={() => setShowStockModal(false)}
           />
         )}
-
-        {showFormsModal && (
-          <ExpertFormDashboard onClose={() => setShowFormsModal(false)} />
-        )}
-      </div>
     </div>
   );
 }

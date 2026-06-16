@@ -84,7 +84,7 @@ export default function ExpertFormDashboard({ onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8">
       <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" onClick={onClose}></div>
       <div className="relative bg-surface rounded-3xl w-full max-w-6xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-fade-in-up">
         
