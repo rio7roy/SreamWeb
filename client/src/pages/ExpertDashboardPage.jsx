@@ -557,13 +557,13 @@ export default function ExpertDashboardPage() {
                         }}
                         className="group bg-white border border-on-surface/10 rounded-xl p-5 flex flex-col shadow-sm hover:-translate-y-1 hover:shadow-md transition-all cursor-pointer"
                       >
-                        <div className="flex items-center gap-4 mb-3">
-                          <div className="w-10 h-10 rounded-lg bg-primary-container/30 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                            <span className="material-symbols-outlined text-xl">
+                        <div className="flex flex-col gap-3 mb-3">
+                          <div className="w-12 h-12 rounded-xl bg-primary-container/30 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                            <span className="material-symbols-outlined text-2xl">
                               {tool.icon}
                             </span>
                           </div>
-                          <h3 className="text-lg font-bold text-on-surface tracking-tight leading-tight">
+                          <h3 className="text-xl font-bold text-on-surface tracking-tight leading-tight">
                             {tool.title}
                           </h3>
                         </div>
