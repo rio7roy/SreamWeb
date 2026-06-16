@@ -638,7 +638,7 @@
   {
     "uniqueId": "DF01-D",
     "itemName": "3D Pen",
-    "category": "Didital fabrication",
+    "category": "Digital fabrication",
     "newQty": 5,
     "section": "Digital Fabrication",
     "label": "3D printing",
@@ -650,7 +650,7 @@
   {
     "uniqueId": "DF02-D",
     "itemName": "3D Printer",
-    "category": "Didital fabrication",
+    "category": "Digital fabrication",
     "newQty": 1,
     "section": "Digital Fabrication",
     "label": "3D printing",
@@ -662,7 +662,7 @@
   {
     "uniqueId": "DF03-D",
     "itemName": "3D printer accessories",
-    "category": "Didital fabrication",
+    "category": "Digital fabrication",
     "newQty": 1,
     "section": "Digital Fabrication",
     "label": "3D printing",
@@ -674,7 +674,7 @@
   {
     "uniqueId": "DF04-D",
     "itemName": "PLA Filament",
-    "category": "Didital fabrication",
+    "category": "Digital fabrication",
     "newQty": 3,
     "section": "Digital Fabrication",
     "label": "3D printing",
@@ -686,7 +686,7 @@
   {
     "uniqueId": "DF07-D",
     "itemName": "CNC plotter",
-    "category": "Didital fabrication",
+    "category": "Digital fabrication",
     "newQty": 1,
     "section": "Digital Fabrication",
     "label": "Plotter",
@@ -698,7 +698,7 @@
   {
     "uniqueId": "DF08-D",
     "itemName": "Vinyl Sheets",
-    "category": "Didital fabrication",
+    "category": "Digital fabrication",
     "newQty": 1,
     "section": "Digital Fabrication",
     "label": "Plotter",
@@ -3854,7 +3854,7 @@
   {
     "uniqueId": "ITEM-322",
     "itemName": "Neodimium Magnet",
-    "category": "Lab Aparatus",
+    "category": "Lab apparatus",
     "newQty": 20,
     "section": "Science Lab Corner",
     "label": "",
@@ -3866,7 +3866,7 @@
   {
     "uniqueId": "ITEM-323",
     "itemName": "galvanometer",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 2,
     "section": "Science Lab Corner",
     "label": "",
@@ -3878,7 +3878,7 @@
   {
     "uniqueId": "LA04-S",
     "itemName": "Filter Paper",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 1,
     "section": "Science Lab Corner",
     "label": "Consumables",
@@ -3890,7 +3890,7 @@
   {
     "uniqueId": "LA07-S",
     "itemName": "Graduated Cylinder",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 1,
     "section": "Science Lab Corner",
     "label": "Lab apparatus",
@@ -3902,7 +3902,7 @@
   {
     "uniqueId": "LA08-S",
     "itemName": "Measuring Jug",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 1,
     "section": "Science Lab Corner",
     "label": "Lab apparatus",
@@ -3914,7 +3914,7 @@
   {
     "uniqueId": "LA01/01-S",
     "itemName": "Beaker 250 ml",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 10,
     "section": "Science Lab Corner",
     "label": "Lab Glass apparatus",
@@ -3926,7 +3926,7 @@
   {
     "uniqueId": "LA01/02-S",
     "itemName": "Beaker 500mL",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 5,
     "section": "Science Lab Corner",
     "label": "Lab Glass apparatus",
@@ -3938,7 +3938,7 @@
   {
     "uniqueId": "LA02-S",
     "itemName": "Conical Flask",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 8,
     "section": "Science Lab Corner",
     "label": "Lab Glass apparatus",
@@ -3950,7 +3950,7 @@
   {
     "uniqueId": "LA05-S",
     "itemName": "Glass Stirring Rod",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 1,
     "section": "Science Lab Corner",
     "label": "Lab Glass apparatus",
@@ -3962,7 +3962,7 @@
   {
     "uniqueId": "LA11-S",
     "itemName": "Petri Dishes",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 30,
     "section": "Science Lab Corner",
     "label": "Lab Glass apparatus",
@@ -3974,7 +3974,7 @@
   {
     "uniqueId": "LA12-S",
     "itemName": "Pippette Set",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 2,
     "section": "Science Lab Corner",
     "label": "Lab Glass apparatus",
@@ -3986,7 +3986,7 @@
   {
     "uniqueId": "LA17-S",
     "itemName": "Spirit Lamp",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 1,
     "section": "Science Lab Corner",
     "label": "Lab Glass apparatus",
@@ -3998,7 +3998,7 @@
   {
     "uniqueId": "LA18/01-S",
     "itemName": "Test Tube",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 10,
     "section": "Science Lab Corner",
     "label": "Lab Glass apparatus",
@@ -4010,7 +4010,7 @@
   {
     "uniqueId": "LA18/02-S",
     "itemName": "Test Tube Stand",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 2,
     "section": "Science Lab Corner",
     "label": "Lab Glass apparatus",
@@ -4022,7 +4022,7 @@
   {
     "uniqueId": "LA20-S",
     "itemName": "Watch Glass",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 10,
     "section": "Science Lab Corner",
     "label": "Lab Glass apparatus",
@@ -4034,7 +4034,7 @@
   {
     "uniqueId": "LA03-S",
     "itemName": "Dropper",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 2,
     "section": "Science Lab Corner",
     "label": "Lab Plastic apparatus",
@@ -4046,7 +4046,7 @@
   {
     "uniqueId": "LA13-S",
     "itemName": "Plastic Funnel",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 10,
     "section": "Science Lab Corner",
     "label": "Lab Plastic apparatus",
@@ -4058,7 +4058,7 @@
   {
     "uniqueId": "LA14-S",
     "itemName": "Plastic Syringe",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 10,
     "section": "Science Lab Corner",
     "label": "Lab Plastic apparatus",
@@ -4070,7 +4070,7 @@
   {
     "uniqueId": "LA16-S",
     "itemName": "Sample Collection Bottle",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 100,
     "section": "Science Lab Corner",
     "label": "Lab Plastic apparatus",
@@ -4082,7 +4082,7 @@
   {
     "uniqueId": "LA19-S",
     "itemName": "Wash Bottle",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 2,
     "section": "Science Lab Corner",
     "label": "Lab Plastic apparatus",
@@ -4094,7 +4094,7 @@
   {
     "uniqueId": "LA09-S",
     "itemName": "Micro Pippette",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 1,
     "section": "Science Lab Corner",
     "label": "Microscopy",
@@ -4106,7 +4106,7 @@
   {
     "uniqueId": "LA10/02-S",
     "itemName": "Microscope Cover Glass",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 1,
     "section": "Science Lab Corner",
     "label": "Microscopy",
@@ -4118,7 +4118,7 @@
   {
     "uniqueId": "LA10/01-S",
     "itemName": "Microscope Slides",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 1,
     "section": "Science Lab Corner",
     "label": "Microscopy",
@@ -4130,7 +4130,7 @@
   {
     "uniqueId": "LA06-S",
     "itemName": "Google Cardboard Lens",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 20,
     "section": "Science Lab Corner",
     "label": "Optics",
@@ -4142,7 +4142,7 @@
   {
     "uniqueId": "LI20-S",
     "itemName": "steel spatula",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 4,
     "section": "Science Lab Corner",
     "label": "lab",
@@ -4274,7 +4274,7 @@
   {
     "uniqueId": "ITEM-357",
     "itemName": "TDS meter",
-    "category": "Lab appratus",
+    "category": "Lab apparatus",
     "newQty": 1,
     "section": "Science Lab Corner",
     "label": "",
