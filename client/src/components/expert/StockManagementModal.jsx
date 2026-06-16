@@ -48,9 +48,9 @@ const resolveImgUrl = (img) => {
   return `${apiBase}/${img}`;
 };
 
-export default function StockManagementModal({ brcCode, brcName, onClose }) {
+export default function StockManagementModal({ brcCode, brcName, onClose, inline = false }) {
   const [stocks, setStocks] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isClosing, setIsClosing] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -234,10 +234,8 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
   // Grid template for all columns: #, UniqueID, IMG, Item, Category, NewQty, Available, Used, Damaged, Consumed, Remarks, Section, Label, Actions
   const gridCols = '30px 80px 40px minmax(200px, 2fr) 90px 50px 50px 50px 55px 60px minmax(150px, 1.5fr) 80px 80px 80px';
 
-  return createPortal(
-    <div className={`fixed inset-0 z-[9999] flex items-center justify-center p-3 ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}>
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" onClick={handleClose}></div>
-      <div className={`relative bg-white rounded-2xl w-full max-w-[1500px] shadow-2xl overflow-hidden flex flex-col h-[94vh] ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}>
+  const content = (
+    <div className={`relative bg-white w-full overflow-hidden flex flex-col ${inline ? 'h-[75vh] border border-slate-200 rounded-2xl shadow-sm' : `max-w-[1500px] rounded-2xl shadow-2xl h-[94vh] ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}`}>
 
         {/* ─── Header ─── */}
         <div style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }} className="px-6 py-4 flex items-center justify-between shrink-0">
@@ -254,9 +252,11 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
             <button onClick={handleDownloadCsv} className="h-9 px-3 bg-white/15 backdrop-blur-sm rounded-lg flex items-center gap-1.5 text-white text-xs hover:bg-white/25 transition-colors">
               <span className="material-symbols-outlined text-base">download</span>Export CSV
             </button>
-            <button onClick={handleClose} className="w-9 h-9 bg-white/15 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-amber-600 transition-colors">
-              <span className="material-symbols-outlined text-lg">close</span>
-            </button>
+            {!inline && (
+              <button onClick={handleClose} className="w-9 h-9 bg-white/15 rounded-full flex items-center justify-center text-white hover:bg-white hover:text-amber-600 transition-colors">
+                <span className="material-symbols-outlined text-lg">close</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -565,6 +565,17 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
         </div>
 
       </div>
+    </div>
+  );
+
+  if (inline) {
+    return content;
+  }
+
+  return createPortal(
+    <div className={`fixed inset-0 z-[9999] flex items-center justify-center p-3 ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}>
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" onClick={handleClose}></div>
+      {content}
     </div>,
     document.body
   );
