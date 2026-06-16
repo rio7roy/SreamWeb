@@ -17,6 +17,9 @@ export default function AdminFormDashboard({ onClose }) {
   // Assign modal state
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [selectedFormToAssign, setSelectedFormToAssign] = useState(null);
+  
+  // Filter state
+  const [brcFilter, setBrcFilter] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -169,10 +172,20 @@ export default function AdminFormDashboard({ onClose }) {
 
       {/* Active Forms Section */}
       <section>
-        <h3 className="text-xl font-bold mb-4 flex items-center gap-2 mt-12">
-          <span className="material-symbols-outlined text-primary">description</span>
-          Active Forms
-        </h3>
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 mt-12 gap-4">
+          <h3 className="text-xl font-bold flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary">description</span>
+            Active Forms
+          </h3>
+          <select 
+            value={brcFilter} 
+            onChange={(e) => setBrcFilter(e.target.value)}
+            className="bg-white border border-outline/20 rounded-xl px-4 py-2 text-sm outline-none focus:border-primary shadow-sm"
+          >
+            <option value="">All BRCs</option>
+            {brcs.map(b => <option key={b.code} value={b.code}>{b.name} ({b.code})</option>)}
+          </select>
+        </div>
         <div className="bg-white rounded-3xl border border-outline/10 shadow-sm overflow-hidden">
           <table className="w-full text-left">
             <thead>
@@ -184,16 +197,24 @@ export default function AdminFormDashboard({ onClose }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-outline/5">
-              {forms.map(form => {
+              {forms.filter(f => !brcFilter || (f.assignedTo && f.assignedTo.includes(brcFilter))).map(form => {
                 const author = form.createdBy === 'unknown' ? 'Admin' : (experts.find(e => e.id === form.createdBy)?.name || form.createdBy);
                 return (
                   <tr key={form.id} className="hover:bg-surface-container-low/50">
                     <td className="p-4 font-bold">{form.title}</td>
                     <td className="p-4 text-sm text-secondary">{author}</td>
                     <td className="p-4">
-                      <button onClick={() => togglePublish(form)} className={`text-xs font-bold px-3 py-1 rounded-full ${form.published ? 'bg-green-100 text-green-700' : 'bg-surface-container text-secondary'}`}>
-                        {form.published ? 'Published' : 'Draft'}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => togglePublish(form)} 
+                          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${form.published ? 'bg-green-500' : 'bg-surface-container-highest'}`}
+                        >
+                          <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${form.published ? 'translate-x-5' : 'translate-x-0'}`} />
+                        </button>
+                        <span className={`text-xs font-bold ${form.published ? 'text-green-700' : 'text-secondary'}`}>
+                          {form.published ? 'Published' : 'Draft'}
+                        </span>
+                      </div>
                     </td>
                     <td className="p-4 flex gap-2 justify-end">
                       <button onClick={() => handleViewAnalytics(form)} className="p-2 text-primary hover:bg-primary/10 rounded-full" title="Analytics">
@@ -206,7 +227,7 @@ export default function AdminFormDashboard({ onClose }) {
                   </tr>
                 );
               })}
-              {forms.length === 0 && (
+              {forms.filter(f => !brcFilter || (f.assignedTo && f.assignedTo.includes(brcFilter))).length === 0 && (
                 <tr><td colSpan="4" className="p-8 text-center text-secondary italic">No active forms found.</td></tr>
               )}
             </tbody>

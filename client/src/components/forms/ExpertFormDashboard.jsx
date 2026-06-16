@@ -139,9 +139,17 @@ export default function ExpertFormDashboard({ onClose }) {
               <div key={form.id} className="bg-white rounded-2xl p-6 border border-outline/10 shadow-sm flex flex-col h-56">
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="font-bold text-lg truncate pr-2">{form.title}</h4>
-                  <button onClick={() => togglePublish(form)} className={`shrink-0 text-xs font-bold px-3 py-1 rounded-full ${form.published ? 'bg-green-100 text-green-700' : 'bg-surface-container text-secondary hover:bg-surface-container-highest'}`}>
-                    {form.published ? 'Published' : 'Draft'}
-                  </button>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <button 
+                      onClick={() => togglePublish(form)} 
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${form.published ? 'bg-green-500' : 'bg-surface-container-highest'}`}
+                    >
+                      <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${form.published ? 'translate-x-5' : 'translate-x-0'}`} />
+                    </button>
+                    <span className={`text-[10px] uppercase tracking-wider font-bold ${form.published ? 'text-green-700' : 'text-secondary'}`}>
+                      {form.published ? 'Published' : 'Draft'}
+                    </span>
+                  </div>
                 </div>
                 <p className="text-sm text-secondary line-clamp-2 mb-auto">{form.description || 'No description'}</p>
                 
