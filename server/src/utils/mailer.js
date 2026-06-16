@@ -1,44 +1,29 @@
 const nodemailer = require('nodemailer');
 
-let testAccount = null;
+let transporter = null;
 
-const createTransporter = async () => {
-  if (process.env.SMTP_USER) {
+const createTransporter = () => {
+  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
     return nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: process.env.SMTP_PORT || 587,
       secure: process.env.SMTP_PORT === '465',
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
     });
-  } else {
-    // Generate test account on the fly if no real SMTP is configured
-    if (!testAccount) {
-      testAccount = await nodemailer.createTestAccount();
-    }
-    return nodemailer.createTransport({
-      host: testAccount.smtp.host,
-      port: testAccount.smtp.port,
-      secure: testAccount.smtp.secure,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
-    });
   }
+  return null;
 };
 
-/**
- * Sends an invitation email to a newly created Expert or Admin.
- * @param {string} email - The recipient's email address
- * @param {string} name - The recipient's full name
- * @param {string} inviteLink - The unique onboarding URL
- * @returns {string|null} - Returns the Ethereal preview URL if using a test account, or null if using real SMTP.
- */
 exports.sendInvite = async (email, name, inviteLink) => {
-  const transporter = await createTransporter();
+  const mailTransporter = createTransporter();
+  
+  if (!mailTransporter) {
+    console.warn(`[MAILER] SMTP not configured. Skipping email to ${email}. Invite link: ${inviteLink}`);
+    return null;
+  }
 
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaeb; border-radius: 12px;">
@@ -63,22 +48,15 @@ exports.sendInvite = async (email, name, inviteLink) => {
   `;
 
   try {
-    const fromEmail = process.env.SMTP_FROM_EMAIL || (testAccount ? testAccount.user : 'onboarding@resend.dev');
-    const info = await transporter.sendMail({
+    const fromEmail = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'noreply@stream.edu';
+    const info = await mailTransporter.sendMail({
       from: `"STREAM Administration" <${fromEmail}>`,
       to: email,
       subject: 'You have been invited to STREAM Ecosystem',
       html: htmlContent,
     });
+    
     console.log(`[MAILER] Invite sent to ${email}`);
-    
-    // If using ethereal test account, log and return the preview URL
-    if (testAccount) {
-      const previewUrl = nodemailer.getTestMessageUrl(info);
-      console.log(`[MAILER] Preview URL: ${previewUrl}`);
-      return previewUrl;
-    }
-    
     return null;
   } catch (error) {
     console.error(`[MAILER] Failed to send invite to ${email}:`, error);
