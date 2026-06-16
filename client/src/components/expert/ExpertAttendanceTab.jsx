@@ -56,7 +56,7 @@ export default function ExpertAttendanceTab({ user }) {
     const query = searchQuery.toLowerCase();
     return events.filter(e => {
       const nameMatch = (e.name || '').toLowerCase().includes(query);
-      const brcMatch = (e.brcCode || '').toLowerCase().includes(query);
+      const brcMatch = (e.brcName || e.brcCode || '').toLowerCase().includes(query);
       return nameMatch || brcMatch;
     });
   }, [events, searchQuery]);
@@ -117,7 +117,7 @@ export default function ExpertAttendanceTab({ user }) {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search by event name or BRC code..."
+                      placeholder="Search by Event or BRC Name..."
                       className="w-full pl-10 pr-4 py-3 bg-surface-container-low border border-outline/20 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm font-medium"
                     />
                   </div>
@@ -182,7 +182,7 @@ export default function ExpertAttendanceTab({ user }) {
                         <tr>
                           <th className="px-6 py-3 font-semibold">Date</th>
                           <th className="px-6 py-3 font-semibold">Event Name</th>
-                          <th className="px-6 py-3 font-semibold">BRC Code</th>
+                          <th className="px-6 py-3 font-semibold">BRC Name</th>
                           <th className="px-6 py-3 font-semibold">Status</th>
                         </tr>
                       </thead>
@@ -195,7 +195,7 @@ export default function ExpertAttendanceTab({ user }) {
                           >
                             <td className="px-6 py-4">{new Date(e.date || e.createdAt).toLocaleDateString()}</td>
                             <td className="px-6 py-4 truncate max-w-[300px]" title={e.name}>{e.name}</td>
-                            <td className="px-6 py-4 font-mono text-xs text-secondary">{e.brcCode}</td>
+                            <td className="px-6 py-4 font-mono text-xs text-secondary">{e.brcName}</td>
                             <td className="px-6 py-4">
                               <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${e.status === 'SUBMITTED' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
                                 {e.status}
@@ -221,7 +221,7 @@ export default function ExpertAttendanceTab({ user }) {
                       {selectedEvent.name}
                     </h3>
                     <p className="text-sm text-secondary font-medium">
-                      {new Date(selectedEvent.date || selectedEvent.createdAt).toLocaleDateString()} &bull; BRC: {selectedEvent.brcCode}
+                      {new Date(selectedEvent.date || selectedEvent.createdAt).toLocaleDateString()} &bull; Hub: {selectedEvent.brcName || selectedEvent.brcCode}
                     </p>
                   </div>
                   <button 

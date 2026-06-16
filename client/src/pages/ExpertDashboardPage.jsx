@@ -9,6 +9,7 @@ import ExpertSessionLogsTab from "../components/expert/ExpertSessionLogsTab";
 import PdfReportModal from "../components/expert/PdfReportModal";
 import ExpertAttendanceTab from "../components/expert/ExpertAttendanceTab";
 import StockManagementModal from "../components/expert/StockManagementModal";
+import ExpertFormDashboard from "../components/forms/ExpertFormDashboard";
 import NotificationBar from "../components/ui/NotificationBar";
 
 const EXPERT_NAV = [
@@ -61,8 +62,12 @@ export default function ExpertDashboardPage() {
   const [brcData, setBrcData] = useState([]);
 
   const [showEventModal, setShowEventModal] = useState(false);
+  const [showOtherBrcModal, setShowOtherBrcModal] = useState(false);
+  const [otherBrcSelected, setOtherBrcSelected] = useState("");
+  const [otherBrcForReport, setOtherBrcForReport] = useState(null);
   const [showPdfModal, setShowPdfModal] = useState(false);
   const [showStockModal, setShowStockModal] = useState(false);
+  const [showFormsModal, setShowFormsModal] = useState(false);
   const [selectedDraft, setSelectedDraft] = useState(null);
   const [drafts, setDrafts] = useState([]);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -374,23 +379,32 @@ export default function ExpertDashboardPage() {
 
                 <div className="max-w-4xl w-full bg-white border border-on-surface/10 rounded-2xl shadow-xl flex flex-col">
                   <div className="py-10 px-6 md:px-10 flex flex-col justify-center">
-                    <div className="mb-8 text-center">
-                      <h2
-                        className="text-3xl md:text-[32px] text-on-surface mb-2 tracking-wide"
-                        style={{
-                          fontFamily: "'Bebas Neue', sans-serif",
-                          lineHeight: 1.2,
-                        }}
+                    <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                      <div className="text-left">
+                        <h2
+                          className="text-3xl md:text-[32px] text-on-surface mb-2 tracking-wide"
+                          style={{
+                            fontFamily: "'Bebas Neue', sans-serif",
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          Select Block Resource Centre
+                        </h2>
+                        <p
+                          className="text-secondary leading-relaxed max-w-2xl text-sm"
+                          style={{ fontFamily: "'Julius Sans One', sans-serif" }}
+                        >
+                          Click on a BRC below to initialize a session and access
+                          expert tools for that region.
+                        </p>
+                      </div>
+                      <button 
+                        onClick={() => setShowOtherBrcModal(true)}
+                        className="shrink-0 bg-amber-100 text-amber-800 hover:bg-amber-200 px-5 py-3 rounded-xl font-bold text-sm shadow-sm transition-colors border border-amber-300 flex items-center gap-2"
                       >
-                        Select Block Resource Centre
-                      </h2>
-                      <p
-                        className="text-secondary leading-relaxed max-w-2xl mx-auto text-sm"
-                        style={{ fontFamily: "'Julius Sans One', sans-serif" }}
-                      >
-                        Click on a BRC below to initialize a session and access
-                        expert tools for that region.
-                      </p>
+                        <span className="material-symbols-outlined text-[18px]">add_circle</span>
+                        Report Other Event
+                      </button>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -553,6 +567,8 @@ export default function ExpertDashboardPage() {
                             setShowPdfModal(true);
                           } else if (tool.title === "Stock Management") {
                             setShowStockModal(true);
+                          } else if (tool.title === "Observation Forms") {
+                            setShowFormsModal(true);
                           }
                         }}
                         className="group bg-white border border-on-surface/10 rounded-xl p-5 flex flex-col shadow-sm hover:-translate-y-1 hover:shadow-md transition-all cursor-pointer"
@@ -647,6 +663,11 @@ export default function ExpertDashboardPage() {
           </div>
         </main>
 
+        {/* Forms Management Modal */}
+        {showFormsModal && (
+          <ExpertFormDashboard onClose={() => setShowFormsModal(false)} />
+        )}
+
         {/* Support Modal */}
         {showSupportModal && (
           <div
@@ -713,18 +734,77 @@ export default function ExpertDashboardPage() {
         {/* Modals */}
         {showEventModal && selectedBrc && (
           <EventReportModal
-            brcCode={selectedBrc.code}
-            brcName={selectedBrc.name}
-            existingEvent={selectedDraft}
-            onClose={() => {
-              setShowEventModal(false);
-              setSelectedDraft(null);
-            }}
-            onRefresh={() => fetchStatsAndDrafts(selectedBrc.code)}
-          />
-        )}
+          brcCode={otherBrcForReport ? otherBrcForReport.code : selectedBrc?.code}
+          brcName={otherBrcForReport ? otherBrcForReport.name : selectedBrc?.name}
+          existingEvent={selectedDraft}
+          defaultTag={otherBrcForReport ? 'other event' : ''}
+          venueType={otherBrcForReport ? 'OTHER_BRC' : 'SELECTED_BRC'}
+          venueValue={otherBrcForReport ? otherBrcForReport.code : null}
+          onClose={() => {
+            setShowEventModal(false);
+            setOtherBrcForReport(null);
+            setSelectedDraft(null);
+            fetchStatsAndDrafts();
+          }}
+          onRefresh={fetchStatsAndDrafts}
+        />
+      )}
 
-        {showPdfModal && selectedBrc && (
+      {showOtherBrcModal && (
+        <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl relative">
+            <button onClick={() => setShowOtherBrcModal(false)} className="absolute top-4 right-4 text-secondary hover:text-on-surface">
+              <span className="material-symbols-outlined">close</span>
+            </button>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center">
+                <span className="material-symbols-outlined">domain_add</span>
+              </div>
+              <h3 className="text-2xl font-bold text-on-surface" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>Report Event in Other BRC</h3>
+            </div>
+            <p className="text-secondary text-sm mb-6">Select the BRC where you conducted this event. This will be automatically tagged as an 'other event'.</p>
+            
+            <div className="mb-6">
+              <label className="block text-sm font-bold text-secondary mb-2">Target BRC</label>
+              <select 
+                value={otherBrcSelected} 
+                onChange={(e) => setOtherBrcSelected(e.target.value)}
+                className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 outline-none transition-all"
+              >
+                <option value="" disabled>Select BRC...</option>
+                {brcData.map(b => (
+                  <option key={b.code} value={b.code}>{b.name} ({b.code})</option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="flex gap-4">
+              <button 
+                onClick={() => setShowOtherBrcModal(false)}
+                className="flex-1 py-3 px-4 bg-surface-container-low text-on-surface font-bold rounded-xl hover:bg-surface-container-high transition-colors border border-outline/10"
+              >
+                Cancel
+              </button>
+              <button 
+                disabled={!otherBrcSelected}
+                onClick={() => {
+                  const brc = brcData.find(b => b.code === otherBrcSelected);
+                  if (brc) {
+                    setOtherBrcForReport(brc);
+                    setShowOtherBrcModal(false);
+                  }
+                }}
+                className="flex-1 py-3 px-4 bg-primary text-on-primary font-bold rounded-xl hover:opacity-90 shadow-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                Continue
+                <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPdfModal && selectedBrc && (
           <PdfReportModal
             brcCode={selectedBrc.code}
             onClose={() => setShowPdfModal(false)}
@@ -738,6 +818,10 @@ export default function ExpertDashboardPage() {
             brcName={selectedBrc.name}
             onClose={() => setShowStockModal(false)}
           />
+        )}
+
+        {showFormsModal && (
+          <ExpertFormDashboard onClose={() => setShowFormsModal(false)} />
         )}
       </div>
     </div>

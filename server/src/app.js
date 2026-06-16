@@ -15,6 +15,7 @@ const adminRoutes = require('./modules/admin/admin.routes');
 const eventsRoutes = require('./modules/events/events.routes');
 const brcsRoutes = require('./modules/brcs/brcs.routes');
 const stocksRoutes = require('./modules/stocks/stocks.routes');
+const formsRoutes = require('./modules/forms/forms.routes');
 
 const app = express();
 
@@ -62,6 +63,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/brcs', brcsRoutes);
 app.use('/api/stocks', stocksRoutes);
+app.use('/api/forms', formsRoutes);
 
 // ── Quick Messages Endpoint (for stock alerts) ──
 const fs = require('fs');

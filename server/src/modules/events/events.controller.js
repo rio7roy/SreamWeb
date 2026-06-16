@@ -300,7 +300,12 @@ exports.getEvents = (req, res) => {
     // Sort by most recent first
     events.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
 
-    res.json(events);
+    const eventsWithNames = events.map(e => ({
+      ...e,
+      brcName: brcMap[e.brcCode]?.name || e.brcCode
+    }));
+
+    res.json(eventsWithNames);
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch events', error: err.message });
   }

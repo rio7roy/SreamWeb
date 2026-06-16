@@ -9,10 +9,12 @@ import StockAdministrationPage from './admin/StockAdministrationPage';
 import ProfilePage from './ProfilePage';
 import BroadcastLogsTab from '../components/admin/BroadcastLogsTab';
 import UserManageModal from '../components/admin/UserManageModal';
+import AdminFormDashboard from '../components/forms/AdminFormDashboard';
 
 const ADMIN_NAV = [
   { label: 'Overview', icon: 'dashboard' },
   { label: 'User Management', icon: 'group_add' },
+  { label: 'Form Builder', icon: 'format_list_bulleted' },
   { label: 'Program Reports', icon: 'analytics' },
   { label: 'Stock Administration', icon: 'inventory_2' },
   { label: 'Broadcast Logs', icon: 'campaign' },
@@ -360,6 +362,8 @@ export default function AdminDashboardPage() {
           </div>
         ) : activeNav === 'User Management' ? (
           <UserManagementTab />
+        ) : activeNav === 'Form Builder' ? (
+          <AdminFormDashboard />
         ) : activeNav === 'Program Reports' ? (
           <div className="p-4 md:p-8 md:px-12 w-full h-full animate-fade-in-up">
             <ReportsPage />

@@ -214,7 +214,7 @@ export default function ReportsPage() {
                 <tr>
                   <th className="px-6 py-3 font-semibold">Date</th>
                   <th className="px-6 py-3 font-semibold">Event Name</th>
-                  <th className="px-6 py-3 font-semibold">BRC Code</th>
+                  <th className="px-6 py-3 font-semibold">BRC Name</th>
                   <th className="px-6 py-3 font-semibold">Teachers</th>
                   <th className="px-6 py-3 font-semibold">Students</th>
                   <th className="px-6 py-3 font-semibold">Tag</th>
@@ -230,7 +230,7 @@ export default function ReportsPage() {
                   >
                     <td className="px-6 py-3">{new Date(e.date || e.createdAt).toLocaleDateString()}</td>
                     <td className="px-6 py-3 truncate max-w-[200px]" title={e.name}>{e.name}</td>
-                    <td className="px-6 py-3 font-mono text-xs text-secondary">{e.brcCode}</td>
+                    <td className="px-6 py-3 font-mono text-xs text-secondary">{e.brcName || e.brcCode}</td>
                     <td className="px-6 py-3 text-secondary">{e.teachersCount || 0}</td>
                     <td className="px-6 py-3 text-secondary">{e.studentsCount || 0}</td>
                     <td className="px-6 py-3 capitalize text-secondary">{e.customTag || e.tag || 'N/A'}</td>

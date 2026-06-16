@@ -11,6 +11,7 @@ import ReportsPage from '../pages/admin/ReportsPage';
 import ExpertOnboardingPage from '../pages/ExpertOnboardingPage';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
 import ProfilePage from '../pages/ProfilePage';
+import PublicFormPage from '../pages/PublicFormPage';
 
 const RootLayout = () => (
   <>
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: '/',
         element: <PortalPage />,
+      },
+      {
+        path: '/f/:id',
+        element: <PublicFormPage />,
       },
       {
         path: '/dashboard',

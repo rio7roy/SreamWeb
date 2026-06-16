@@ -2,18 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import api from '../../lib/api';
 
-export default function EventReportModal({ brcCode, brcName, existingEvent, isReadOnly, onClose, onRefresh }) {
-  const [allBrcs, setAllBrcs] = useState([]);
-  const [venueType, setVenueType] = useState('SELECTED_BRC');
-  const [venueValue, setVenueValue] = useState(brcCode);
-  
+export default function EventReportModal({ brcCode, brcName, existingEvent, isReadOnly, onClose, onRefresh, defaultTag = '', venueType = 'SELECTED_BRC', venueValue = null }) {
+  const actualVenueValue = venueValue || brcCode;
   const [formData, setFormData] = useState({
     name: '',
     date: '',
     description: '',
     teachersCount: 0,
     studentsCount: 0,
-    tag: '',
+    tag: defaultTag,
     customTag: '',
   });
   const [photos, setPhotos] = useState([]);
@@ -49,18 +46,6 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, isRe
     }
   }, [existingEvent]);
 
-  useEffect(() => {
-    // Fetch all BRCs for the "Other BRCs" dropdown
-    const fetchBrcs = async () => {
-      try {
-        const res = await api.get('/brcs');
-        setAllBrcs(res.data);
-      } catch (e) {
-        console.error('Failed to fetch BRCs', e);
-      }
-    };
-    fetchBrcs();
-
     if (existingEvent) {
       setFormData({
         name: existingEvent.name || '',
@@ -71,8 +56,7 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, isRe
         tag: existingEvent.tag || '',
         customTag: existingEvent.customTag || '',
       });
-      if (existingEvent.venueType) setVenueType(existingEvent.venueType);
-      if (existingEvent.venueValue) setVenueValue(existingEvent.venueValue);
+      });
     }
   }, [existingEvent]);
 
@@ -122,11 +106,7 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, isRe
     data.append('status', status); // 'DRAFT' or 'SUBMITTED'
     
     data.append('venueType', venueType);
-    let finalVenueValue = venueValue;
-    if (venueType === 'OTHER_BRC' && allBrcs.length > 0 && (!venueValue || venueValue === brcCode)) {
-      finalVenueValue = allBrcs[0].code;
-    }
-    data.append('venueValue', finalVenueValue);
+    data.append('venueValue', actualVenueValue);
 
     if (location) {
       data.append('latitude', location.lat);
@@ -289,56 +269,6 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, isRe
                 )}
             </div>
 
-            <div className="bg-surface-container-low p-4 rounded-xl border border-outline/20 space-y-4">
-              <div>
-                <label className="block text-sm font-bold text-secondary mb-1">Venue Type</label>
-                <select 
-                  value={venueType} 
-                  onChange={(e) => {
-                    setVenueType(e.target.value);
-                    setVenueValue(e.target.value === 'SELECTED_BRC' ? brcCode : '');
-                  }}
-                  className="w-full bg-white border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none"
-                >
-                  <option value="SELECTED_BRC">Selected BRC ({brcName})</option>
-                  <option value="OTHER_BRC">Other BRCs</option>
-                  <option value="OTHER_VENUE">Other Venue</option>
-                </select>
-              </div>
-
-              {venueType === 'OTHER_BRC' && (
-                <div className="animate-fade-in">
-                  <label className="block text-sm font-bold text-secondary mb-1">Select Other BRC</label>
-                  <select 
-                    value={venueValue} 
-                    onChange={(e) => setVenueValue(e.target.value)}
-                    className="w-full bg-white border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none"
-                  >
-                    <option value="" disabled>Select a BRC...</option>
-                    {allBrcs.filter(b => b.code !== brcCode).map(b => (
-                      <option key={b.code} value={b.code}>{b.name} ({b.code})</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {venueType === 'OTHER_VENUE' && (
-                <div className="animate-fade-in">
-                  <label className="block text-sm font-bold text-secondary mb-1">Custom Venue Name</label>
-                  <input 
-                    type="text" 
-                    value={venueValue}
-                    onChange={(e) => setVenueValue(e.target.value)}
-                    list="venue-suggestions"
-                    placeholder="Type venue name (e.g. CUSAT)"
-                    className="w-full bg-white border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none"
-                  />
-                  <datalist id="venue-suggestions">
-                    <option value="CUSAT" />
-                    <option value="DPO" />
-                  </datalist>
-                </div>
-              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

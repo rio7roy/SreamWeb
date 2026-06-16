@@ -1,0 +1,23 @@
+[
+  {
+    "id": "24d37621a94e81ce8c2644353cf998dd",
+    "title": "New Form",
+    "description": "",
+    "fields": [
+      {
+        "id": "0vpqlwzh2",
+        "type": "short_text",
+        "label": "Untitled Question",
+        "required": false,
+        "options": []
+      }
+    ],
+    "createdBy": "mock-admin",
+    "published": false,
+    "createdAt": "2026-06-16T07:19:56.133Z",
+    "assignedTo": [
+      "fb9fc04a-8328-40ab-beaa-a5c912a439ed"
+    ],
+    "updatedAt": "2026-06-16T07:20:01.666Z"
+  }
+]
