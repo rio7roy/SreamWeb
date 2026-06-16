@@ -68,7 +68,7 @@ export default function ExpertDashboardPage() {
   const [otherBrcForReport, setOtherBrcForReport] = useState(null);
   const [showPdfModal, setShowPdfModal] = useState(false);
   const [showStockModal, setShowStockModal] = useState(false);
-  const [showFormsModal, setShowFormsModal] = useState(false);
+
   const [selectedDraft, setSelectedDraft] = useState(null);
   const [drafts, setDrafts] = useState([]);
   const [isDeleting, setIsDeleting] = useState(false);
