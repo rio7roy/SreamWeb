@@ -76,5 +76,12 @@
     "name": "Fake Rio",
     "email": "rio7roy@gmail.com",
     "createdAt": "2026-06-16T06:11:55.516Z"
+  },
+  {
+    "id": "7b8b4e8bf5ead1c879e665593935c5bf",
+    "token": "d2fdb9258735416fb35d2353eceb9007",
+    "name": "maria",
+    "email": "john365joe@gmail.com",
+    "createdAt": "2026-06-16T06:22:23.935Z"
   }
 ]

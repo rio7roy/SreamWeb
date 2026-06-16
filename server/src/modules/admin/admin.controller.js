@@ -73,7 +73,8 @@ exports.createUser = async (req, res) => {
     data.push(newUser);
     writeData(filePath, data);
     
-    const inviteLink = `http://localhost:5173/onboard/${token}`;
+    const clientOrigin = req.headers.origin || 'http://localhost:5173';
+    const inviteLink = `${clientOrigin}/onboard/${token}`;
     
     try {
       const previewUrl = await mailer.sendInvite(newUser.email, newUser.name, inviteLink);
