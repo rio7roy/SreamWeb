@@ -7,6 +7,7 @@ export default function UserCreationModal({ type, entityName, onClose }) {
   const [experts, setExperts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState(null);
+  const [generatedLink, setGeneratedLink] = useState(null);
 
   // Auto-suggest BRC state
   const [brcSearch, setBrcSearch] = useState('');
@@ -76,11 +77,10 @@ export default function UserCreationModal({ type, entityName, onClose }) {
       const res = await api.post(`/admin/users/${type}`, formData);
       
       if (type === 'experts' || type === 'admins') {
-        if (res.data.previewUrl) {
-          setFeedback({ type: 'success', text: `Success! Email sent. Preview: ${res.data.previewUrl}` });
-        } else if (res.data.inviteLink) {
-          // Fallback if SMTP failed but link was generated
-          setFeedback({ type: 'success', text: `Email failed. Manual invite link: ${res.data.inviteLink}` });
+        const link = res.data.previewUrl || res.data.inviteLink;
+        if (link) {
+          setGeneratedLink(link);
+          setFeedback({ type: 'success', text: `Success! Invite link generated.` });
         } else {
           setFeedback({ type: 'success', text: `Success! An invitation email has been sent.` });
           setTimeout(onClose, 2000);
@@ -132,88 +132,119 @@ export default function UserCreationModal({ type, entityName, onClose }) {
             </div>
           )}
 
-          <form id="create-form" onSubmit={handleSubmit} className="space-y-6">
-            
-            {/* COMMON: STREAM Hub, iLab, Creative Corner */}
-            {(type === 'labs' || type === 'ilabs' || type === 'creative_corners') && (
-              <>
-                <div>
-                  <label className="block text-sm font-bold text-secondary mb-1">Name of {type === 'labs' ? 'Hub' : 'School'}</label>
-                  <input required name="name" onChange={handleChange} type="text" className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none" />
-                </div>
-                
-                {type === 'labs' && (
-                  <div className="mt-4">
-                    <label className="block text-sm font-bold text-secondary mb-1">STREAM Expert in Charge</label>
-                    <select required name="expertId" onChange={(e) => handleExpertSelect(e.target.value)} className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none">
-                      <option value="">Select an Expert...</option>
-                      {experts.map(ex => <option key={ex.id} value={ex.id}>{ex.name} ({ex.district})</option>)}
-                    </select>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {generatedLink ? (
+            <div className="flex flex-col items-center justify-center py-8 animate-fade-in-up text-center">
+              <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-3xl">check_circle</span>
+              </div>
+              <h4 className="text-xl font-bold mb-2">Registration Successful!</h4>
+              <p className="text-secondary mb-6">Share this unique onboarding link with the user so they can complete their setup:</p>
+              
+              <div className="flex w-full bg-surface-container border border-outline/20 rounded-xl overflow-hidden">
+                <input 
+                  type="text" 
+                  readOnly 
+                  value={generatedLink} 
+                  className="flex-1 bg-transparent px-4 py-3 outline-none text-sm font-medium text-on-surface truncate"
+                />
+                <button 
+                  onClick={() => {
+                    navigator.clipboard.writeText(generatedLink);
+                    setFeedback({ type: 'success', text: 'Copied to clipboard!' });
+                  }}
+                  className="px-6 py-3 bg-primary/10 text-primary font-bold hover:bg-primary hover:text-white transition-colors border-l border-outline/20 flex items-center gap-2 shrink-0"
+                >
+                  <span className="material-symbols-outlined text-sm">content_copy</span>
+                  Copy Link
+                </button>
+              </div>
+            </div>
+          ) : (
+            <form id="create-form" onSubmit={handleSubmit} className="space-y-6">
+              
+              {/* COMMON: STREAM Hub, iLab, Creative Corner */}
+              {(type === 'labs' || type === 'ilabs' || type === 'creative_corners') && (
+                <>
                   <div>
-                    <label className="block text-sm font-bold text-secondary mb-1">District</label>
-                    <select required name="district" value={formData.district || ''} onChange={handleChange} className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none">
-                      <option value="">Select District</option>
-                      {districts.map(d => <option key={d} value={d}>{d}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-secondary mb-1">Location</label>
-                    <input required name="location" onChange={handleChange} type="text" className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none" />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-outline/10">
-                  <div>
-                    <label className="block text-sm font-bold text-secondary mb-1">Password</label>
-                    <input required name="password" onChange={handleChange} type="password" className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-secondary mb-1">Confirm Password</label>
-                    <input required name="confirmPassword" onChange={handleChange} type="password" className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none" />
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* STREAM EXPERT / SYSTEM ADMIN */}
-            {(type === 'experts' || type === 'admins') && (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-bold text-secondary mb-1">Full Name</label>
+                    <label className="block text-sm font-bold text-secondary mb-1">Name of {type === 'labs' ? 'Hub' : 'School'}</label>
                     <input required name="name" onChange={handleChange} type="text" className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none" />
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-secondary mb-1">Email Address</label>
-                    <input required name="email" onChange={handleChange} type="email" className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none" />
+                  
+                  {type === 'labs' && (
+                    <div className="mt-4">
+                      <label className="block text-sm font-bold text-secondary mb-1">STREAM Expert in Charge</label>
+                      <select required name="expertId" onChange={(e) => handleExpertSelect(e.target.value)} className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none">
+                        <option value="">Select an Expert...</option>
+                        {experts.map(ex => <option key={ex.id} value={ex.id}>{ex.name} ({ex.district})</option>)}
+                      </select>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-bold text-secondary mb-1">District</label>
+                      <select required name="district" value={formData.district || ''} onChange={handleChange} className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none">
+                        <option value="">Select District</option>
+                        {districts.map(d => <option key={d} value={d}>{d}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-secondary mb-1">Location</label>
+                      <input required name="location" onChange={handleChange} type="text" className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none" />
+                    </div>
                   </div>
-                </div>
-                
 
-                <div className="bg-primary-container/20 p-4 rounded-xl flex items-start gap-3 mt-4">
-                  <span className="material-symbols-outlined text-primary mt-0.5">info</span>
-                  <p className="text-sm text-secondary">
-                    When you click Register, a unique onboarding link will be generated. The {type === 'experts' ? 'expert' : 'administrator'} will use this link to complete their profile and activate their account.
-                  </p>
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-outline/10">
+                    <div>
+                      <label className="block text-sm font-bold text-secondary mb-1">Password</label>
+                      <input required name="password" onChange={handleChange} type="password" className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-secondary mb-1">Confirm Password</label>
+                      <input required name="confirmPassword" onChange={handleChange} type="password" className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none" />
+                    </div>
+                  </div>
+                </>
+              )}
 
-              </>
-            )}
+              {/* STREAM EXPERT / SYSTEM ADMIN */}
+              {(type === 'experts' || type === 'admins') && (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-bold text-secondary mb-1">Full Name</label>
+                      <input required name="name" onChange={handleChange} type="text" className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-secondary mb-1">Email Address</label>
+                      <input required name="email" onChange={handleChange} type="email" className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none" />
+                    </div>
+                  </div>
+                  
 
-          </form>
+                  <div className="bg-primary-container/20 p-4 rounded-xl flex items-start gap-3 mt-4">
+                    <span className="material-symbols-outlined text-primary mt-0.5">info</span>
+                    <p className="text-sm text-secondary">
+                      When you click Register, a unique onboarding link will be generated. The {type === 'experts' ? 'expert' : 'administrator'} will use this link to complete their profile and activate their account.
+                    </p>
+                  </div>
+
+                </>
+              )}
+
+            </form>
+          )}
         </div>
 
         <div className="bg-surface-container-low px-8 py-5 flex justify-end gap-4 shrink-0 border-t border-outline/10">
           <button onClick={onClose} className="px-6 py-2 rounded-xl text-secondary hover:bg-surface-container transition-colors font-bold">
-            Cancel
+            {generatedLink ? 'Done' : 'Cancel'}
           </button>
-          <button form="create-form" type="submit" disabled={loading} className="px-8 py-2 rounded-xl bg-primary text-on-primary font-bold shadow-md hover:opacity-90 transition-all disabled:opacity-50">
-            {loading ? 'Processing...' : 'Register'}
-          </button>
+          {!generatedLink && (
+            <button form="create-form" type="submit" disabled={loading} className="px-8 py-2 rounded-xl bg-primary text-on-primary font-bold shadow-md hover:opacity-90 transition-all disabled:opacity-50">
+              {loading ? 'Processing...' : 'Register'}
+            </button>
+          )}
         </div>
       </div>
     </div>,
