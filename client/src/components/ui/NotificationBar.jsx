@@ -15,6 +15,27 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
   // Persisted dismissed IDs — scoped to the current context (global vs specific BRC)
   const storageKey = selectedBrc ? `dismissed_notifications_${selectedBrc.code}` : 'dismissed_notifications_global';
   
+  const getTargetLabel = (msgTo) => {
+    if (!msgTo || !Array.isArray(msgTo)) return 'ALL';
+    
+    const specificTargets = msgTo.filter(t => t !== 'ALL').map(t => {
+      if (t.startsWith('BRC:')) {
+        const code = t.split(':')[1];
+        const brc = assignedBrcs.find(b => b.code === code);
+        return brc ? brc.name : code;
+      }
+      if (t.startsWith('DISTRICT:')) {
+        return t.split(':')[1] + ' District';
+      }
+      return t;
+    });
+
+    if (specificTargets.length > 0) {
+      return specificTargets.join(', ');
+    }
+    return 'ALL';
+  };
+  
   const [dismissedIds, setDismissedIds] = useState(() => {
     try {
       const stored = localStorage.getItem(selectedBrc ? `dismissed_notifications_${selectedBrc.code}` : 'dismissed_notifications_global');
@@ -226,13 +247,7 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
             const toast = [...activeToasts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
             
             // Determine target label
-            let targetLabel = 'ALL';
-            if (toast.to && Array.isArray(toast.to)) {
-              const specificTargets = toast.to.filter(t => t !== 'ALL').map(t => t.split(':')[1]);
-              if (specificTargets.length > 0) {
-                targetLabel = specificTargets.join(', ');
-              }
-            }
+            const targetLabel = getTargetLabel(toast.to);
 
             // Unread left (excluding this one we are showing, if we consider this one "toast-read" vs fully read)
             // The user wants "number of unread messages left".
@@ -312,13 +327,7 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
                 const isUnread = !readIds.includes(msg.id);
                 
                 // Determine target label
-                let targetLabel = 'ALL';
-                if (msg.to && Array.isArray(msg.to)) {
-                  const specificTargets = msg.to.filter(t => t !== 'ALL').map(t => t.split(':')[1]);
-                  if (specificTargets.length > 0) {
-                    targetLabel = specificTargets.join(', ');
-                  }
-                }
+                const targetLabel = getTargetLabel(msg.to);
 
                 return (
                   <div 
