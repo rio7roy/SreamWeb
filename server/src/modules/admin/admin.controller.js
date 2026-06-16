@@ -54,7 +54,8 @@ exports.getUsers = (req, res) => {
     sanitized.forEach(u => {
       const userEvents = allEvents.filter(e => e.createdBy === u.id);
       const uniqueDates = new Set(userEvents.map(e => {
-        const timestamp = e.locationTimestamp || e.createdAt;
+        let timestamp = e.locationTimestamp || e.createdAt;
+        if (timestamp && !isNaN(Number(timestamp))) timestamp = Number(timestamp);
         return new Date(timestamp).toLocaleDateString();
       }));
       u.attendanceCount = uniqueDates.size;

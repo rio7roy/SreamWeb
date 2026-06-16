@@ -208,7 +208,7 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, isRe
                         Captured: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
                         {location.timestamp && (
                           <span className="block text-[10px] mt-0.5 opacity-80 font-mono">
-                            GPS Timestamp: {new Date(location.timestamp).toLocaleString()}
+                            GPS Timestamp: {new Date(!isNaN(Number(location.timestamp)) ? Number(location.timestamp) : location.timestamp).toLocaleString()}
                           </span>
                         )}
                       </>

@@ -282,7 +282,7 @@ export default function ReportsPage() {
                 {(selectedEvent.locationTimestamp || selectedEvent.createdAt) && (
                   <p className="text-xs text-primary/80 font-mono mt-1 flex items-center gap-1">
                     <span className="material-symbols-outlined text-[14px]">location_on</span>
-                    GPS: {new Date(selectedEvent.locationTimestamp || selectedEvent.createdAt).toLocaleString()}
+                    GPS: {new Date(selectedEvent.locationTimestamp && !isNaN(Number(selectedEvent.locationTimestamp)) ? Number(selectedEvent.locationTimestamp) : (selectedEvent.locationTimestamp || selectedEvent.createdAt)).toLocaleString()}
                   </p>
                 )}
               </div>
