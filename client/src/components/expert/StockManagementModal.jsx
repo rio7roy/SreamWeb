@@ -61,7 +61,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
   const [isAddingItem, setIsAddingItem] = useState(false);
   const [newItemForm, setNewItemForm] = useState({
     uniqueId: '', itemName: '', category: 'Other', newQty: 0, availableQty: 0,
-    usedQty: 0, damagedQty: 0, consumedQty: 0, remarks: '', section: '', label: ''
+    usedQty: 0, damagedQty: 0, consumedQty: 0, remarks: '', section: '', label: '', imgFile: null
   });
 
   const handleClose = () => { setIsClosing(true); setTimeout(onClose, 300); };
@@ -135,14 +135,29 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
   const handleAddItem = async (e) => {
     e.preventDefault();
     if (!newItemForm.itemName || !newItemForm.uniqueId) return showFeedback('error', 'Item Name and Unique ID are required');
+    if (!newItemForm.imgFile) return showFeedback('error', 'Please upload a photo of the equipment');
+    
     const finalCategory = newItemForm.category === 'Other' ? (newItemForm.customCategory || 'Other') : newItemForm.category;
 
     try {
-      const response = await api.post('/stocks', {
-        ...newItemForm,
-        category: finalCategory,
-        brc: brcCode,
-        district: 'NA',
+      const formData = new FormData();
+      formData.append('uniqueId', newItemForm.uniqueId);
+      formData.append('itemName', newItemForm.itemName);
+      formData.append('category', finalCategory);
+      formData.append('section', newItemForm.section);
+      formData.append('label', newItemForm.label);
+      formData.append('newQty', newItemForm.newQty);
+      formData.append('availableQty', newItemForm.availableQty);
+      formData.append('usedQty', newItemForm.usedQty);
+      formData.append('damagedQty', newItemForm.damagedQty);
+      formData.append('consumedQty', newItemForm.consumedQty);
+      formData.append('remarks', newItemForm.remarks);
+      formData.append('brc', brcCode);
+      formData.append('district', 'NA');
+      formData.append('img', newItemForm.imgFile);
+
+      const response = await api.post('/stocks', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
       if (response.data?.success) {
         const addedStock = response.data.data.stock;
@@ -158,7 +173,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
 
         showFeedback('success', 'New item added successfully!');
         setIsAddingItem(false);
-        setNewItemForm({ uniqueId: '', itemName: '', category: 'Other', customCategory: '', newQty: 0, availableQty: 0, usedQty: 0, damagedQty: 0, consumedQty: 0, remarks: '', section: '', label: '' });
+        setNewItemForm({ uniqueId: '', itemName: '', category: 'Other', customCategory: '', newQty: 0, availableQty: 0, usedQty: 0, damagedQty: 0, consumedQty: 0, remarks: '', section: '', label: '', imgFile: null });
       }
     } catch (err) {
       showFeedback('error', 'Failed to add new item.');
@@ -315,16 +330,21 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
                     {uniqueCategories.filter(c => c !== 'All').map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                   {newItemForm.category === 'Other' && (
-                    <input type="text" placeholder="Type custom category..." value={newItemForm.customCategory || ''} onChange={e => setNewItemForm({...newItemForm, customCategory: e.target.value})} className="w-full text-xs p-2 border rounded-lg focus:border-amber-400 outline-none mt-2" />
+                    <input required type="text" placeholder="Type custom category..." value={newItemForm.customCategory || ''} onChange={e => setNewItemForm({...newItemForm, customCategory: e.target.value})} className="w-full text-xs p-2 border rounded-lg focus:border-amber-400 outline-none mt-2" />
                   )}
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Section</label>
-                  <input type="text" value={newItemForm.section} onChange={e => setNewItemForm({...newItemForm, section: e.target.value})} className="w-full text-xs p-2 border rounded-lg focus:border-amber-400 outline-none" />
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Section *</label>
+                  <input required type="text" value={newItemForm.section} onChange={e => setNewItemForm({...newItemForm, section: e.target.value})} className="w-full text-xs p-2 border rounded-lg focus:border-amber-400 outline-none" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Label</label>
-                  <input type="text" value={newItemForm.label} onChange={e => setNewItemForm({...newItemForm, label: e.target.value})} className="w-full text-xs p-2 border rounded-lg focus:border-amber-400 outline-none" />
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Label *</label>
+                  <input required type="text" value={newItemForm.label} onChange={e => setNewItemForm({...newItemForm, label: e.target.value})} className="w-full text-xs p-2 border rounded-lg focus:border-amber-400 outline-none" />
+                </div>
+                
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Equipment Photo *</label>
+                  <input required type="file" accept="image/*" onChange={e => setNewItemForm({...newItemForm, imgFile: e.target.files[0]})} className="w-full text-xs p-1.5 border rounded-lg focus:border-amber-400 outline-none file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer" />
                 </div>
 
                 <div>

@@ -1,10 +1,9 @@
 const express = require('express');
-const multer = require('multer');
+const { upload, compressImage } = require('../../middleware/upload.middleware');
 const stocksController = require('./stocks.controller');
 const { authenticate, authorize } = require('../../middleware/auth.middleware');
 
 const router = express.Router();
-const upload = multer({ storage: multer.memoryStorage() });
 
 // Protect all stock routes
 router.use(authenticate);
@@ -15,7 +14,7 @@ router.use(authorize('ADMIN', 'STREAM_LAB', 'EXPERT'));
 router.get('/', stocksController.getStocks);
 
 // Create single stock
-router.post('/', stocksController.createStock);
+router.post('/', upload.single('img'), compressImage, stocksController.createStock);
 
 // Update single stock
 router.put('/:id', stocksController.updateStock);

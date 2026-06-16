@@ -28,6 +28,16 @@ module.exports = {
   createStock: async (req, res, next) => {
     try {
       const stockData = req.body;
+      if (req.file) {
+        stockData.img = `/api/uploads/${req.file.filename}`;
+      }
+      // Cast quantity fields to numbers to handle multipart/form-data strings
+      ['newQty', 'availableQty', 'usedQty', 'damagedQty', 'consumedQty'].forEach(field => {
+        if (stockData[field] !== undefined) {
+          stockData[field] = parseInt(stockData[field], 10) || 0;
+        }
+      });
+      
       
       const stock = await stocksService.createStock({
         ...stockData,
