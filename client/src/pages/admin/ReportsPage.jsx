@@ -279,6 +279,12 @@ export default function ReportsPage() {
                 <p className="text-sm text-secondary font-medium">
                   {new Date(selectedEvent.date || selectedEvent.createdAt).toLocaleDateString()} &bull; {selectedEvent.brcCode}
                 </p>
+                {(selectedEvent.locationTimestamp || selectedEvent.createdAt) && (
+                  <p className="text-xs text-primary/80 font-mono mt-1 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">location_on</span>
+                    GPS: {new Date(selectedEvent.locationTimestamp || selectedEvent.createdAt).toLocaleString()}
+                  </p>
+                )}
               </div>
               <button 
                 onClick={() => setSelectedEvent(null)}

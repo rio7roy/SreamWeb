@@ -16,7 +16,7 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, isRe
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState(null);
-  const [location, setLocation] = useState(existingEvent?.latitude && existingEvent?.longitude ? { lat: existingEvent.latitude, lng: existingEvent.longitude } : null);
+  const [location, setLocation] = useState(existingEvent?.latitude && existingEvent?.longitude ? { lat: existingEvent.latitude, lng: existingEvent.longitude, timestamp: existingEvent.locationTimestamp || existingEvent.createdAt } : null);
   const [locationStatus, setLocationStatus] = useState(existingEvent?.latitude ? 'captured' : 'idle');
   const [isClosing, setIsClosing] = useState(false);
 
@@ -203,9 +203,16 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, isRe
                 <div>
                   <p className="font-bold text-sm text-on-surface">GPS Location Tracker</p>
                   <p className="text-xs font-medium text-secondary">
-                    {locationStatus === 'captured' ? `Captured: ${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` :
-                     locationStatus === 'locating' ? 'Acquiring GPS coordinates...' :
-                     'Location could not be captured'}
+                    {locationStatus === 'captured' ? (
+                      <>
+                        Captured: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                        {location.timestamp && (
+                          <span className="block text-[10px] mt-0.5 opacity-80 font-mono">
+                            GPS Timestamp: {new Date(location.timestamp).toLocaleString()}
+                          </span>
+                        )}
+                      </>
+                    ) : locationStatus === 'locating' ? 'Acquiring GPS coordinates...' : 'Location could not be captured'}
                   </p>
                 </div>
               </div>
