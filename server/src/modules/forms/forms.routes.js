@@ -19,6 +19,7 @@ router.get('/', authenticate, formsController.getForms);
 router.post('/', authenticate, formsController.createForm);
 router.get('/:id', optionalAuth, formsController.getFormById);
 router.put('/:id', authenticate, formsController.updateForm);
+router.delete('/:id', authenticate, formsController.deleteForm);
 
 router.get('/:id/responses', authenticate, formsController.getResponses);
 router.post('/:id/responses', optionalAuth, formsController.submitResponse);

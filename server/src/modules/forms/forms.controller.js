@@ -51,6 +51,12 @@ exports.updateForm = (req, res) => {
   res.json(form);
 };
 
+exports.deleteForm = (req, res) => {
+  const success = formsService.deleteForm(req.params.id);
+  if (!success) return res.status(404).json({ message: 'Form not found' });
+  res.json({ message: 'Form deleted successfully' });
+};
+
 exports.getResponses = (req, res) => {
   const responses = formsService.getResponses(req.params.id);
   res.json(responses);

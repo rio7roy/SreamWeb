@@ -17,6 +17,11 @@ export default function AdminFormDashboard({ onClose }) {
   // Assign modal state
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [selectedFormToAssign, setSelectedFormToAssign] = useState(null);
+  const [assignMode, setAssignMode] = useState('SPECIFIC');
+  const [assignDistrict, setAssignDistrict] = useState('');
+  const [assignBrcs, setAssignBrcs] = useState([]);
+  
+  const uniqueDistricts = [...new Set(brcs.map(b => b.district))].filter(Boolean);
   
   // Filter state
   const [brcFilter, setBrcFilter] = useState('');
@@ -81,15 +86,37 @@ export default function AdminFormDashboard({ onClose }) {
     }
   };
 
+  const handleDeleteForm = async (form) => {
+    if (window.confirm(`Are you sure you want to delete "${form.title}"? This cannot be undone.`)) {
+      try {
+        await api.delete(`/forms/${form.id}`);
+        fetchData();
+      } catch (err) {
+        console.error('Failed to delete form', err);
+      }
+    }
+  };
+
   const handleAssignSubmit = async (e) => {
     e.preventDefault();
-    const brcCode = e.target.brcCode.value;
     try {
       const currentAssigned = selectedFormToAssign.assignedTo || [];
-      if (!currentAssigned.includes(brcCode)) {
-        await api.put(`/forms/${selectedFormToAssign.id}`, { assignedTo: [...currentAssigned, brcCode] });
+      let codesToAdd = [];
+      
+      if (assignMode === 'ALL') {
+        codesToAdd = brcs.map(b => b.code);
+      } else if (assignMode === 'DISTRICT') {
+        codesToAdd = brcs.filter(b => b.district === assignDistrict).map(b => b.code);
+      } else {
+        codesToAdd = assignBrcs;
       }
+      
+      const newAssignedTo = [...new Set([...currentAssigned, ...codesToAdd])];
+      
+      await api.put(`/forms/${selectedFormToAssign.id}`, { assignedTo: newAssignedTo });
+      
       setShowAssignModal(false);
+      setAssignBrcs([]);
       fetchData();
     } catch (err) {
       console.error(err);
@@ -223,6 +250,9 @@ export default function AdminFormDashboard({ onClose }) {
                       <button onClick={() => { setSelectedFormToAssign(form); setShowAssignModal(true); }} className="p-2 text-secondary hover:bg-surface-container rounded-full" title="Assign to BRC">
                         <span className="material-symbols-outlined text-sm">domain_add</span>
                       </button>
+                      <button onClick={() => handleDeleteForm(form)} className="p-2 text-red-500 hover:bg-red-50 rounded-full" title="Delete Form">
+                        <span className="material-symbols-outlined text-sm">delete</span>
+                      </button>
                     </td>
                   </tr>
                 );
@@ -242,15 +272,65 @@ export default function AdminFormDashboard({ onClose }) {
           <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
               <h3 className="text-2xl font-bold mb-2">Assign Form</h3>
-              <p className="text-secondary mb-6 text-sm">Select a BRC to assign "{selectedFormToAssign?.title}" to.</p>
-              <form onSubmit={handleAssignSubmit} className="space-y-6">
-                <select name="brcCode" required className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 outline-none focus:border-primary">
-                  <option value="">Select a BRC...</option>
-                  {brcs.map(b => <option key={b.code} value={b.code}>{b.name} ({b.code})</option>)}
-                </select>
-                <div className="flex justify-end gap-3">
+              <p className="text-secondary mb-6 text-sm">Select target BRCs for "{selectedFormToAssign?.title}".</p>
+              <form onSubmit={handleAssignSubmit} className="space-y-4">
+                
+                <div className="flex gap-4 mb-4">
+                  <label className="flex items-center gap-2 text-sm font-bold cursor-pointer">
+                    <input type="radio" checked={assignMode === 'SPECIFIC'} onChange={() => setAssignMode('SPECIFIC')} className="accent-primary" />
+                    Specific
+                  </label>
+                  <label className="flex items-center gap-2 text-sm font-bold cursor-pointer">
+                    <input type="radio" checked={assignMode === 'DISTRICT'} onChange={() => setAssignMode('DISTRICT')} className="accent-primary" />
+                    By District
+                  </label>
+                  <label className="flex items-center gap-2 text-sm font-bold cursor-pointer">
+                    <input type="radio" checked={assignMode === 'ALL'} onChange={() => setAssignMode('ALL')} className="accent-primary" />
+                    All BRCs
+                  </label>
+                </div>
+
+                {assignMode === 'SPECIFIC' && (
+                  <div className="max-h-48 overflow-y-auto border border-outline/20 rounded-xl p-3 space-y-2">
+                    {brcs.map(b => (
+                      <label key={b.code} className="flex items-center gap-3 text-sm cursor-pointer hover:bg-surface-container-low p-2 rounded-lg">
+                        <input 
+                          type="checkbox" 
+                          className="accent-primary"
+                          checked={assignBrcs.includes(b.code)}
+                          onChange={(e) => {
+                            if (e.target.checked) setAssignBrcs([...assignBrcs, b.code]);
+                            else setAssignBrcs(assignBrcs.filter(code => code !== b.code));
+                          }}
+                        />
+                        {b.name} ({b.code})
+                      </label>
+                    ))}
+                    {brcs.length === 0 && <p className="text-sm text-secondary italic">No BRCs available.</p>}
+                  </div>
+                )}
+
+                {assignMode === 'DISTRICT' && (
+                  <select 
+                    required 
+                    value={assignDistrict}
+                    onChange={(e) => setAssignDistrict(e.target.value)}
+                    className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 outline-none focus:border-primary"
+                  >
+                    <option value="">Select a District...</option>
+                    {uniqueDistricts.map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                )}
+
+                {assignMode === 'ALL' && (
+                  <div className="p-4 bg-green-50 text-green-700 rounded-xl text-sm font-bold border border-green-200">
+                    This form will be assigned to all {brcs.length} registered BRCs.
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-3 mt-6">
                   <button type="button" onClick={() => setShowAssignModal(false)} className="px-6 py-2 rounded-xl text-secondary hover:bg-surface-container font-bold">Cancel</button>
-                  <button type="submit" className="px-6 py-2 rounded-xl bg-primary text-on-primary font-bold shadow-md hover:opacity-90">Assign</button>
+                  <button type="submit" disabled={assignMode === 'SPECIFIC' && assignBrcs.length === 0} className="px-6 py-2 rounded-xl bg-primary text-on-primary font-bold shadow-md hover:opacity-90 disabled:opacity-50">Assign</button>
                 </div>
               </form>
             </div>

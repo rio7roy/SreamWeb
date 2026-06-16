@@ -65,6 +65,7 @@ export default function ExpertDashboardPage() {
   const [showEventModal, setShowEventModal] = useState(false);
   const [showOtherBrcModal, setShowOtherBrcModal] = useState(false);
   const [otherBrcSelected, setOtherBrcSelected] = useState("");
+  const [customBrcText, setCustomBrcText] = useState("");
   const [otherBrcForReport, setOtherBrcForReport] = useState(null);
   const [showPdfModal, setShowPdfModal] = useState(false);
   const [showStockModal, setShowStockModal] = useState(false);
@@ -770,17 +771,33 @@ export default function ExpertDashboardPage() {
             <p className="text-secondary text-sm mb-6">Select the BRC where you conducted this event. This will be automatically tagged as an 'other event'.</p>
             
             <div className="mb-6">
-              <label className="block text-sm font-bold text-secondary mb-2">Target BRC</label>
+              <label className="block text-sm font-bold text-secondary mb-2">Target Venue / BRC</label>
               <select 
                 value={otherBrcSelected} 
                 onChange={(e) => setOtherBrcSelected(e.target.value)}
-                className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 outline-none transition-all"
+                className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 outline-none transition-all mb-3"
               >
-                <option value="" disabled>Select BRC...</option>
-                {brcData.map(b => (
-                  <option key={b.code} value={b.code}>{b.name} ({b.code})</option>
-                ))}
+                <option value="" disabled>Select Venue...</option>
+                <option value="CUSAT">CUSAT</option>
+                <option value="BRC Office">BRC Office</option>
+                <option value="OTHER">Other (Custom)</option>
+                <optgroup label="Registered BRCs">
+                  {brcData.map(b => (
+                    <option key={b.code} value={b.code}>{b.name} ({b.code})</option>
+                  ))}
+                </optgroup>
               </select>
+              
+              {otherBrcSelected === 'OTHER' && (
+                <input
+                  type="text"
+                  placeholder="Enter custom venue name"
+                  value={customBrcText}
+                  onChange={(e) => setCustomBrcText(e.target.value)}
+                  className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none"
+                  autoFocus
+                />
+              )}
             </div>
             
             <div className="flex gap-4">
@@ -791,9 +808,14 @@ export default function ExpertDashboardPage() {
                 Cancel
               </button>
               <button 
-                disabled={!otherBrcSelected}
+                disabled={!otherBrcSelected || (otherBrcSelected === 'OTHER' && !customBrcText.trim())}
                 onClick={() => {
-                  const brc = brcData.find(b => b.code === otherBrcSelected);
+                  let brc = brcData.find(b => b.code === otherBrcSelected);
+                  if (!brc) {
+                    const venueName = otherBrcSelected === 'OTHER' ? customBrcText.trim() : otherBrcSelected;
+                    brc = { code: venueName, name: venueName };
+                  }
+                  
                   if (brc) {
                     setOtherBrcForReport(brc);
                     setSelectedBrc(brc);

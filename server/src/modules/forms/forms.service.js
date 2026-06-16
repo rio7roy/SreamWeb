@@ -60,6 +60,14 @@ exports.updateForm = (id, updates) => {
   return forms[index];
 };
 
+exports.deleteForm = (id) => {
+  const forms = readData(FORMS_FILE);
+  const filteredForms = forms.filter(f => f.id !== id);
+  if (filteredForms.length === forms.length) return false;
+  writeData(FORMS_FILE, filteredForms);
+  return true;
+};
+
 exports.getResponses = (formId) => {
   const responses = readData(RESPONSES_FILE);
   return responses.filter(r => r.formId === formId);
