@@ -563,11 +563,8 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
             Low: {stocks.filter(s => (s.availableQty || 0) <= LOW_STOCK_THRESHOLD && (s.newQty || s.quantity || 0) > LOW_STOCK_THRESHOLD).length}
           </div>
         </div>
-
       </div>
-    </div>
   );
-
   if (inline) {
     return content;
   }
