@@ -69,5 +69,12 @@
     "name": "Test",
     "email": "test@example.com",
     "createdAt": "2026-06-16T05:34:10.088Z"
+  },
+  {
+    "id": "9ab378788bbdaf09cd75bdfd5b02128c",
+    "token": "ff1392eda76afb4a19dc3b8bc5e1cd7e",
+    "name": "Fake Rio",
+    "email": "rio7roy@gmail.com",
+    "createdAt": "2026-06-16T06:11:55.516Z"
   }
 ]
