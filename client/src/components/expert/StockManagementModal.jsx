@@ -60,7 +60,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
   const [alertSending, setAlertSending] = useState(null);
   const [isAddingItem, setIsAddingItem] = useState(false);
   const [newItemForm, setNewItemForm] = useState({
-    uniqueId: '', itemName: '', category: 'Other', newQty: 0, availableQty: 0,
+    uniqueId: '', itemName: '', category: '', newQty: '', availableQty: 0,
     usedQty: 0, damagedQty: 0, consumedQty: 0, remarks: '', section: '', label: '', imgFile: null
   });
 
@@ -138,6 +138,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
     if (!newItemForm.imgFile) return showFeedback('error', 'Please upload a photo of the equipment');
     
     const finalCategory = newItemForm.category === 'Other' ? (newItemForm.customCategory || 'Other') : newItemForm.category;
+    if (!finalCategory) return showFeedback('error', 'Please select or enter a category');
 
     try {
       const formData = new FormData();
@@ -173,7 +174,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
 
         showFeedback('success', 'New item added successfully!');
         setIsAddingItem(false);
-        setNewItemForm({ uniqueId: '', itemName: '', category: 'Other', customCategory: '', newQty: 0, availableQty: 0, usedQty: 0, damagedQty: 0, consumedQty: 0, remarks: '', section: '', label: '', imgFile: null });
+        setNewItemForm({ uniqueId: '', itemName: '', category: '', customCategory: '', newQty: '', availableQty: 0, usedQty: 0, damagedQty: 0, consumedQty: 0, remarks: '', section: '', label: '', imgFile: null });
       }
     } catch (err) {
       showFeedback('error', 'Failed to add new item.');
@@ -324,8 +325,9 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
                 </div>
                 
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Category</label>
-                  <select value={newItemForm.category} onChange={e => setNewItemForm({...newItemForm, category: e.target.value})} className="w-full text-xs p-2 border rounded-lg focus:border-amber-400 outline-none bg-white">
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Category *</label>
+                  <select required value={newItemForm.category} onChange={e => setNewItemForm({...newItemForm, category: e.target.value})} className="w-full text-xs p-2 border rounded-lg focus:border-amber-400 outline-none bg-white">
+                    <option value="" disabled>Select Category...</option>
                     <option value="Other">Add New (Custom)</option>
                     {uniqueCategories.filter(c => c !== 'All').map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
@@ -348,8 +350,8 @@ export default function StockManagementModal({ brcCode, brcName, onClose }) {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-amber-600 uppercase mb-1">New Quantity</label>
-                  <input type="number" min="0" value={newItemForm.newQty} onChange={e => setNewItemForm({...newItemForm, newQty: parseInt(e.target.value) || 0})} className="w-full text-xs p-2 border rounded-lg focus:border-amber-400 outline-none" />
+                  <label className="block text-[10px] font-bold text-amber-600 uppercase mb-1">New Quantity *</label>
+                  <input required type="number" min="0" value={newItemForm.newQty} onChange={e => setNewItemForm({...newItemForm, newQty: e.target.value === '' ? '' : parseInt(e.target.value) || 0})} className="w-full text-xs p-2 border rounded-lg focus:border-amber-400 outline-none" />
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-green-600 uppercase mb-1">Available Qty</label>
