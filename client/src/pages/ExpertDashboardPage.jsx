@@ -399,13 +399,6 @@ export default function ExpertDashboardPage() {
                           expert tools for that region.
                         </p>
                       </div>
-                      <button 
-                        onClick={() => setShowOtherBrcModal(true)}
-                        className="shrink-0 bg-amber-100 text-amber-800 hover:bg-amber-200 px-5 py-3 rounded-xl font-bold text-sm shadow-sm transition-colors border border-amber-300 flex items-center gap-2"
-                      >
-                        <span className="material-symbols-outlined text-[18px]">add_circle</span>
-                        Report Other Event
-                      </button>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -440,6 +433,17 @@ export default function ExpertDashboardPage() {
                           </button>
                         ))
                       )}
+                    </div>
+
+                    <div className="mt-8 border-t border-outline/10 pt-6">
+                      <p className="text-secondary text-sm mb-4">Did you conduct a session at a BRC not assigned to you?</p>
+                      <button 
+                        onClick={() => setShowOtherBrcModal(true)}
+                        className="bg-amber-100 text-amber-800 hover:bg-amber-200 px-5 py-3 rounded-xl font-bold text-sm shadow-sm transition-colors border border-amber-300 flex items-center gap-2 w-fit"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">add_circle</span>
+                        Report Other Event
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -792,6 +796,8 @@ export default function ExpertDashboardPage() {
                   const brc = brcData.find(b => b.code === otherBrcSelected);
                   if (brc) {
                     setOtherBrcForReport(brc);
+                    setSelectedBrc(brc);
+                    setShowEventModal(true);
                     setShowOtherBrcModal(false);
                   }
                 }}
