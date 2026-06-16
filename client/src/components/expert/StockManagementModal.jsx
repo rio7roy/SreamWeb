@@ -132,6 +132,29 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
     setEditingStock(null);
   };
 
+  const handleQuantityUpdate = (stock, field, value) => {
+    let val = parseInt(value) || 0;
+    const maxVal = stock.newQty || stock.quantity || 0;
+
+    const updates = { [field]: val };
+
+    if (['usedQty', 'damagedQty', 'consumedQty'].includes(field)) {
+       const used = field === 'usedQty' ? val : (stock.usedQty || 0);
+       const damaged = field === 'damagedQty' ? val : (stock.damagedQty || 0);
+       const consumed = field === 'consumedQty' ? val : (stock.consumedQty || 0);
+       
+       let newAvailable = maxVal - used - damaged - consumed;
+       if (newAvailable < 0) newAvailable = 0;
+       
+       updates.availableQty = newAvailable;
+    } else if (field === 'availableQty') {
+       if (val > maxVal) val = maxVal;
+       updates.availableQty = val;
+    }
+
+    updateStockField(stock.id, updates);
+  };
+
   const handleAddItem = async (e) => {
     e.preventDefault();
     if (!newItemForm.itemName || !newItemForm.uniqueId) return showFeedback('error', 'Item Name and Unique ID are required');
@@ -474,15 +497,10 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
                       {/* Available Qty (inline editable) */}
                       <div className="flex justify-center">
                         <input type="number" min="0" max={stock.newQty || stock.quantity}
+                          key={`avail-${stock.id}-${stock.availableQty}`}
                           defaultValue={stock.availableQty ?? stock.newQty ?? stock.quantity ?? 0}
                           className="w-10 text-center text-[11px] font-bold border rounded py-0.5 outline-none focus:border-green-500 focus:bg-green-50"
-                          onBlur={(e) => {
-                            let val = parseInt(e.target.value) || 0;
-                            const maxVal = stock.newQty || stock.quantity || 0;
-                            if (val > maxVal) val = maxVal;
-                            e.target.value = val;
-                            updateStockField(stock.id, { availableQty: val });
-                          }}
+                          onBlur={(e) => handleQuantityUpdate(stock, 'availableQty', e.target.value)}
                           onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
                       </div>
 
@@ -491,7 +509,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
                         <input type="number" min="0"
                           defaultValue={stock.usedQty || 0}
                           className="w-10 text-center text-[11px] font-semibold border rounded py-0.5 outline-none focus:border-blue-500 focus:bg-blue-50 text-blue-700"
-                          onBlur={(e) => updateStockField(stock.id, { usedQty: parseInt(e.target.value) || 0 })}
+                          onBlur={(e) => handleQuantityUpdate(stock, 'usedQty', e.target.value)}
                           onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
                       </div>
 
@@ -500,7 +518,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
                         <input type="number" min="0"
                           defaultValue={stock.damagedQty || 0}
                           className="w-10 text-center text-[11px] font-semibold border rounded py-0.5 outline-none focus:border-red-500 focus:bg-red-50 text-red-700"
-                          onBlur={(e) => updateStockField(stock.id, { damagedQty: parseInt(e.target.value) || 0 })}
+                          onBlur={(e) => handleQuantityUpdate(stock, 'damagedQty', e.target.value)}
                           onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
                       </div>
 
@@ -509,7 +527,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
                         <input type="number" min="0"
                           defaultValue={stock.consumedQty || 0}
                           className="w-10 text-center text-[11px] font-semibold border rounded py-0.5 outline-none focus:border-orange-500 focus:bg-orange-50 text-orange-700"
-                          onBlur={(e) => updateStockField(stock.id, { consumedQty: parseInt(e.target.value) || 0 })}
+                          onBlur={(e) => handleQuantityUpdate(stock, 'consumedQty', e.target.value)}
                           onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
                       </div>
 
