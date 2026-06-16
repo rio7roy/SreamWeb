@@ -269,8 +269,6 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, isRe
                 )}
             </div>
 
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-bold text-secondary mb-1">Event Name</label>
