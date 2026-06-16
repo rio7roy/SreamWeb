@@ -602,12 +602,12 @@ export default function ExpertDashboardPage() {
                           }}
                           className="bg-[#fff9e6] border border-amber-200 rounded-xl p-6 hover:shadow-md transition-all cursor-pointer group flex flex-col h-full"
                         >
-                          <div className="flex items-center justify-between mb-4">
-                            <span className="px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold uppercase rounded-full tracking-wider">
+                          <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                            <span className="px-2 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold uppercase rounded-full tracking-wider shrink-0">
                               Draft
                             </span>
-                            <div className="flex items-center gap-3">
-                              <span className="text-sm text-secondary font-semibold">
+                            <div className="flex items-center gap-1 shrink-0 ml-auto">
+                              <span className="text-[11px] text-secondary font-semibold">
                                 {new Date(draft.createdAt).toLocaleDateString()}
                               </span>
                               <button
@@ -617,7 +617,7 @@ export default function ExpertDashboardPage() {
                                 className="text-secondary hover:text-error transition-colors p-1 rounded-md hover:bg-error/10 disabled:opacity-50"
                                 title="Delete Draft"
                               >
-                                <span className="material-symbols-outlined text-[20px]">
+                                <span className="material-symbols-outlined text-[18px]">
                                   delete
                                 </span>
                               </button>
