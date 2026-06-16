@@ -53,7 +53,10 @@ exports.getUsers = (req, res) => {
     const allEvents = readData(eventsPath).filter(e => e.status === 'SUBMITTED');
     sanitized.forEach(u => {
       const userEvents = allEvents.filter(e => e.createdBy === u.id);
-      const uniqueDates = new Set(userEvents.map(e => new Date(e.date || e.createdAt).toLocaleDateString()));
+      const uniqueDates = new Set(userEvents.map(e => {
+        const timestamp = e.locationTimestamp || e.createdAt;
+        return new Date(timestamp).toLocaleDateString();
+      }));
       u.attendanceCount = uniqueDates.size;
     });
   }
