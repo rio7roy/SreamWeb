@@ -44,7 +44,7 @@ export default function DashboardLayout() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 h-screen w-[280px] bg-white border-r border-black/[0.04] z-50 flex flex-col transition-transform duration-300 ${
+        className={`fixed lg:sticky top-0 left-0 h-screen w-[280px] bg-white border-r lg:border-r-0 border-black/[0.04] z-50 flex flex-col transition-transform duration-300 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
@@ -105,7 +105,7 @@ export default function DashboardLayout() {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen lg:border-l lg:border-black/[0.04]">
         <NotificationBar />
         
         {/* Top Bar */}
