@@ -9,6 +9,7 @@ import BrcManagementPage from '../pages/admin/BrcManagementPage';
 import ExpertManagementPage from '../pages/admin/ExpertManagementPage';
 import ReportsPage from '../pages/admin/ReportsPage';
 import ExpertOnboardingPage from '../pages/ExpertOnboardingPage';
+import ResetPasswordPage from '../pages/ResetPasswordPage';
 import ProfilePage from '../pages/ProfilePage';
 
 const RootLayout = () => (
@@ -103,6 +104,10 @@ const router = createBrowserRouter([
       {
         path: '/onboard/:token',
         element: <ExpertOnboardingPage />
+      },
+      {
+        path: '/reset-password/:token',
+        element: <ResetPasswordPage />
       },
       {
         path: '*',

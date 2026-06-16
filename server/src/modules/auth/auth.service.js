@@ -131,17 +131,24 @@ async function updateProfile(userId, data) {
     throw Object.assign(new Error('User not found.'), { statusCode: 404 });
   }
 
-  // Persist to JSON if EXPERT
-  if (updatedUser.role === 'EXPERT') {
-    const fs = require('fs');
-    const path = require('path');
-    const expertsPath = path.join(__dirname, '../../../data/experts.json');
-    if (fs.existsSync(expertsPath)) {
-      const experts = JSON.parse(fs.readFileSync(expertsPath, 'utf8'));
-      const idx = experts.findIndex(e => e.id === userId);
-      if (idx !== -1) {
-        Object.assign(experts[idx], updateData);
-        fs.writeFileSync(expertsPath, JSON.stringify(experts, null, 2));
+  // Persist to JSON based on role
+  const fs = require('fs');
+  const path = require('path');
+  const dataDir = path.join(__dirname, '../../../data');
+  let fileName = null;
+  
+  if (updatedUser.role === 'EXPERT') fileName = 'experts.json';
+  else if (updatedUser.role === 'ADMIN' || updatedUser.role === 'MAIN_ADMIN') fileName = 'admins.json';
+  else if (updatedUser.role === 'STREAM_LAB' || updatedUser.role === 'ILAB_SCHOOL' || updatedUser.role === 'CREATIVE_CORNER') fileName = 'brcs.json';
+  
+  if (fileName) {
+    const filePath = path.join(dataDir, fileName);
+    if (fs.existsSync(filePath)) {
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      const index = data.findIndex(u => u.id === userId);
+      if (index !== -1) {
+        data[index] = { ...data[index], ...updateData };
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
       }
     }
   }
@@ -149,4 +156,72 @@ async function updateProfile(userId, data) {
   return updatedUser;
 }
 
-module.exports = { login, register, getProfile, updateProfile };
+async function forgotPassword(email, origin) {
+  const crypto = require('crypto');
+  const mailer = require('../../utils/mailer');
+  
+  const user = db.users.findFirst({ where: { email } });
+  if (!user) {
+    return { success: true };
+  }
+
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  const resetTokenExpires = new Date(Date.now() + 3600000); // 1 hour
+
+  db.users.update({
+    where: { id: user.id },
+    data: { resetToken, resetTokenExpires }
+  });
+
+  const resetLink = `${origin}/reset-password/${resetToken}`;
+  const previewUrl = await mailer.sendPasswordReset(user.email, user.name || user.username, resetLink);
+  
+  return { success: true, link: previewUrl || resetLink };
+}
+
+async function resetPassword(token, newPassword) {
+  const fs = require('fs');
+  const path = require('path');
+  
+  const user = db.users.findFirst({
+    where: { resetToken: token }
+  });
+
+  if (!user || !user.resetTokenExpires || user.resetTokenExpires < new Date()) {
+    throw Object.assign(new Error('Invalid or expired password reset token.'), { statusCode: 400 });
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+
+  db.users.update({
+    where: { id: user.id },
+    data: { 
+      password: hashedPassword,
+      resetToken: null,
+      resetTokenExpires: null
+    }
+  });
+
+  const dataDir = path.join(__dirname, '../../../data');
+  let fileName = null;
+  
+  if (user.role === 'EXPERT') fileName = 'experts.json';
+  else if (user.role === 'ADMIN' || user.role === 'MAIN_ADMIN') fileName = 'admins.json';
+  else if (user.role === 'STREAM_LAB' || user.role === 'ILAB_SCHOOL' || user.role === 'CREATIVE_CORNER') fileName = 'brcs.json';
+  
+  if (fileName) {
+    const filePath = path.join(dataDir, fileName);
+    if (fs.existsSync(filePath)) {
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      const index = data.findIndex(u => u.id === user.id);
+      if (index !== -1) {
+        data[index].password = hashedPassword;
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+      }
+    }
+  }
+
+  return true;
+}
+
+module.exports = { login, register, getProfile, updateProfile, forgotPassword, resetPassword };

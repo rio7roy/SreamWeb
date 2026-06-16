@@ -9,6 +9,8 @@ const router = Router();
 // Public routes
 router.post('/login', validate(loginSchema), authController.login);
 router.post('/register', validate(registerSchema), authController.register);
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/reset-password/:token', authController.resetPassword);
 
 // Protected routes
 router.get('/me', authenticate, authController.getProfile);

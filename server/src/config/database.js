@@ -228,6 +228,17 @@ const db = {
         }
         return null;
       }
+      if (where) {
+        const found = users.find((u) => {
+          return Object.entries(where).every(([key, val]) => {
+            if (typeof u[key] === 'string' && typeof val === 'string') {
+              return u[key].toLowerCase() === val.toLowerCase();
+            }
+            return u[key] === val;
+          });
+        });
+        if (found) return { ...found };
+      }
       return null;
     },
 

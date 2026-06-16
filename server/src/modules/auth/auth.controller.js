@@ -50,4 +50,26 @@ async function updateProfile(req, res, next) {
   }
 }
 
-module.exports = { login, register, getProfile, updateProfile };
+async function forgotPassword(req, res, next) {
+  try {
+    const { email } = req.body;
+    const origin = req.headers.origin || 'http://localhost:5173';
+    const result = await authService.forgotPassword(email, origin);
+    return success(res, result, 200, 'Password reset email sent (if account exists)');
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function resetPassword(req, res, next) {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+    await authService.resetPassword(token, password);
+    return success(res, null, 200, 'Password reset successful');
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { login, register, getProfile, updateProfile, forgotPassword, resetPassword };

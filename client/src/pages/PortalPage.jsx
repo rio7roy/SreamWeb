@@ -6,6 +6,7 @@ import Footer from '../components/layout/Footer';
 import Modal from '../components/ui/Modal';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
+import api from '../lib/api';
 
 const PORTALS = [
   { role: 'ADMIN', label: 'Admin', icon: 'admin_panel_settings', defaultEmail: '', defaultPassword: '' },
@@ -17,7 +18,7 @@ const PORTALS = [
 
 export default function PortalPage() {
   const navigate = useNavigate();
-  const { login, logout, isAuthenticated, user } = useAuth();
+  const { login, logout, isAuthenticated } = useAuth();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPortal, setSelectedPortal] = useState(null);
@@ -26,6 +27,11 @@ export default function PortalPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const portalGridRef = useRef(null);
+
+  // Forgot password state
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotSuccess, setForgotSuccess] = useState(null);
 
   // Automatically logout if arriving at the portal page while authenticated
   useEffect(() => {
@@ -45,6 +51,9 @@ export default function PortalPage() {
   const closeLoginModal = () => {
     setIsModalOpen(false);
     setError('');
+    setIsForgotPassword(false);
+    setForgotEmail('');
+    setForgotSuccess(null);
   };
 
   const handleLogin = async (e) => {
@@ -73,6 +82,29 @@ export default function PortalPage() {
     } catch (err) {
       const message = err.response?.data?.message || 'Login failed. Please try again.';
       setError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setError('');
+    setForgotSuccess(null);
+    if (!forgotEmail.trim()) {
+      setError('Please enter your email.');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const res = await api.post('/auth/forgot-password', { email: forgotEmail });
+      if (res.data.data && res.data.data.link && !res.data.data.link.includes('ethereal')) {
+        setForgotSuccess(`Email disabled. Manual reset link: ${res.data.data.link}`);
+      } else {
+        setForgotSuccess('Password reset link has been sent to your email.');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to process password reset request.');
     } finally {
       setIsLoading(false);
     }
@@ -142,12 +174,9 @@ export default function PortalPage() {
 
       {/* Login Modal */}
       <Modal isOpen={isModalOpen} onClose={closeLoginModal}>
-        <div className="flex items-center justify-between mb-6">
-          <h2
-            className="text-2xl md:text-3xl text-on-surface tracking-tight font-bold uppercase"
-            style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}
-          >
-            {selectedPortal?.label} Login
+        <div className="flex justify-between items-start mb-8">
+          <h2 className="text-2xl font-black text-on-surface uppercase tracking-tight font-display">
+            {isForgotPassword ? 'Reset Password' : `${selectedPortal?.label} Login`}
           </h2>
           <button
             className="w-8 h-8 flex items-center justify-center hover:bg-surface-container rounded-full transition-all"
@@ -157,62 +186,110 @@ export default function PortalPage() {
           </button>
         </div>
 
+        {isForgotPassword ? (
+          <div className="animate-fade-in">
+            {forgotSuccess ? (
+              <div className="bg-success-container/30 border border-success/20 rounded-xl p-6 text-center">
+                <span className="material-symbols-outlined text-4xl text-success mb-2">check_circle</span>
+                <p className="text-on-surface font-medium mb-4">{forgotSuccess}</p>
+                <Button onClick={closeLoginModal} className="w-full">Close</Button>
+              </div>
+            ) : (
+              <form className="space-y-6" onSubmit={handleForgotPassword}>
+                <p className="text-on-surface/70 text-sm mb-4">
+                  Enter your email address and we'll send you a link to reset your password.
+                </p>
+                <Input
+                  id="forgot-email"
+                  label="Email Address"
+                  type="email"
+                  icon="mail"
+                  placeholder="Enter your email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  autoFocus
+                />
+                {error && (
+                  <div className="bg-error-container/30 border border-error/20 rounded-xl px-4 py-3 animate-fade-in">
+                    <p className="text-error text-sm font-medium flex items-center gap-2">
+                      <span className="material-symbols-outlined text-base">error</span>
+                      {error}
+                    </p>
+                  </div>
+                )}
+                <div className="flex flex-col gap-3 mt-4">
+                  <Button type="submit" loading={isLoading}>
+                    Send Reset Link
+                  </Button>
+                  <button
+                    type="button"
+                    className="btn-ghost underline"
+                    onClick={() => { setIsForgotPassword(false); setError(''); }}
+                  >
+                    Back to Login
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        ) : (
+          <form className="space-y-6" onSubmit={handleLogin}>
+            <Input
+              id="login-identifier"
+              label="Username / Email"
+              type="text"
+              icon="alternate_email"
+              placeholder="Enter your unique ID"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              autoFocus
+            />
 
+            <Input
+              id="login-password"
+              label="Password"
+              type="password"
+              icon="lock_open"
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
-        <form className="space-y-6" onSubmit={handleLogin}>
-          <Input
-            id="login-identifier"
-            label="Username / Email"
-            type="text"
-            icon="alternate_email"
-            placeholder="Enter your unique ID"
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
-            autoFocus
-          />
+            {error && (
+              <div className="bg-error-container/30 border border-error/20 rounded-xl px-4 py-3 animate-fade-in">
+                <p className="text-error text-sm font-medium flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base">error</span>
+                  {error}
+                </p>
+              </div>
+            )}
 
-          <Input
-            id="login-password"
-            label="Password"
-            type="password"
-            icon="lock_open"
-            placeholder="Enter password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          {error && (
-            <div className="bg-error-container/30 border border-error/20 rounded-xl px-4 py-3 animate-fade-in">
-              <p className="text-error text-sm font-medium flex items-center gap-2">
-                <span className="material-symbols-outlined text-base">error</span>
-                {error}
-              </p>
+            <div className="flex flex-col gap-3 mt-4">
+              <Button type="submit" loading={isLoading}>
+                Sign In
+                <span className="material-symbols-outlined text-xl">east</span>
+              </Button>
+              <button
+                type="button"
+                className="btn-ghost underline"
+                onClick={closeLoginModal}
+              >
+                Cancel
+              </button>
             </div>
-          )}
+          </form>
+        )}
 
-          <div className="flex flex-col gap-3 mt-4">
-            <Button type="submit" loading={isLoading}>
-              Sign In
-              <span className="material-symbols-outlined text-xl">east</span>
-            </Button>
+        {!isForgotPassword && (
+          <div className="mt-8 pt-6 border-t border-black/[0.03] flex justify-center">
             <button
-              type="button"
-              className="btn-ghost underline"
-              onClick={closeLoginModal}
+              onClick={() => { setIsForgotPassword(true); setError(''); }}
+              className="text-xs font-bold uppercase tracking-widest text-secondary/50 hover:text-primary transition-colors hover:underline"
             >
-              Cancel
+              Forgot Password?
             </button>
           </div>
-        </form>
-
-        <div className="mt-8 pt-6 border-t border-black/[0.03] flex justify-center">
-          <a
-            href="#"
-            className="text-xs font-bold uppercase tracking-widest text-secondary/50 hover:text-primary transition-colors hover:underline"
-          >
-            Forgot Password?
-          </a>
-        </div>
+        )}
       </Modal>
     </div>
   );

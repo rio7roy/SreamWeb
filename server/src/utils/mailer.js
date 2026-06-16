@@ -63,3 +63,52 @@ exports.sendInvite = async (email, name, inviteLink) => {
     throw new Error('Failed to send email');
   }
 };
+
+exports.sendPasswordReset = async (email, name, resetLink) => {
+  const mailTransporter = createTransporter();
+  
+  if (!mailTransporter) {
+    console.warn(`[MAILER] SMTP not configured. Skipping email to ${email}. Reset link: ${resetLink}`);
+    return null;
+  }
+
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaeb; border-radius: 12px;">
+      <h2 style="color: #1a1a1a;">Password Reset Request</h2>
+      <p style="color: #4a4a4a; font-size: 16px; line-height: 1.5;">
+        Hi ${name},<br/><br/>
+        We received a request to reset your password for your STREAM Ecosystem account. If you didn't make this request, you can safely ignore this email.
+      </p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${resetLink}" style="background-color: #0056b3; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">
+          Reset Password
+        </a>
+      </div>
+      <p style="color: #71717a; font-size: 14px;">
+        This link will expire in 1 hour.<br/>
+        If the button above does not work, copy and paste this link into your browser:<br/>
+        <a href="${resetLink}" style="color: #0056b3;">${resetLink}</a>
+      </p>
+      <hr style="border: none; border-top: 1px solid #eaeaeb; margin: 20px 0;" />
+      <p style="color: #a1a1aa; font-size: 12px; text-align: center;">
+        &copy; ${new Date().getFullYear()} STREAM Ecosystem. All rights reserved.
+      </p>
+    </div>
+  `;
+
+  try {
+    const fromEmail = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'noreply@stream.edu';
+    await mailTransporter.sendMail({
+      from: `"STREAM Administration" <${fromEmail}>`,
+      to: email,
+      subject: 'Password Reset - STREAM Ecosystem',
+      html: htmlContent,
+    });
+    
+    console.log(`[MAILER] Password reset sent to ${email}`);
+    return null;
+  } catch (error) {
+    console.error(`[MAILER] Failed to send password reset to ${email}:`, error);
+    throw new Error('Failed to send email');
+  }
+};
