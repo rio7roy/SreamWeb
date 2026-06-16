@@ -79,7 +79,8 @@ exports.createUser = async (req, res) => {
       const previewUrl = await mailer.sendInvite(newUser.email, newUser.name, inviteLink);
       return res.status(201).json({ 
         message: `${type === 'experts' ? 'Expert' : 'Admin'} invited successfully.`,
-        previewUrl: previewUrl || null 
+        previewUrl: previewUrl || null,
+        inviteLink 
       });
     } catch (err) {
       // If email fails, we might still want to return the link so the admin isn't completely blocked, or just fail.

@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": "ffb3bba3b19b2bae6dfac7ebee2cbd63",
+    "name": "RANDOMSCHOOL",
+    "district": "KANNUR",
+    "location": "CHALAKUDY",
+    "password": "123456",
+    "confirmPassword": "123456",
+    "createdAt": "2026-06-16T06:19:03.812Z"
+  }
+]
