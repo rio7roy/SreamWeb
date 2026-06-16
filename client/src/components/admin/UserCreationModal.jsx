@@ -76,7 +76,9 @@ export default function UserCreationModal({ type, entityName, onClose }) {
       const res = await api.post(`/admin/users/${type}`, formData);
       
       if (type === 'experts' || type === 'admins') {
-        if (res.data.inviteLink) {
+        if (res.data.previewUrl) {
+          setFeedback({ type: 'success', text: `Success! Email sent. Preview: ${res.data.previewUrl}` });
+        } else if (res.data.inviteLink) {
           // Fallback if SMTP failed but link was generated
           setFeedback({ type: 'success', text: `Email failed. Manual invite link: ${res.data.inviteLink}` });
         } else {

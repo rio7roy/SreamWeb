@@ -76,8 +76,11 @@ exports.createUser = async (req, res) => {
     const inviteLink = `http://localhost:5173/onboard/${token}`;
     
     try {
-      await mailer.sendInvite(newUser.email, newUser.name, inviteLink);
-      return res.status(201).json({ message: `${type === 'experts' ? 'Expert' : 'Admin'} invited successfully.` });
+      const previewUrl = await mailer.sendInvite(newUser.email, newUser.name, inviteLink);
+      return res.status(201).json({ 
+        message: `${type === 'experts' ? 'Expert' : 'Admin'} invited successfully.`,
+        previewUrl: previewUrl || null 
+      });
     } catch (err) {
       // If email fails, we might still want to return the link so the admin isn't completely blocked, or just fail.
       return res.status(201).json({ 
