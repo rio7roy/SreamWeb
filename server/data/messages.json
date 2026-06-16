@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": "b2f2f2a6-21eb-41b6-b2fa-d02b71e43c31",
+    "to": [
+      "BRC:32110100105SH"
+    ],
+    "content": "hello",
+    "scheduledFor": null,
+    "createdAt": "2026-06-16T05:19:35.852Z"
+  }
+]
