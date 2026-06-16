@@ -33,7 +33,11 @@ export default function BroadcastLogsTab() {
   };
 
   const getDisplayName = (targetCode) => {
-    const brc = allBrcs.find(b => b.code === targetCode);
+    let cleanCode = targetCode;
+    if (targetCode.startsWith('BRC:')) {
+      cleanCode = targetCode.split(':')[1];
+    }
+    const brc = allBrcs.find(b => b.code === cleanCode);
     return brc ? brc.name : targetCode;
   };
 

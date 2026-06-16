@@ -202,22 +202,6 @@ export default function AdminDashboardPage() {
           <div className="p-4 md:p-8 md:px-12 space-y-10 w-full animate-fade-in-up">
             
             {/* Header & Filter Section */}
-          <section className="bg-white border border-on-surface/10 rounded-2xl p-4 md:px-6 md:py-4 shadow-sm relative overflow-hidden expert-brutalist-hover">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-primary-container/30 rounded-bl-full -z-0"></div>
-            
-            <div className="relative z-10 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-              <div>
-                <h2
-                  className="text-2xl md:text-3xl text-on-surface tracking-wide mb-1"
-                  style={{ fontFamily: "'Bebas Neue', sans-serif", lineHeight: 1.2 }}
-                >
-                  Administrator Console
-                </h2>
-              </div>
-
-              {/* Filters removed from here */}
-            </div>
-          </section>
 
           {/* Quick Management Section */}
           <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
