@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import api from '../../lib/api';
 import FormBuilder from './FormBuilder';
 import FormAnalytics from './FormAnalytics';
@@ -64,27 +65,29 @@ export default function ExpertFormDashboard({ onClose }) {
   };
 
   if (view === 'builder') {
-    return (
-      <div className="fixed inset-0 z-[100] bg-surface overflow-y-auto">
+    return createPortal(
+      <div className="fixed inset-0 z-[9999] bg-surface overflow-y-auto">
         <div className="p-4 md:p-8">
           <FormBuilder initialData={currentForm} onSave={handleSaveForm} onCancel={() => setView('list')} />
         </div>
-      </div>
+      </div>,
+      document.body
     );
   }
 
   if (view === 'analytics') {
-    return (
-      <div className="fixed inset-0 z-[100] bg-surface overflow-y-auto">
+    return createPortal(
+      <div className="fixed inset-0 z-[9999] bg-surface overflow-y-auto">
         <div className="p-4 md:p-8">
           <FormAnalytics form={currentForm} responses={responses} onBack={() => setView('list')} />
         </div>
-      </div>
+      </div>,
+      document.body
     );
   }
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-8">
       <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" onClick={onClose}></div>
       <div className="relative bg-surface rounded-3xl w-full max-w-6xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-fade-in-up">
         
@@ -172,6 +175,7 @@ export default function ExpertFormDashboard({ onClose }) {
 
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
