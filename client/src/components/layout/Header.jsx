@@ -11,9 +11,12 @@ export default function Header({ transparent = false, onSignInClick }) {
     >
       <div className="max-w-max-width mx-auto px-margin-mobile md:px-margin-desktop py-4 md:py-5 flex justify-between items-center">
         <Link to="/" className="flex items-center gap-3 group">
-          <img src="/logo-2.png" alt="STREAM Ecosystem" className="h-10 w-auto" />
+          <img src="/logo-2.png" alt="STREAM Logo" className="h-14 w-auto shrink-0" />
+          <div className="flex flex-col justify-center">
+            <span className="text-xl font-bold tracking-tight text-slate-900 leading-none" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>STREAM</span>
+            <span className="text-[11px] font-bold tracking-widest text-brand-600 uppercase mt-0.5">Ecosystem</span>
+          </div>
         </Link>
-
 
       </div>
     </header>

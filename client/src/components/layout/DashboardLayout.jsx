@@ -44,14 +44,18 @@ export default function DashboardLayout() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 h-screen w-[280px] bg-white border-r lg:border-r-0 border-black/[0.04] z-50 flex flex-col transition-transform duration-300 ${
+        className={`fixed lg:sticky self-start top-0 left-0 h-screen w-[280px] bg-white lg:border-r-0 border-r border-black/[0.04] z-50 flex flex-col transition-transform duration-300 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         {/* Sidebar Header */}
         <div className="p-6 border-b border-black/[0.04]">
           <Link to="/dashboard" className="flex items-center gap-3">
-            <img src="/logo-2.png" alt="STREAM Ecosystem" className="h-10 w-auto" />
+            <img src="/logo-2.png" alt="STREAM Logo" className="h-14 w-auto shrink-0" />
+            <div className="flex flex-col justify-center">
+              <span className="text-xl font-bold tracking-tight text-slate-900 leading-none" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>STREAM</span>
+              <span className="text-[11px] font-bold tracking-widest text-brand-600 uppercase mt-0.5">Ecosystem</span>
+            </div>
           </Link>
         </div>
 
