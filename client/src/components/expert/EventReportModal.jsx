@@ -46,6 +46,7 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, isRe
     }
   }, [existingEvent]);
 
+  useEffect(() => {
     if (existingEvent) {
       setFormData({
         name: existingEvent.name || '',
@@ -55,7 +56,6 @@ export default function EventReportModal({ brcCode, brcName, existingEvent, isRe
         studentsCount: existingEvent.studentsCount || 0,
         tag: existingEvent.tag || '',
         customTag: existingEvent.customTag || '',
-      });
       });
     }
   }, [existingEvent]);
