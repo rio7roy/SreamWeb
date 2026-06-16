@@ -45,74 +45,72 @@ export default function DashboardLayout() {
       {/* Sidebar */}
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 w-[280px] bg-white lg:border-r-0 border-r border-black/[0.04] z-50 transition-transform duration-300 ${
+        className={`fixed inset-y-0 left-0 w-[280px] bg-white border-r border-black/[0.04] z-50 flex flex-col transition-transform duration-300 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        <div className="sticky top-0 h-[100dvh] w-full flex flex-col">
-          {/* Sidebar Header */}
-          <div className="p-6 border-b border-black/[0.04] shrink-0">
-            <Link to="/dashboard" className="flex items-center gap-3">
-              <img src="/logo-2.png" alt="STREAM Logo" className="h-16 w-auto shrink-0" />
-              <div className="flex flex-col justify-center">
-                <span className="text-xl font-bold tracking-tight text-slate-900 leading-none" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>STREAM</span>
-                <span className="text-[11px] font-bold tracking-widest text-brand-600 uppercase mt-0.5">Ecosystem</span>
-              </div>
-            </Link>
-          </div>
+        {/* Sidebar Header */}
+        <div className="p-6 border-b border-black/[0.04] shrink-0">
+          <Link to="/dashboard" className="flex items-center gap-3">
+            <img src="/logo-2.png" alt="STREAM Logo" className="h-16 w-auto shrink-0" />
+            <div className="flex flex-col justify-center">
+              <span className="text-xl font-bold tracking-tight text-slate-900 leading-none" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>STREAM</span>
+              <span className="text-[11px] font-bold tracking-widest text-brand-600 uppercase mt-0.5">Ecosystem</span>
+            </div>
+          </Link>
+        </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
-            {filteredNav.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => setSidebarOpen(false)}
-                className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
-              >
-                <span className="material-symbols-outlined text-xl">{item.icon}</span>
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-
-          {/* User Card & Logout (Anchored to bottom) */}
-          <div className="p-4 border-t border-black/[0.04] mt-auto shrink-0 bg-white">
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
+          {filteredNav.map((item) => (
             <Link
-              to="/dashboard/profile"
+              key={item.path}
+              to={item.path}
               onClick={() => setSidebarOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-black/[0.02] transition-colors cursor-pointer group mb-2"
+              className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
             >
-              <div className="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center overflow-hidden shrink-0">
-                {user?.avatar ? (
-                  <img src={`${import.meta.env.VITE_API_URL || '/api'}/uploads/${user.avatar}`} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-on-primary-container font-bold text-sm">
-                    {user?.name?.charAt(0)?.toUpperCase()}
-                  </span>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-on-surface truncate">{user?.name}</p>
-                <p className="text-xs text-secondary truncate">{ROLE_LABELS[user?.role]}</p>
-              </div>
-              <span className="material-symbols-outlined text-[14px] text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
-                arrow_forward
-              </span>
+              <span className="material-symbols-outlined text-xl">{item.icon}</span>
+              {item.label}
             </Link>
-            <button
-              onClick={handleLogout}
-              className="sidebar-link w-full text-error/80 hover:text-error hover:bg-error/5 mt-2"
-            >
-              <span className="material-symbols-outlined text-xl">logout</span>
-              Sign Out
-            </button>
-          </div>
+          ))}
+        </nav>
+
+        {/* User Card & Logout (Anchored to bottom) */}
+        <div className="p-4 border-t border-black/[0.04] mt-auto shrink-0 bg-white">
+          <Link
+            to="/dashboard/profile"
+            onClick={() => setSidebarOpen(false)}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-black/[0.02] transition-colors cursor-pointer group mb-2"
+          >
+            <div className="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center overflow-hidden shrink-0">
+              {user?.avatar ? (
+                <img src={`${import.meta.env.VITE_API_URL || '/api'}/uploads/${user.avatar}`} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-on-primary-container font-bold text-sm">
+                  {user?.name?.charAt(0)?.toUpperCase()}
+                </span>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-on-surface truncate">{user?.name}</p>
+              <p className="text-xs text-secondary truncate">{ROLE_LABELS[user?.role]}</p>
+            </div>
+            <span className="material-symbols-outlined text-[14px] text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
+              arrow_forward
+            </span>
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="sidebar-link w-full text-error/80 hover:text-error hover:bg-error/5 mt-2"
+          >
+            <span className="material-symbols-outlined text-xl">logout</span>
+            Sign Out
+          </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-screen lg:border-l lg:border-black/[0.04]">
+      <div className="flex-1 flex flex-col min-h-screen lg:pl-[280px]">
         <NotificationBar />
         
         {/* Top Bar */}
