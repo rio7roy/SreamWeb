@@ -182,8 +182,8 @@ async function forgotPassword(email, origin) {
     emailSent = false;
   }
   
-  // If no SMTP user is configured, we assume it's disabled
-  if (!process.env.SMTP_USER) {
+  // If no email provider is configured, we assume it's disabled
+  if (!process.env.SMTP_USER && !process.env.SENDGRID_API_KEY && !process.env.RESEND_API_KEY) {
     emailSent = false;
   }
   
