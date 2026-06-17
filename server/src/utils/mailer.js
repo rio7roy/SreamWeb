@@ -145,7 +145,7 @@ exports.sendFormAssignmentEmail = async (email, name, formName, formLink) => {
         email: fromEmail,
         name: 'STREAM Administration'
       },
-      subject: \`New Form Assigned: \${formName}\`,
+      subject: `New Form Assigned: ${formName}`,
       html: htmlContent,
     };
     
