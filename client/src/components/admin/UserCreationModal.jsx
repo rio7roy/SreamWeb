@@ -84,7 +84,8 @@ export default function UserCreationModal({ type, entityName, onClose }) {
         setTimeout(onClose, 1500);
       }
     } catch (err) {
-      setFeedback({ type: 'error', text: 'Registration failed. Try again.' });
+      const errorMsg = err.response?.data?.message || 'Registration failed. Try again.';
+      setFeedback({ type: 'error', text: errorMsg });
     } finally {
       setLoading(false);
     }
