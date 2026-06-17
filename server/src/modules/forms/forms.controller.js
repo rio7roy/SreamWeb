@@ -45,9 +45,46 @@ exports.getFormById = (req, res) => {
   res.json(form);
 };
 
-exports.updateForm = (req, res) => {
+exports.updateForm = async (req, res) => {
+  const oldForm = formsService.getFormById(req.params.id);
   const form = formsService.updateForm(req.params.id, req.body);
   if (!form) return res.status(404).json({ message: 'Form not found' });
+
+  // Check if assignedTo has changed
+  if (req.body.assignedTo && oldForm) {
+    const oldAssigned = oldForm.assignedTo || [];
+    const newAssigned = form.assignedTo || [];
+    const newlyAssigned = newAssigned.filter(brc => !oldAssigned.includes(brc));
+
+    if (newlyAssigned.length > 0) {
+      try {
+        const { sendFormAssignmentEmail } = require('../../utils/mailer');
+        const path = require('path');
+        const fs = require('fs');
+        // experts.json is at server/data/experts.json
+        const expertsPath = path.join(__dirname, '../../../data/experts.json');
+        if (fs.existsSync(expertsPath)) {
+          const experts = JSON.parse(fs.readFileSync(expertsPath, 'utf8'));
+          
+          const notifiedEmails = new Set();
+          
+          experts.forEach(expert => {
+            if (expert.role === 'EXPERT' && expert.assignedBrcs) {
+              const hasNewBrc = expert.assignedBrcs.some(b => newlyAssigned.includes(b));
+              if (hasNewBrc && expert.email && !notifiedEmails.has(expert.email)) {
+                notifiedEmails.add(expert.email);
+                const formLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/dashboard/portal?form=${form.id}`;
+                sendFormAssignmentEmail(expert.email, expert.name || 'STREAM Expert', form.title || 'New Survey', formLink);
+              }
+            }
+          });
+        }
+      } catch (err) {
+        console.error('Error sending form assignment emails:', err);
+      }
+    }
+  }
+
   res.json(form);
 };
 

@@ -217,6 +217,14 @@ export default function PortalPage() {
                     </p>
                   </div>
                 )}
+                {forgotSuccess && (
+                  <div className="bg-green-100 border border-green-200 rounded-xl px-4 py-3 animate-fade-in">
+                    <p className="text-green-800 text-sm font-medium flex items-center gap-2">
+                      <span className="material-symbols-outlined text-base">check_circle</span>
+                      {forgotSuccess}
+                    </p>
+                  </div>
+                )}
                 <div className="flex flex-col gap-3 mt-4">
                   <Button type="submit" loading={isLoading}>
                     Send Reset Link
@@ -263,6 +271,16 @@ export default function PortalPage() {
                 </p>
               </div>
             )}
+
+            <div className="flex justify-end mt-2">
+              <button
+                type="button"
+                className="text-primary text-sm font-bold hover:underline"
+                onClick={() => { setIsForgotPassword(true); setError(''); }}
+              >
+                Forgot Password?
+              </button>
+            </div>
 
             <div className="flex flex-col gap-3 mt-4">
               <Button type="submit" loading={isLoading}>

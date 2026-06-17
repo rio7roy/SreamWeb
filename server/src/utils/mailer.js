@@ -112,3 +112,50 @@ exports.sendPasswordReset = async (email, name, resetLink) => {
     throw new Error('Failed to send email');
   }
 };
+
+exports.sendFormAssignmentEmail = async (email, name, formName, formLink) => {
+  const mailTransporter = createTransporter();
+  
+  if (!mailTransporter) {
+    console.warn(`[MAILER] SMTP not configured. Skipping form assignment email to ${email}. Link: ${formLink}`);
+    return null;
+  }
+
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaeb; border-radius: 12px;">
+      <h2 style="color: #1a1a1a;">New Form Assignment</h2>
+      <p style="color: #4a4a4a; font-size: 16px; line-height: 1.5;">
+        Hi ${name},<br/><br/>
+        A new form <strong>${formName}</strong> has been assigned to your STREAM Hub by the administrator.
+      </p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${formLink}" style="background-color: #0056b3; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">
+          Access Form
+        </a>
+      </div>
+      <p style="color: #71717a; font-size: 14px;">
+        If the button above does not work, copy and paste this link into your browser:<br/>
+        <a href="${formLink}" style="color: #0056b3;">${formLink}</a>
+      </p>
+      <hr style="border: none; border-top: 1px solid #eaeaeb; margin: 20px 0;" />
+      <p style="color: #a1a1aa; font-size: 12px; text-align: center;">
+        &copy; ${new Date().getFullYear()} STREAM Ecosystem. All rights reserved.
+      </p>
+    </div>
+  `;
+
+  try {
+    const fromEmail = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'noreply@stream.edu';
+    await mailTransporter.sendMail({
+      from: `"STREAM Administration" <${fromEmail}>`,
+      to: email,
+      subject: `New Form Assigned: ${formName}`,
+      html: htmlContent,
+    });
+    
+    console.log(`[MAILER] Form assignment sent to ${email}`);
+    return null;
+  } catch (error) {
+    console.error(`[MAILER] Failed to send form assignment to ${email}:`, error);
+  }
+};
