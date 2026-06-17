@@ -1,16 +1,29 @@
-const sgMail = require('@sendgrid/mail');
+const nodemailer = require('nodemailer');
 
-const initMailer = () => {
-  if (process.env.SENDGRID_API_KEY) {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-    return true;
+let transporter = null;
+
+const createTransporter = () => {
+  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: process.env.SMTP_PORT || 587,
+      secure: process.env.SMTP_PORT === '465',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+      debug: true, // Show SMTP traffic in logs
+      logger: true // Log information to console
+    });
   }
-  return false;
+  return null;
 };
 
 exports.sendInvite = async (email, name, inviteLink) => {
-  if (!initMailer()) {
-    console.warn(`[MAILER] SendGrid not configured. Skipping email to ${email}. Invite link: ${inviteLink}`);
+  const mailTransporter = createTransporter();
+  
+  if (!mailTransporter) {
+    console.warn(`[MAILER] SMTP not configured. Skipping email to ${email}. Invite link: ${inviteLink}`);
     return null;
   }
 
@@ -37,29 +50,27 @@ exports.sendInvite = async (email, name, inviteLink) => {
   `;
 
   try {
-    const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@stream.edu';
-    const msg = {
+    const fromEmail = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'noreply@stream.edu';
+    await mailTransporter.sendMail({
+      from: `"STREAM Administration" <${fromEmail}>`,
       to: email,
-      from: {
-        email: fromEmail,
-        name: 'STREAM Administration'
-      },
       subject: 'You have been invited to STREAM Ecosystem',
       html: htmlContent,
-    };
+    });
     
-    await sgMail.send(msg);
     console.log(`[MAILER] Invite sent to ${email}`);
     return null;
   } catch (error) {
-    console.error(`[MAILER] Failed to send invite to ${email}:`, error.response ? error.response.body : error);
+    console.error(`[MAILER] Failed to send invite to ${email}:`, error);
     throw new Error('Failed to send email');
   }
 };
 
 exports.sendPasswordReset = async (email, name, resetLink) => {
-  if (!initMailer()) {
-    console.warn(`[MAILER] SendGrid not configured. Skipping email to ${email}. Reset link: ${resetLink}`);
+  const mailTransporter = createTransporter();
+  
+  if (!mailTransporter) {
+    console.warn(`[MAILER] SMTP not configured. Skipping email to ${email}. Reset link: ${resetLink}`);
     return null;
   }
 
@@ -88,29 +99,27 @@ exports.sendPasswordReset = async (email, name, resetLink) => {
   `;
 
   try {
-    const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@stream.edu';
-    const msg = {
+    const fromEmail = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'noreply@stream.edu';
+    await mailTransporter.sendMail({
+      from: `"STREAM Administration" <${fromEmail}>`,
       to: email,
-      from: {
-        email: fromEmail,
-        name: 'STREAM Administration'
-      },
       subject: 'Password Reset - STREAM Ecosystem',
       html: htmlContent,
-    };
+    });
     
-    await sgMail.send(msg);
     console.log(`[MAILER] Password reset sent to ${email}`);
     return null;
   } catch (error) {
-    console.error(`[MAILER] Failed to send password reset to ${email}:`, error.response ? error.response.body : error);
+    console.error(`[MAILER] Failed to send password reset to ${email}:`, error);
     throw new Error('Failed to send email');
   }
 };
 
 exports.sendFormAssignmentEmail = async (email, name, formName, formLink) => {
-  if (!initMailer()) {
-    console.warn(`[MAILER] SendGrid not configured. Skipping form assignment email to ${email}. Link: ${formLink}`);
+  const mailTransporter = createTransporter();
+  
+  if (!mailTransporter) {
+    console.warn(`[MAILER] SMTP not configured. Skipping form assignment email to ${email}. Link: ${formLink}`);
     return null;
   }
 
@@ -138,21 +147,17 @@ exports.sendFormAssignmentEmail = async (email, name, formName, formLink) => {
   `;
 
   try {
-    const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@stream.edu';
-    const msg = {
+    const fromEmail = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'noreply@stream.edu';
+    await mailTransporter.sendMail({
+      from: `"STREAM Administration" <${fromEmail}>`,
       to: email,
-      from: {
-        email: fromEmail,
-        name: 'STREAM Administration'
-      },
       subject: `New Form Assigned: ${formName}`,
       html: htmlContent,
-    };
+    });
     
-    await sgMail.send(msg);
     console.log(`[MAILER] Form assignment sent to ${email}`);
     return null;
   } catch (error) {
-    console.error(`[MAILER] Failed to send form assignment to ${email}:`, error.response ? error.response.body : error);
+    console.error(`[MAILER] Failed to send form assignment to ${email}:`, error);
   }
 };
