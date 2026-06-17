@@ -155,10 +155,16 @@ export default function ExpertFormDashboard({ onClose }) {
                 
                 <div className="mt-4 flex flex-col gap-2">
                   {form.published && (
-                    <button onClick={() => copyLink(form.id)} className="w-full py-2 bg-primary/10 text-primary font-bold rounded-lg text-sm hover:bg-primary hover:text-white transition-colors flex items-center justify-center gap-2">
-                      <span className="material-symbols-outlined text-[18px]">link</span>
-                      Copy Link
-                    </button>
+                    <div className="flex gap-2">
+                      <button onClick={() => window.open(`/f/${form.id}`, '_blank')} className="flex-1 py-2 bg-primary text-on-primary font-bold rounded-lg text-sm hover:opacity-90 transition-colors flex items-center justify-center gap-2 shadow-sm">
+                        <span className="material-symbols-outlined text-[18px]">open_in_new</span>
+                        Open Form
+                      </button>
+                      <button onClick={() => copyLink(form.id)} className="flex-1 py-2 bg-primary/10 text-primary font-bold rounded-lg text-sm hover:bg-primary hover:text-white transition-colors flex items-center justify-center gap-2">
+                        <span className="material-symbols-outlined text-[18px]">link</span>
+                        Copy Link
+                      </button>
+                    </div>
                   )}
                   <div className="flex gap-2">
                     <button onClick={() => { setCurrentForm(form); setView('builder'); }} className="flex-1 py-2 border border-outline/20 rounded-lg text-sm font-bold text-secondary hover:bg-surface-container transition-colors flex items-center justify-center gap-2">

@@ -66,6 +66,12 @@ export default function AdminFormDashboard({ onClose }) {
     }
   };
 
+  const copyLink = (formId) => {
+    const link = `${window.location.origin}/f/${formId}`;
+    navigator.clipboard.writeText(link);
+    alert('Form link copied to clipboard!');
+  };
+
   const handleViewAnalytics = async (form) => {
     try {
       const res = await api.get(`/forms/${form.id}/responses`);
@@ -127,7 +133,7 @@ export default function AdminFormDashboard({ onClose }) {
     return createPortal(
       <div className="fixed inset-0 z-[9999] bg-surface overflow-y-auto animate-fade-in">
         <div className="p-4 md:p-8 max-w-7xl mx-auto">
-          <FormBuilder initialData={currentForm} onSave={handleSaveForm} onCancel={() => setView('list')} />
+          <FormBuilder initialData={currentForm} onSave={handleSaveForm} onCancel={() => setView('list')} isTemplate={isTemplate} />
         </div>
       </div>,
       document.body
@@ -244,6 +250,16 @@ export default function AdminFormDashboard({ onClose }) {
                       </div>
                     </td>
                     <td className="p-4 flex gap-2 justify-end">
+                      {form.published && (
+                        <>
+                          <button onClick={() => window.open(`/f/${form.id}`, '_blank')} className="p-2 text-primary hover:bg-primary/10 rounded-full" title="Open Form">
+                            <span className="material-symbols-outlined text-sm">open_in_new</span>
+                          </button>
+                          <button onClick={() => copyLink(form.id)} className="p-2 text-primary hover:bg-primary/10 rounded-full" title="Copy Link">
+                            <span className="material-symbols-outlined text-sm">link</span>
+                          </button>
+                        </>
+                      )}
                       <button onClick={() => handleViewAnalytics(form)} className="p-2 text-primary hover:bg-primary/10 rounded-full" title="Analytics">
                         <span className="material-symbols-outlined text-sm">analytics</span>
                       </button>
