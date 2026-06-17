@@ -79,12 +79,10 @@ exports.createUser = async (req, res) => {
 
     const fileName = type === 'experts' ? 'pending_experts.json' : 'pending_admins.json';
     const filePath = path.join(DATA_DIR, fileName);
-    const data = readData(filePath);
+    let data = readData(filePath);
     
-    // Check pending invites as well
-    if (data.some(u => u.email === req.body.email)) {
-      return res.status(400).json({ message: 'An invite has already been sent to this email.' });
-    }
+    // Remove any existing pending invites for this email to expire old links
+    data = data.filter(u => u.email !== req.body.email);
 
     const token = crypto.randomBytes(16).toString('hex');
     const newUser = { id: crypto.randomBytes(16).toString('hex'), token, ...req.body, createdAt: new Date().toISOString() };
