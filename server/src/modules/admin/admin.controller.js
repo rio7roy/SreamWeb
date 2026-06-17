@@ -69,9 +69,23 @@ exports.createUser = async (req, res) => {
   const { type } = req.params;
   
   if (type === 'experts' || type === 'admins') {
+    const existingUser = await db.users.findFirst({
+      where: { email: req.body.email }
+    });
+    
+    if (existingUser) {
+      return res.status(400).json({ message: 'A user with this email already exists.' });
+    }
+
     const fileName = type === 'experts' ? 'pending_experts.json' : 'pending_admins.json';
     const filePath = path.join(DATA_DIR, fileName);
     const data = readData(filePath);
+    
+    // Check pending invites as well
+    if (data.some(u => u.email === req.body.email)) {
+      return res.status(400).json({ message: 'An invite has already been sent to this email.' });
+    }
+
     const token = crypto.randomBytes(16).toString('hex');
     const newUser = { id: crypto.randomBytes(16).toString('hex'), token, ...req.body, createdAt: new Date().toISOString() };
     data.push(newUser);

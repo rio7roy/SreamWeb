@@ -77,14 +77,8 @@ export default function UserCreationModal({ type, entityName, onClose }) {
       const res = await api.post(`/admin/users/${type}`, formData);
       
       if (type === 'experts' || type === 'admins') {
-        const link = res.data.previewUrl || res.data.inviteLink;
-        if (link) {
-          setGeneratedLink(link);
-          setFeedback({ type: 'success', text: `Success! Invite link generated.` });
-        } else {
-          setFeedback({ type: 'success', text: `Success! An invitation email has been sent.` });
-          setTimeout(onClose, 2000);
-        }
+        setFeedback({ type: 'success', text: `Success! An invitation email has been sent to the user.` });
+        setTimeout(onClose, 2000);
       } else {
         setFeedback({ type: 'success', text: `${entityName} successfully registered!` });
         setTimeout(onClose, 1500);

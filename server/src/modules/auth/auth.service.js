@@ -162,7 +162,7 @@ async function forgotPassword(email, origin) {
   
   const user = db.users.findFirst({ where: { email } });
   if (!user) {
-    return { success: true };
+    throw Object.assign(new Error('This email address is not registered in our system.'), { statusCode: 404 });
   }
 
   const resetToken = crypto.randomBytes(32).toString('hex');
@@ -174,9 +174,20 @@ async function forgotPassword(email, origin) {
   });
 
   const resetLink = `${origin}/reset-password/${resetToken}`;
-  const previewUrl = await mailer.sendPasswordReset(user.email, user.name || user.username, resetLink);
   
-  return { success: true, link: previewUrl || resetLink };
+  let emailSent = true;
+  try {
+    await mailer.sendPasswordReset(user.email, user.name || user.username, resetLink);
+  } catch (err) {
+    emailSent = false;
+  }
+  
+  // If no SMTP user is configured, we assume it's disabled
+  if (!process.env.SMTP_USER) {
+    emailSent = false;
+  }
+  
+  return { success: true, emailSent, link: emailSent ? null : resetLink };
 }
 
 async function resetPassword(token, newPassword) {

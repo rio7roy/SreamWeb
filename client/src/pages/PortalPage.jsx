@@ -98,8 +98,9 @@ export default function PortalPage() {
     setIsLoading(true);
     try {
       const res = await api.post('/auth/forgot-password', { email: forgotEmail });
-      if (res.data.data && res.data.data.link && !res.data.data.link.includes('ethereal')) {
-        setForgotSuccess(`Email disabled. Manual reset link: ${res.data.data.link}`);
+      const data = res.data?.data || {};
+      if (data.emailSent === false && data.link) {
+        setForgotSuccess(`Email disabled. Manual reset link: ${data.link}`);
       } else {
         setForgotSuccess('Password reset link has been sent to your email.');
       }
@@ -272,15 +273,7 @@ export default function PortalPage() {
               </div>
             )}
 
-            <div className="flex justify-end mt-2">
-              <button
-                type="button"
-                className="text-primary text-sm font-bold hover:underline"
-                onClick={() => { setIsForgotPassword(true); setError(''); }}
-              >
-                Forgot Password?
-              </button>
-            </div>
+
 
             <div className="flex flex-col gap-3 mt-4">
               <Button type="submit" loading={isLoading}>
