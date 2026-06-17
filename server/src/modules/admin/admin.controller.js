@@ -122,7 +122,7 @@ exports.createUser = async (req, res) => {
   res.status(201).json({ message: 'User created successfully', data: safeUser });
 };
 
-exports.softDeleteUser = (req, res) => {
+exports.softDeleteUser = async (req, res) => {
   const { type, id } = req.params;
   const activePath = getFilePath(type, false);
   const pastPath = getFilePath(type, true);
@@ -158,6 +158,25 @@ exports.softDeleteUser = (req, res) => {
   pastData.push(user);
   writeData(pastPath, pastData);
   
+  // Free up the email in the Prisma database so the user can be re-registered
+  if (user.email) {
+    try {
+      const dbUser = await db.users.findFirst({ where: { email: user.email } });
+      if (dbUser) {
+        await db.users.update({
+          where: { id: dbUser.id },
+          data: {
+            email: `${user.email}_deleted_${Date.now()}`,
+            username: `${user.username}_deleted_${Date.now()}`,
+            isActive: false
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Failed to free up email in DB during soft delete:', err);
+    }
+  }
+
   res.json({ message: 'User soft deleted successfully' });
 };
 
