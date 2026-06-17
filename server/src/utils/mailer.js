@@ -12,6 +12,8 @@ const createTransporter = () => {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
+      debug: true, // Show SMTP traffic in logs
+      logger: true // Log information to console
     });
   }
   return null;
