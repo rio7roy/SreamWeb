@@ -348,6 +348,22 @@ export default function ReportsPage() {
                   </div>
                 </div>
               )}
+
+              {/* Uploaded PDF Report */}
+              {selectedEvent.reportPdf && (
+                <div>
+                  <h4 className="text-sm font-bold text-secondary uppercase tracking-wider mb-3">Expert Report</h4>
+                  <a 
+                    href={`${import.meta.env.VITE_API_URL?.replace('/api', '') || ''}${selectedEvent.reportPdf}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-3 bg-[#d32f2f]/10 text-[#d32f2f] hover:bg-[#d32f2f]/20 transition-colors rounded-xl font-bold text-sm border border-[#d32f2f]/20"
+                  >
+                    <span className="material-symbols-outlined">picture_as_pdf</span>
+                    View Uploaded PDF Report
+                  </a>
+                </div>
+              )}
             </div>
             
             <div className="p-4 border-t border-outline/10 bg-surface-container-low flex justify-end shrink-0">
