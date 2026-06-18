@@ -52,5 +52,21 @@
       "32110300803SH"
     ],
     "deletedAt": "2026-06-08T07:16:04.301Z"
+  },
+  {
+    "id": "3d941ad187fd20b4199e2aeeb60fd265",
+    "name": "Fake Rio",
+    "email": "john365joe@gmail.com",
+    "createdAt": "2026-06-16T06:15:40.772Z",
+    "phone": "80783838833",
+    "address": "dgfdfg",
+    "username": "sabu",
+    "confirmPassword": "123456",
+    "whatsappJoined": true,
+    "password": "$2b$12$BbFZWY9oO6501XCPTfiNZuo1Owk2iER7HALGMC7pispNtfCt0/tza",
+    "role": "EXPERT",
+    "isActive": true,
+    "activatedAt": "2026-06-16T06:16:17.470Z",
+    "deletedAt": "2026-06-17T05:28:28.227Z"
   }
 ]
