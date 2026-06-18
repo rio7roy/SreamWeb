@@ -4,8 +4,18 @@ import api from '../../lib/api';
 export default function StockMonitoring({ viewType }) {
   const [stocks, setStocks] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState({ search: '', status: '' });
+  const [filters, setFilters] = useState({ search: '', status: '', district: '', brc: '' });
   const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
+  const [brcs, setBrcs] = useState([]);
+  const [districts, setDistricts] = useState([]);
+
+  useEffect(() => {
+    api.get('/brcs').then(res => {
+      setBrcs(res.data);
+      const uniqueDistricts = [...new Set(res.data.map(b => b.district))].filter(Boolean);
+      setDistricts(uniqueDistricts);
+    }).catch(console.error);
+  }, []);
 
   useEffect(() => {
     fetchStocks();
@@ -17,8 +27,10 @@ export default function StockMonitoring({ viewType }) {
       const params = new URLSearchParams();
       if (filters.search) params.append('search', filters.search);
       if (filters.status) params.append('status', filters.status);
+      if (viewType === 'district' && filters.district) params.append('district', filters.district);
+      if (viewType === 'brc' && filters.brc) params.append('brc', filters.brc);
       
-      const response = await api.get(`/api/stocks?${params.toString()}`);
+      const response = await api.get(`/stocks?${params.toString()}`);
       if (response.data?.success) {
         let fetchedData = response.data.data.stocks || [];
         
@@ -62,6 +74,25 @@ export default function StockMonitoring({ viewType }) {
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
           />
+          {viewType === 'district' ? (
+            <select
+              className="border rounded px-3 py-1 text-sm bg-white"
+              value={filters.district}
+              onChange={(e) => setFilters({ ...filters, district: e.target.value })}
+            >
+              <option value="">All Districts</option>
+              {districts.map(d => <option key={d} value={d}>{d}</option>)}
+            </select>
+          ) : (
+            <select
+              className="border rounded px-3 py-1 text-sm bg-white"
+              value={filters.brc}
+              onChange={(e) => setFilters({ ...filters, brc: e.target.value })}
+            >
+              <option value="">All BRCs</option>
+              {brcs.map(b => <option key={b.code} value={b.code}>{b.name}</option>)}
+            </select>
+          )}
           <select 
             className="border rounded px-3 py-1 text-sm bg-white"
             value={filters.status}

@@ -7,5 +7,29 @@
     "content": "hello",
     "scheduledFor": null,
     "createdAt": "2026-06-16T05:19:35.852Z"
+  },
+  {
+    "id": "b35bbd48-0d36-496f-95b7-05932ec6a7aa",
+    "type": "OUT_OF_STOCK_ALERT",
+    "title": "🚨 Out of Stock: Water Pump Plier",
+    "content": "🚨 OUT OF STOCK: \"Water Pump Plier\" (PB05-T) at GOVT VHSS ARYAD. Available: 0 / Original: 1",
+    "to": [
+      "ADMIN"
+    ],
+    "message": "🚨 OUT OF STOCK: \"Water Pump Plier\" (PB05-T) at GOVT VHSS ARYAD. Available: 0 / Original: 1",
+    "brc": "32110100105SH",
+    "priority": "CRITICAL",
+    "createdAt": "2026-06-17T09:19:06.380Z",
+    "read": false
+  },
+  {
+    "id": "e4609e37-f919-4bd1-9c7d-2976e4419251",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "Bulk Upload Completed: 0 created, 406 updated.",
+    "scheduledFor": null,
+    "createdAt": "2026-06-17T10:32:42.649Z"
   }
 ]

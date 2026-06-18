@@ -81,23 +81,54 @@ async function deleteStockById(id) {
 }
 
 /**
- * Bulk create stock items
+ * Bulk create or update stock items (Upsert by itemName + brc)
  */
-async function bulkCreateStocks(items) {
-  // Add some default values if missing
-  const data = items.map(item => ({
-    status: 'ACTIVE',
-    ...item
-  }));
-  const result = db.stocks.createMany({ data });
-  return result;
+async function bulkUpsertStocks(items) {
+  let updatedCount = 0;
+  let createdCount = 0;
+
+  for (const item of items) {
+    const existing = db.stocks.findMany({
+      where: {
+        itemName: item.itemName,
+        brc: item.brc,
+      },
+      take: 1
+    });
+
+    if (existing.data && existing.data.length > 0) {
+      // Update existing item (add quantity)
+      const ex = existing.data[0];
+      db.stocks.update({
+        where: { id: ex.id },
+        data: {
+          quantity: ex.quantity + item.quantity,
+          category: item.category || ex.category,
+          serialNumber: item.serialNumber || ex.serialNumber,
+          district: item.district || ex.district,
+        }
+      });
+      updatedCount++;
+    } else {
+      // Create new
+      db.stocks.create({
+        data: {
+          status: 'ACTIVE',
+          ...item
+        }
+      });
+      createdCount++;
+    }
+  }
+
+  return { createdCount, updatedCount };
 }
 
 /**
- * Bulk update all stocks
+ * Bulk update stocks
  */
-async function bulkUpdateStocks(data) {
-  const result = db.stocks.updateMany({ data });
+async function bulkUpdateStocks(data, where = {}) {
+  const result = db.stocks.updateMany({ where, data });
   return result;
 }
 
@@ -108,6 +139,6 @@ module.exports = {
   getStockById,
   updateStockById,
   deleteStockById,
-  bulkCreateStocks,
+  bulkUpsertStocks,
   bulkUpdateStocks,
 };

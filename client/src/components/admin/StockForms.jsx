@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../../lib/api';
+import MultiSelect from '../common/MultiSelect';
 
 export default function StockForms({ onActionComplete }) {
   const [activeTab, setActiveTab] = useState('create'); // 'create', 'bulkUpload', 'bulkUpdate'
@@ -8,11 +9,35 @@ export default function StockForms({ onActionComplete }) {
 
   // Form states
   const [createForm, setCreateForm] = useState({
-    itemName: '', category: '', serialNumber: '', quantity: 1, district: '', brc: '', status: 'ACTIVE'
+    itemName: '', category: '', serialNumber: '', quantity: 1, district: [], brc: []
   });
   
   const [file, setFile] = useState(null);
-  const [updateForm, setUpdateForm] = useState({ status: '', category: '' });
+  const [updateForm, setUpdateForm] = useState({ itemName: '', brc: '', status: '', category: '' });
+
+  const [brcs, setBrcs] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [uniqueItemNames, setUniqueItemNames] = useState([]);
+  const [uniqueCategories, setUniqueCategories] = useState([]);
+
+  useEffect(() => {
+    api.get('/brcs').then(res => {
+      if (Array.isArray(res.data)) {
+        setBrcs(res.data);
+        const dists = [...new Set(res.data.map(b => b.district))].filter(Boolean);
+        setDistricts(dists);
+      }
+    }).catch(console.error);
+    
+    api.get('/stocks').then(res => {
+      if (res.data?.data?.stocks) {
+        const itemNames = [...new Set(res.data.data.stocks.map(s => s.itemName))].filter(Boolean);
+        setUniqueItemNames(itemNames);
+        const categories = [...new Set(res.data.data.stocks.map(s => s.category))].filter(Boolean);
+        setUniqueCategories(categories);
+      }
+    }).catch(console.error);
+  }, []);
 
   const showMessage = (text, type = 'success') => {
     setMessage({ text, type });
@@ -23,9 +48,23 @@ export default function StockForms({ onActionComplete }) {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post('/api/stocks', createForm);
-      showMessage('Stock item created successfully!');
-      setCreateForm({ itemName: '', category: '', serialNumber: '', quantity: 1, district: '', brc: '', status: 'ACTIVE' });
+      const dists = Array.isArray(createForm.district) ? createForm.district : (createForm.district ? [createForm.district] : []);
+      const brcsList = Array.isArray(createForm.brc) ? createForm.brc : (createForm.brc ? [createForm.brc] : []);
+      
+      const targets = [];
+      if (dists.length === 0 && brcsList.length === 0) {
+        targets.push({ district: '', brc: '' });
+      } else {
+        dists.forEach(d => targets.push({ district: d, brc: '' }));
+        brcsList.forEach(b => targets.push({ district: '', brc: b }));
+      }
+
+      await Promise.all(targets.map(t => 
+        api.post('/stocks', { ...createForm, district: t.district, brc: t.brc })
+      ));
+
+      showMessage('Stock item(s) created successfully!');
+      setCreateForm({ itemName: '', category: '', serialNumber: '', quantity: 1, district: [], brc: [] });
       if (onActionComplete) onActionComplete();
     } catch (err) {
       showMessage(err.response?.data?.message || 'Failed to create stock', 'error');
@@ -43,7 +82,7 @@ export default function StockForms({ onActionComplete }) {
 
     setLoading(true);
     try {
-      await api.post('/api/stocks/bulk-upload', formData, {
+      await api.post('/stocks/bulk-upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       showMessage('Bulk upload completed successfully!');
@@ -64,9 +103,9 @@ export default function StockForms({ onActionComplete }) {
 
     setLoading(true);
     try {
-      const res = await api.put('/api/stocks/bulk-update', updateForm);
+      const res = await api.put('/stocks/bulk-update', updateForm);
       showMessage(res.data.message || 'Bulk update successful');
-      setUpdateForm({ status: '', category: '' });
+      setUpdateForm({ itemName: '', brc: '', status: '', category: '' });
       if (onActionComplete) onActionComplete();
     } catch (err) {
       showMessage(err.response?.data?.message || 'Failed to perform bulk update', 'error');
@@ -81,19 +120,19 @@ export default function StockForms({ onActionComplete }) {
       {/* Internal Tabs */}
       <div className="flex border-b border-slate-200 mb-6">
         <button 
-          className={`pb-2 px-4 font-medium text-sm ${activeTab === 'create' ? 'border-b-2 border-brand-500 text-brand-600' : 'text-slate-500 hover:text-slate-700'}`}
+          className={`pb-2 px-4 font-medium text-sm ${activeTab === 'create' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
           onClick={() => setActiveTab('create')}
         >
           Create Stock
         </button>
         <button 
-          className={`pb-2 px-4 font-medium text-sm ${activeTab === 'bulkUpload' ? 'border-b-2 border-brand-500 text-brand-600' : 'text-slate-500 hover:text-slate-700'}`}
+          className={`pb-2 px-4 font-medium text-sm ${activeTab === 'bulkUpload' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
           onClick={() => setActiveTab('bulkUpload')}
         >
           Bulk Upload
         </button>
         <button 
-          className={`pb-2 px-4 font-medium text-sm ${activeTab === 'bulkUpdate' ? 'border-b-2 border-brand-500 text-brand-600' : 'text-slate-500 hover:text-slate-700'}`}
+          className={`pb-2 px-4 font-medium text-sm ${activeTab === 'bulkUpdate' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
           onClick={() => setActiveTab('bulkUpdate')}
         >
           Bulk Update
@@ -117,11 +156,15 @@ export default function StockForms({ onActionComplete }) {
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Category *</label>
-              <input required type="text" className="w-full border rounded px-3 py-2" 
-                value={createForm.category} onChange={e => setCreateForm({...createForm, category: e.target.value})} />
+              <select required className="w-full border rounded px-3 py-2 bg-white" 
+                value={createForm.category} onChange={e => setCreateForm({...createForm, category: e.target.value})}>
+                <option value="">-- Select Category --</option>
+                {uniqueCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                {/* Fallback for adding new categories manually could be handled here or elsewhere, sticking to simple select for now */}
+              </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Serial Number</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Unique No</label>
               <input type="text" className="w-full border rounded px-3 py-2" 
                 value={createForm.serialNumber} onChange={e => setCreateForm({...createForm, serialNumber: e.target.value})} />
             </div>
@@ -131,26 +174,25 @@ export default function StockForms({ onActionComplete }) {
                 value={createForm.quantity} onChange={e => setCreateForm({...createForm, quantity: parseInt(e.target.value)})} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">District</label>
-              <input type="text" className="w-full border rounded px-3 py-2" 
-                value={createForm.district} onChange={e => setCreateForm({...createForm, district: e.target.value})} />
+              <label className="block text-sm font-medium text-slate-700 mb-1">District (Multiple)</label>
+              <MultiSelect 
+                options={districts.map(d => ({ value: d, label: d }))}
+                selected={createForm.district}
+                onChange={(newSelected) => setCreateForm({...createForm, district: newSelected})}
+                placeholder="-- Select Districts --"
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">BRC</label>
-              <input type="text" className="w-full border rounded px-3 py-2" 
-                value={createForm.brc} onChange={e => setCreateForm({...createForm, brc: e.target.value})} />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
-              <select className="w-full border rounded px-3 py-2 bg-white" 
-                value={createForm.status} onChange={e => setCreateForm({...createForm, status: e.target.value})}>
-                <option value="ACTIVE">Active</option>
-                <option value="DEFECTIVE">Defective</option>
-                <option value="IN_REPAIR">In Repair</option>
-              </select>
+              <label className="block text-sm font-medium text-slate-700 mb-1">BRC (Multiple)</label>
+              <MultiSelect 
+                options={brcs.map(b => ({ value: b.code, label: b.name }))}
+                selected={createForm.brc}
+                onChange={(newSelected) => setCreateForm({...createForm, brc: newSelected})}
+                placeholder="-- Select BRCs --"
+              />
             </div>
           </div>
-          <button disabled={loading} type="submit" className="bg-brand-600 text-white px-4 py-2 rounded font-medium hover:bg-brand-700 disabled:opacity-50">
+          <button disabled={loading} type="submit" className="bg-primary text-on-primary px-4 py-2 rounded font-bold hover:opacity-90 disabled:opacity-50 transition-all">
             {loading ? 'Creating...' : 'Create Stock'}
           </button>
         </form>
@@ -170,7 +212,7 @@ export default function StockForms({ onActionComplete }) {
               className="w-full"
             />
           </div>
-          <button disabled={loading} type="submit" className="bg-brand-600 text-white px-4 py-2 rounded font-medium hover:bg-brand-700 disabled:opacity-50">
+          <button disabled={loading} type="submit" className="bg-primary text-on-primary px-4 py-2 rounded font-bold hover:opacity-90 disabled:opacity-50 transition-all">
             {loading ? 'Uploading...' : 'Process Upload'}
           </button>
         </form>
@@ -180,9 +222,25 @@ export default function StockForms({ onActionComplete }) {
       {activeTab === 'bulkUpdate' && (
         <form onSubmit={handleBulkUpdate} className="space-y-4 max-w-lg">
           <p className="text-sm text-slate-600">
-            Update properties for all existing stock items across all hubs.
+            Update properties for specific items across all hubs, or restrict to a single hub.
           </p>
           <div className="grid grid-cols-1 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Target Item Name (Optional)</label>
+              <select className="w-full border rounded px-3 py-2 bg-white" 
+                value={updateForm.itemName} onChange={e => setUpdateForm({...updateForm, itemName: e.target.value})}>
+                <option value="">-- All Items --</option>
+                {uniqueItemNames.map(name => <option key={name} value={name}>{name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Target BRC Hub (Optional)</label>
+              <select className="w-full border rounded px-3 py-2 bg-white" 
+                value={updateForm.brc} onChange={e => setUpdateForm({...updateForm, brc: e.target.value})}>
+                <option value="">-- All Hubs --</option>
+                {brcs.map(b => <option key={b.code} value={b.code}>{b.name}</option>)}
+              </select>
+            </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Change All Status To</label>
               <select className="w-full border rounded px-3 py-2 bg-white" 
@@ -194,8 +252,8 @@ export default function StockForms({ onActionComplete }) {
               </select>
             </div>
           </div>
-          <button disabled={loading} type="submit" className="bg-brand-600 text-white px-4 py-2 rounded font-medium hover:bg-brand-700 disabled:opacity-50">
-            {loading ? 'Updating...' : 'Update All Hubs'}
+          <button disabled={loading} type="submit" className="bg-primary text-on-primary px-4 py-2 rounded font-bold hover:opacity-90 disabled:opacity-50 transition-all">
+            {loading ? 'Updating...' : 'Update Selected Hubs'}
           </button>
         </form>
       )}

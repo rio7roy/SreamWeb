@@ -19,6 +19,12 @@ router.post('/', upload.single('img'), compressImage, stocksController.createSto
 // Update single stock
 router.put('/:id', stocksController.updateStock);
 
+// Bulk upload
+router.post('/bulk-upload', upload.single('file'), stocksController.bulkUploadStocks);
+
+// Bulk update
+router.put('/bulk-update', stocksController.bulkUpdateStocks);
+
 // Download stock report
 router.get('/reports/download', stocksController.downloadStockReport);
 

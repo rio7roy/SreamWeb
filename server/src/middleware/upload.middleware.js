@@ -23,13 +23,18 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter — allow images and PDFs
+// File filter — allow images, PDFs, and spreadsheets
 const fileFilter = (_req, file, cb) => {
-  const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+  const allowedMimes = [
+    'image/jpeg', 'image/png', 'image/webp', 'application/pdf',
+    'text/csv', 
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+    'application/vnd.ms-excel'
+  ];
   if (allowedMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Only JPEG, PNG, WebP, and PDF files are allowed.'), false);
+    cb(new Error('Only JPEG, PNG, WebP, PDF, CSV, and Excel files are allowed.'), false);
   }
 };
 
