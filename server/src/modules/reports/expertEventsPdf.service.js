@@ -48,7 +48,13 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
   let footfall = 0;
 
   expertEvents.forEach(e => {
-    const dateStr = new Date(e.date || e.createdAt).toISOString().split('T')[0];
+    let ts = e.locationTimestamp;
+    if (ts) {
+      ts = !isNaN(Number(ts)) ? Number(ts) : ts;
+    } else {
+      ts = e.createdAt;
+    }
+    const dateStr = new Date(ts).toLocaleDateString();
     uniqueDates.add(dateStr);
     footfall += (e.studentsCount || 0) + (e.teachersCount || 0);
   });
