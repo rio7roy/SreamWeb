@@ -49,4 +49,25 @@ async function getMonthEndPdf(req, res, next) {
   }
 }
 
-module.exports = { getUsersExcel, getUsersPdf, getMonthEndPdf };
+const { generateExpertEventsPdfReport } = require('./expertEventsPdf.service');
+
+/**
+ * GET /api/reports/expert/:expertId/pdf
+ */
+async function getExpertEventsPdf(req, res, next) {
+  try {
+    const { expertId } = req.params;
+    const buffer = await generateExpertEventsPdfReport(expertId);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=expert-activity-${expertId}.pdf`);
+    return res.send(buffer);
+  } catch (err) {
+    if (err.message === 'Expert not found') {
+      return res.status(404).json({ message: 'Expert not found' });
+    }
+    next(err);
+  }
+}
+
+module.exports = { getUsersExcel, getUsersPdf, getMonthEndPdf, getExpertEventsPdf };

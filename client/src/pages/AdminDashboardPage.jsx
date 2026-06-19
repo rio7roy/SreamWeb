@@ -56,6 +56,33 @@ export default function AdminDashboardPage() {
     fetchData();
   }, []);
 
+  const handleExpertReportDownload = () => {
+    if (!selectedExpertId) return;
+    const token = localStorage.getItem('token');
+    fetch(`${import.meta.env.VITE_API_URL}/reports/expert/${selectedExpertId}/pdf`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Failed to download');
+      return res.blob();
+    })
+    .then(blob => {
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      const expertName = experts.find(e => e.id === selectedExpertId)?.name || 'expert';
+      a.download = `${expertName}_Activity_Report.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+    })
+    .catch(err => {
+      console.error('Download error:', err);
+      alert('Failed to download report. Please try again.');
+    });
+  };
+
   // Derived Data
   const districts = useMemo(() => {
     const d = new Set(brcs.map((b) => b.district).filter(Boolean));
@@ -306,14 +333,24 @@ export default function AdminDashboardPage() {
                     arrow_drop_down
                   </span>
                 </div>
-                <button
-                  onClick={() => setShowExpertManageModal(true)}
-                  disabled={!selectedExpertId}
-                  className="shrink-0 px-6 py-3 bg-amber-500 text-white font-bold rounded-xl shadow hover:opacity-90 transition-all disabled:opacity-50 disabled:shadow-none flex items-center gap-2"
-                >
-                  <span className="material-symbols-outlined text-sm">edit</span>
-                  Manage
-                </button>
+                <div className="flex shrink-0 gap-2">
+                  <button
+                    onClick={() => setShowExpertManageModal(true)}
+                    disabled={!selectedExpertId}
+                    className="px-6 py-3 bg-amber-500 text-white font-bold rounded-xl shadow hover:opacity-90 transition-all disabled:opacity-50 disabled:shadow-none flex items-center gap-2"
+                  >
+                    <span className="material-symbols-outlined text-sm">edit</span>
+                    Manage
+                  </button>
+                  <button
+                    onClick={handleExpertReportDownload}
+                    disabled={!selectedExpertId}
+                    className="px-6 py-3 bg-[#d32f2f] text-white font-bold rounded-xl shadow hover:opacity-90 transition-all disabled:opacity-50 disabled:shadow-none flex items-center gap-2"
+                  >
+                    <span className="material-symbols-outlined text-sm">picture_as_pdf</span>
+                    Activity Report
+                  </button>
+                </div>
               </div>
             </div>
           </section>

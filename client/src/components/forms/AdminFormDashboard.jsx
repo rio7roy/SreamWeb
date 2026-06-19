@@ -25,6 +25,7 @@ export default function AdminFormDashboard({ onClose }) {
   
   // Filter state
   const [brcFilter, setBrcFilter] = useState('');
+  const [expertFilter, setExpertFilter] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -206,18 +207,28 @@ export default function AdminFormDashboard({ onClose }) {
       {/* Active Forms Section */}
       <section>
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 mt-12 gap-4">
-          <h3 className="text-xl font-bold flex items-center gap-2">
+          <h3 className="text-xl font-bold flex items-center gap-2 shrink-0">
             <span className="material-symbols-outlined text-primary">description</span>
             Active Forms
           </h3>
-          <select 
-            value={brcFilter} 
-            onChange={(e) => setBrcFilter(e.target.value)}
-            className="bg-white border border-outline/20 rounded-xl px-4 py-2 text-sm outline-none focus:border-primary shadow-sm"
-          >
-            <option value="">All BRCs</option>
-            {brcs.map(b => <option key={b.code} value={b.code}>{b.name} ({b.code})</option>)}
-          </select>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <select 
+              value={expertFilter} 
+              onChange={(e) => setExpertFilter(e.target.value)}
+              className="bg-white border border-outline/20 rounded-xl px-4 py-2 text-sm outline-none focus:border-primary shadow-sm min-w-[200px]"
+            >
+              <option value="">All Experts</option>
+              {experts.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
+            </select>
+            <select 
+              value={brcFilter} 
+              onChange={(e) => setBrcFilter(e.target.value)}
+              className="bg-white border border-outline/20 rounded-xl px-4 py-2 text-sm outline-none focus:border-primary shadow-sm min-w-[200px]"
+            >
+              <option value="">All BRCs</option>
+              {brcs.map(b => <option key={b.code} value={b.code}>{b.name} ({b.code})</option>)}
+            </select>
+          </div>
         </div>
         <div className="bg-white rounded-3xl border border-outline/10 shadow-sm overflow-hidden">
           <table className="w-full text-left">
@@ -230,7 +241,11 @@ export default function AdminFormDashboard({ onClose }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-outline/5">
-              {forms.filter(f => !brcFilter || (f.assignedTo && f.assignedTo.includes(brcFilter))).map(form => {
+              {forms.filter(f => {
+                const matchesBrc = !brcFilter || (f.assignedTo && f.assignedTo.includes(brcFilter));
+                const matchesExpert = !expertFilter || f.createdBy === expertFilter;
+                return matchesBrc && matchesExpert;
+              }).map(form => {
                 const author = form.createdBy === 'unknown' ? 'Admin' : (experts.find(e => e.id === form.createdBy)?.name || form.createdBy);
                 return (
                   <tr key={form.id} className="hover:bg-surface-container-low/50">
