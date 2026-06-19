@@ -95,6 +95,8 @@ export default function ExpertAttendanceTab({ user }) {
     return dates.size;
   }, [filteredEvents]);
 
+  const currentMonthName = new Date().toLocaleString('default', { month: 'long' });
+
   return (
     <div className="flex flex-col animate-fade-in w-full">
       {/* Attendance Header (Clickable Panel) */}
@@ -113,6 +115,7 @@ export default function ExpertAttendanceTab({ user }) {
             <span className="material-symbols-outlined text-primary text-4xl mb-2">calendar_month</span>
             <span className="text-5xl font-black text-on-surface">{currentMonthUniqueDays}</span>
             <span className="text-xs font-bold text-secondary uppercase tracking-widest mt-1">Unique Days</span>
+            <span className="text-[10px] font-medium text-secondary/70 mt-1 uppercase tracking-wider">for the month of {currentMonthName}</span>
           </div>
         </div>
       </button>
