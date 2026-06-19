@@ -86,25 +86,5 @@
     "status": "SUBMITTED",
     "createdAt": "2026-06-17T08:48:50.260Z",
     "createdBy": "fb9fc04a-8328-40ab-beaa-a5c912a439ed"
-  },
-  {
-    "id": "6369ef3c84ae7e6d1d9a1f483a9d4025",
-    "brcCode": "sdfs",
-    "venueType": "OTHER_BRC",
-    "venueValue": "sdfs",
-    "name": "",
-    "date": "",
-    "description": "",
-    "teachersCount": 0,
-    "studentsCount": 0,
-    "latitude": 10.046025545510078,
-    "longitude": 76.32810305925473,
-    "locationTimestamp": "1781757643956",
-    "tag": "other event",
-    "customTag": null,
-    "photos": [],
-    "status": "DRAFT",
-    "createdAt": "2026-06-18T04:40:48.841Z",
-    "createdBy": "fb9fc04a-8328-40ab-beaa-a5c912a439ed"
   }
 ]

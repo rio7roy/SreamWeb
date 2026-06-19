@@ -4,6 +4,7 @@ import api from '../../lib/api';
 import { useAuth } from '../../features/auth/AuthContext';
 
 const STATUSES = ['All Status', 'ACTIVE', 'CONSUMED', 'USED', 'DAMAGED'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 // Predefined colors for major categories, fallback generated later
 const CATEGORY_COLORS = {
@@ -122,6 +123,10 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
   }, [stocks]);
 
   const updateStockField = async (id, updates) => {
+    if (!updates.month) {
+      updates.month = MONTHS[new Date().getMonth()];
+    }
+
     try {
       const response = await api.put(`/stocks/${id}`, updates);
       if (response.data?.success) {
@@ -137,6 +142,8 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
   const handleQuantityUpdate = (stock, field, value) => {
     let val = parseInt(value) || 0;
     const maxVal = stock.newQty || stock.quantity || 0;
+
+    if (val === (stock[field] || 0)) return;
 
     const updates = { [field]: val };
 
@@ -257,7 +264,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
   const getStatusStyle = (s) => STATUS_CONFIG[s] || STATUS_CONFIG.ACTIVE;
 
   // Grid template for all columns: #, UniqueID, IMG, Item, Category, NewQty, Available, Used, Damaged, Consumed, Remarks, Section, Label, Actions
-  const gridCols = '30px 80px 40px minmax(200px, 2fr) 90px 50px 50px 50px 55px 60px minmax(150px, 1.5fr) 80px 80px 80px';
+  const gridCols = '30px minmax(65px, 0.8fr) 35px minmax(120px, 1.5fr) minmax(70px, 1fr) minmax(40px, 0.6fr) minmax(40px, 0.6fr) minmax(40px, 0.6fr) minmax(40px, 0.6fr) minmax(40px, 0.6fr) minmax(100px, 1.2fr) minmax(60px, 1fr) minmax(60px, 1fr) 60px';
 
   const content = (
     <div className={`relative bg-white w-full overflow-hidden flex flex-col ${inline ? 'h-[75vh] border border-slate-200 rounded-2xl shadow-sm' : `max-w-[1500px] rounded-2xl shadow-2xl h-[94vh] ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}`}>
@@ -309,6 +316,12 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
             <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-base">search</span>
             <input type="text" placeholder="Search name, ID, code..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-8 pr-3 py-2 bg-white border border-gray-200 rounded-lg text-xs outline-none focus:border-amber-400 shadow-sm" />
+          </div>
+          <div className="flex items-center gap-1.5 ml-2">
+            <div className="px-3 py-2 bg-gray-50/80 border border-gray-200 rounded-lg text-xs font-bold text-gray-500 shadow-sm flex items-center gap-1.5 cursor-default" title="Current Inventory Month">
+              <span className="material-symbols-outlined text-[14px]">calendar_month</span>
+              {MONTHS[new Date().getMonth()]}
+            </div>
           </div>
           <button onClick={() => setIsAddingItem(true)} className="w-9 h-9 flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors shadow-sm" title="Add New Item">
             <span className="material-symbols-outlined text-xl">add</span>
@@ -412,9 +425,9 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
 
         {/* ─── Table Area (Single scrollbar) ─── */}
         <div className="flex-grow overflow-auto custom-scrollbar relative">
-          <div className="min-w-[1200px] flex flex-col min-h-full">
+          <div className="w-full min-w-[950px] flex flex-col min-h-full">
             {/* Table Header */}
-            <div className="sticky top-0 z-10 bg-gray-100 border-b border-gray-200 px-6 py-2.5 shadow-sm">
+            <div className="sticky top-0 z-30 bg-gray-100 border-b border-gray-200 px-6 py-2.5 shadow-sm">
               <div className="grid items-center text-[10px] gap-2 font-extrabold text-gray-500 uppercase tracking-widest" style={{ gridTemplateColumns: gridCols }}>
                 <span>#</span>
                 <span>Unique ID</span>
@@ -501,7 +514,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
                         <input type="number" min="0" max={stock.newQty || stock.quantity}
                           key={`avail-${stock.id}-${stock.availableQty}`}
                           defaultValue={stock.availableQty ?? stock.newQty ?? stock.quantity ?? 0}
-                          className="w-10 text-center text-[11px] font-bold border rounded py-0.5 outline-none focus:border-green-500 focus:bg-green-50"
+                          className="w-full min-w-0 text-center text-[11px] font-bold border rounded py-0.5 outline-none focus:border-green-500 focus:bg-green-50"
                           onBlur={(e) => handleQuantityUpdate(stock, 'availableQty', e.target.value)}
                           onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
                       </div>
@@ -510,7 +523,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
                       <div className="flex justify-center">
                         <input type="number" min="0"
                           defaultValue={stock.usedQty || 0}
-                          className="w-10 text-center text-[11px] font-semibold border rounded py-0.5 outline-none focus:border-blue-500 focus:bg-blue-50 text-blue-700"
+                          className="w-full min-w-0 text-center text-[11px] font-semibold border rounded py-0.5 outline-none focus:border-blue-500 focus:bg-blue-50 text-blue-700"
                           onBlur={(e) => handleQuantityUpdate(stock, 'usedQty', e.target.value)}
                           onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
                       </div>
@@ -519,7 +532,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
                       <div className="flex justify-center">
                         <input type="number" min="0"
                           defaultValue={stock.damagedQty || 0}
-                          className="w-10 text-center text-[11px] font-semibold border rounded py-0.5 outline-none focus:border-red-500 focus:bg-red-50 text-red-700"
+                          className="w-full min-w-0 text-center text-[11px] font-semibold border rounded py-0.5 outline-none focus:border-red-500 focus:bg-red-50 text-red-700"
                           onBlur={(e) => handleQuantityUpdate(stock, 'damagedQty', e.target.value)}
                           onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
                       </div>
@@ -528,7 +541,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
                       <div className="flex justify-center">
                         <input type="number" min="0"
                           defaultValue={stock.consumedQty || 0}
-                          className="w-10 text-center text-[11px] font-semibold border rounded py-0.5 outline-none focus:border-orange-500 focus:bg-orange-50 text-orange-700"
+                          className="w-full min-w-0 text-center text-[11px] font-semibold border rounded py-0.5 outline-none focus:border-orange-500 focus:bg-orange-50 text-orange-700"
                           onBlur={(e) => handleQuantityUpdate(stock, 'consumedQty', e.target.value)}
                           onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
                       </div>
@@ -538,8 +551,12 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
                         <input type="text"
                           defaultValue={stock.remarks || ''}
                           placeholder="Add remark..."
-                          className="w-full text-[10px] border rounded px-1.5 py-0.5 outline-none focus:border-amber-400 focus:bg-amber-50"
-                          onBlur={(e) => updateStockField(stock.id, { remarks: e.target.value })}
+                          className="w-full min-w-0 text-[10px] border rounded px-1.5 py-0.5 outline-none focus:border-amber-400 focus:bg-amber-50"
+                          onBlur={(e) => {
+                            if (e.target.value !== (stock.remarks || '')) {
+                              updateStockField(stock.id, { remarks: e.target.value });
+                            }
+                          }}
                           onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
                       </div>
 
