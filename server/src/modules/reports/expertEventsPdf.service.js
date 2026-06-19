@@ -94,7 +94,7 @@ async function generateExpertEventsPdfReport(expertId) {
     doc.moveDown(1);
 
     const tableTop = doc.y;
-    const colX = [50, 220, 310, 470]; // Event Name, GPS Date, GPS Location, Footfall
+    const colX = [50, 200, 320, 480]; // Event Name, GPS Date, GPS Location, Footfall
 
     doc.fillColor('#785900').fontSize(10).font('Helvetica-Bold');
     doc.text('Event Name', colX[0], tableTop);
@@ -149,10 +149,11 @@ async function generateExpertEventsPdfReport(expertId) {
 
         const evFootfall = (e.studentsCount || 0) + (e.teachersCount || 0);
 
-        doc.text(e.name || 'Unnamed Event', colX[0], rowY, { width: 160, ellipsis: true });
-        doc.text(gpsDateStr, colX[1], rowY, { width: 80, ellipsis: true });
-        doc.text(gpsLocStr, colX[2], rowY, { width: 150, ellipsis: true });
-        doc.text(evFootfall.toString(), colX[3], rowY);
+        // Limit the strings to 1 line (lineBreak: false) so they don't wrap and overlap the next row
+        doc.text(e.name || 'Unnamed Event', colX[0], rowY, { width: 140, lineBreak: false, ellipsis: true });
+        doc.text(gpsDateStr, colX[1], rowY, { width: 110, lineBreak: false, ellipsis: true });
+        doc.text(gpsLocStr, colX[2], rowY, { width: 150, lineBreak: false, ellipsis: true });
+        doc.text(evFootfall.toString(), colX[3], rowY, { width: 50, lineBreak: false, ellipsis: true });
 
         doc.moveDown(0.5);
       });
