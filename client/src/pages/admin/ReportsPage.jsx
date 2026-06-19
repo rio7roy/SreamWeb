@@ -101,6 +101,39 @@ export default function ReportsPage() {
       console.error('Download error:', err);
       alert('Failed to download report. Please try again.');
     });
+  const handleMonthEndDownload = () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    let url = `${import.meta.env.VITE_API_URL}/reports/month-end-pdf?`;
+    if (selectedMonth) {
+      url += `month=${selectedMonth}&year=${new Date().getFullYear()}`;
+    }
+
+    fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Failed to download');
+      return res.blob();
+    })
+    .then(blob => {
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      const mName = selectedMonth ? `Month_${selectedMonth}` : 'All_Time';
+      a.download = `Month_End_Report_${mName}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+    })
+    .catch(err => {
+      console.error('Download error:', err);
+      alert('Failed to download Month-End report. Please try again.');
+    });
   };
 
   if (loading) {
@@ -248,7 +281,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Action Buttons Row */}
-      <div className="shrink-0 mt-6 grid grid-cols-2 gap-4">
+      <div className="shrink-0 mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
         <button 
           onClick={() => handleDownload('excel')}
           disabled={previewLoading || previewEvents.length === 0}
@@ -264,6 +297,13 @@ export default function ReportsPage() {
         >
           <span className="material-symbols-outlined text-xl">picture_as_pdf</span>
           Download as PDF
+        </button>
+        <button 
+          onClick={handleMonthEndDownload}
+          className="bg-[#785900] text-white py-3 px-6 rounded-xl font-bold flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-lg transition-all"
+        >
+          <span className="material-symbols-outlined text-xl">assessment</span>
+          Generate Month-End Report
         </button>
       </div>
 

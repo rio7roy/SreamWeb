@@ -9,5 +9,6 @@ router.use(authenticate, authorize('ADMIN'));
 
 router.get('/users/excel', reportsController.getUsersExcel);
 router.get('/users/pdf', reportsController.getUsersPdf);
+router.get('/month-end-pdf', reportsController.getMonthEndPdf);
 
 module.exports = router;

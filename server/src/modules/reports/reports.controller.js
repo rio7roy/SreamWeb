@@ -29,5 +29,24 @@ async function getUsersPdf(req, res, next) {
     next(err);
   }
 }
+const { generateMonthEndPdfReport } = require('./monthEndPdf.service');
 
-module.exports = { getUsersExcel, getUsersPdf };
+/**
+ * GET /api/reports/month-end-pdf
+ */
+async function getMonthEndPdf(req, res, next) {
+  try {
+    const { month, year } = req.query;
+    const buffer = await generateMonthEndPdfReport(month, year);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    let filename = 'stream-month-end-report';
+    if (month && year) filename += `-${year}-${month}`;
+    res.setHeader('Content-Disposition', `attachment; filename=${filename}.pdf`);
+    return res.send(buffer);
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { getUsersExcel, getUsersPdf, getMonthEndPdf };
