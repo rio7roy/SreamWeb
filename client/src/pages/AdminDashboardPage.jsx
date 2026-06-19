@@ -58,29 +58,24 @@ export default function AdminDashboardPage() {
 
   const handleExpertReportDownload = () => {
     if (!selectedExpertId) return;
-    const token = localStorage.getItem('token');
-    fetch(`${import.meta.env.VITE_API_URL}/reports/expert/${selectedExpertId}/pdf`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-    .then(res => {
-      if (!res.ok) throw new Error('Failed to download');
-      return res.blob();
-    })
-    .then(blob => {
-      const downloadUrl = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = downloadUrl;
-      const expertName = experts.find(e => e.id === selectedExpertId)?.name || 'expert';
-      a.download = `${expertName}_Activity_Report.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(downloadUrl);
-    })
-    .catch(err => {
-      console.error('Download error:', err);
-      alert('Failed to download report. Please try again.');
-    });
+    
+    api.get(`/reports/expert/${selectedExpertId}/pdf`, { responseType: 'blob' })
+      .then(res => {
+        const blob = res.data;
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        const expertName = experts.find(e => e.id === selectedExpertId)?.name || 'expert';
+        a.download = `${expertName}_Activity_Report.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(downloadUrl);
+      })
+      .catch(err => {
+        console.error('Download error:', err);
+        alert('Failed to download report. Please try again.');
+      });
   };
 
   // Derived Data

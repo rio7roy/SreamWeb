@@ -65,7 +65,7 @@ export default function ReportsPage() {
   }, [selectedDistrict, selectedBrc, selectedMonth, selectedExpert]);
 
   const handleDownload = (type) => {
-    let url = `${import.meta.env.VITE_API_URL || '/api'}/events/export/${type}`;
+    let url = `/events/export/${type}`;
     const params = new URLSearchParams();
     if (selectedDistrict) params.append('district', selectedDistrict);
     if (selectedBrc) params.append('brcCode', selectedBrc);
@@ -76,66 +76,47 @@ export default function ReportsPage() {
       url += '?' + params.toString();
     }
 
-    const token = localStorage.getItem('stream_token');
-    
-    fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    .then(res => {
-      if (!res.ok) throw new Error('Failed to download');
-      return res.blob();
-    })
-    .then(blob => {
-      const downloadUrl = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = downloadUrl;
-      a.download = `Event_Reports.${type === 'excel' ? 'xlsx' : 'pdf'}`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(downloadUrl);
-    })
-    .catch(err => {
-      console.error('Download error:', err);
-      alert('Failed to download report. Please try again.');
-    });
+    api.get(url, { responseType: 'blob' })
+      .then(res => {
+        const blob = res.data;
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `Event_Reports.${type === 'excel' ? 'xlsx' : 'pdf'}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(downloadUrl);
+      })
+      .catch(err => {
+        console.error('Download error:', err);
+        alert('Failed to download report. Please try again.');
+      });
   };
 
   const handleMonthEndDownload = () => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
-    let url = `${import.meta.env.VITE_API_URL}/reports/month-end-pdf?`;
+    let url = '/reports/month-end-pdf';
     if (selectedMonth) {
-      url += `month=${selectedMonth}&year=${new Date().getFullYear()}`;
+      url += `?month=${selectedMonth}&year=${new Date().getFullYear()}`;
     }
 
-    fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    .then(res => {
-      if (!res.ok) throw new Error('Failed to download');
-      return res.blob();
-    })
-    .then(blob => {
-      const downloadUrl = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = downloadUrl;
-      const mName = selectedMonth ? `Month_${selectedMonth}` : 'All_Time';
-      a.download = `Month_End_Report_${mName}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(downloadUrl);
-    })
-    .catch(err => {
-      console.error('Download error:', err);
-      alert('Failed to download Month-End report. Please try again.');
-    });
+    api.get(url, { responseType: 'blob' })
+      .then(res => {
+        const blob = res.data;
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        const mName = selectedMonth ? `Month_${selectedMonth}` : 'All_Time';
+        a.download = `Month_End_Report_${mName}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(downloadUrl);
+      })
+      .catch(err => {
+        console.error('Download error:', err);
+        alert('Failed to download Month-End report. Please try again.');
+      });
   };
 
   if (loading) {
