@@ -301,3 +301,24 @@ exports.updateExpertBrcs = (req, res) => {
   
   res.json({ message: 'Expert assignments updated successfully', data: activeData[expertIndex] });
 };
+
+exports.deleteMessage = (req, res) => {
+  const { id } = req.params;
+  const messagesPath = getMessagesPath();
+  const messages = readData(messagesPath);
+  const updated = messages.filter(m => m.id !== id);
+  if (messages.length === updated.length) return res.status(404).json({ message: 'Message not found' });
+  writeData(messagesPath, updated);
+  res.json({ message: 'Message deleted' });
+};
+
+exports.markMessageRead = (req, res) => {
+  const { id } = req.params;
+  const messagesPath = getMessagesPath();
+  const messages = readData(messagesPath);
+  const index = messages.findIndex(m => m.id === id);
+  if (index === -1) return res.status(404).json({ message: 'Message not found' });
+  messages[index].read = true;
+  writeData(messagesPath, messages);
+  res.json({ message: 'Message marked as read', data: messages[index] });
+};

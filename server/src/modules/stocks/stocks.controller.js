@@ -67,13 +67,15 @@ function sendGeneralStockNotification(messageContent) {
 module.exports = {
   getStocks: async (req, res, next) => {
     try {
-      const { brc, category, status, search, page, limit } = req.query;
+      const { brc, district, category, status, search, page, limit, source } = req.query;
       
       const result = await stocksService.listStocks({
         brc,
+        district,
         category,
         status,
         search,
+        source,
         page: page ? parseInt(page) : 1,
         limit: limit ? parseInt(limit) : 20,
       });
@@ -101,6 +103,7 @@ module.exports = {
       const stock = await stocksService.createStock({
         ...stockData,
         source: 'MANUAL',
+        createdByRole: req.user ? req.user.role : 'UNKNOWN',
         status: stockData.status || 'ACTIVE',
       });
 
@@ -193,6 +196,17 @@ module.exports = {
       let headerRowFound = false;
       let headerMap = {};
 
+      const reqDistricts = req.body.districts ? JSON.parse(req.body.districts) : [];
+      const reqBrcs = req.body.brcs ? JSON.parse(req.body.brcs) : [];
+
+      const targets = [];
+      if (reqDistricts.length === 0 && reqBrcs.length === 0) {
+        targets.push({ district: '', brc: '' });
+      } else {
+        reqDistricts.forEach(d => targets.push({ district: d, brc: '' }));
+        reqBrcs.forEach(b => targets.push({ district: '', brc: b }));
+      }
+
       worksheet.eachRow((row, rowNumber) => {
         if (!headerRowFound) {
           row.eachCell((cell, colNumber) => {
@@ -214,14 +228,32 @@ module.exports = {
         const quantityVal = headerMap['quantity'] ? row.getCell(headerMap['quantity']).value : 1;
         const quantity = parseInt(quantityVal, 10) || 1;
 
-        items.push({
-          itemName: itemName.toString(),
-          category: headerMap['category'] ? (row.getCell(headerMap['category']).value?.toString() || 'Uncategorized') : 'Uncategorized',
-          serialNumber: headerMap['serialNumber'] ? (row.getCell(headerMap['serialNumber']).value?.toString() || '') : '',
-          quantity,
-          district: headerMap['district'] ? (row.getCell(headerMap['district']).value?.toString() || '') : '',
-          brc: headerMap['brc'] ? (row.getCell(headerMap['brc']).value?.toString() || '') : '',
-        });
+        const rowDistrict = headerMap['district'] ? (row.getCell(headerMap['district']).value?.toString() || '') : '';
+        const rowBrc = headerMap['brc'] ? (row.getCell(headerMap['brc']).value?.toString() || '') : '';
+        const rowCategory = headerMap['category'] ? (row.getCell(headerMap['category']).value?.toString() || 'Uncategorized') : 'Uncategorized';
+        const rowSerialNumber = headerMap['serialNumber'] ? (row.getCell(headerMap['serialNumber']).value?.toString() || '') : '';
+
+        if (reqDistricts.length > 0 || reqBrcs.length > 0) {
+          targets.forEach(t => {
+            items.push({
+              itemName: itemName.toString(),
+              category: rowCategory,
+              serialNumber: rowSerialNumber,
+              quantity,
+              district: t.district || rowDistrict,
+              brc: t.brc || rowBrc,
+            });
+          });
+        } else {
+          items.push({
+            itemName: itemName.toString(),
+            category: rowCategory,
+            serialNumber: rowSerialNumber,
+            quantity,
+            district: rowDistrict,
+            brc: rowBrc,
+          });
+        }
       });
 
       if (items.length === 0) {

@@ -1,6 +1,57 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import api from '../../lib/api';
 import MultiSelect from '../common/MultiSelect';
+
+const PREDEFINED_CATEGORIES = [
+  'Adhesive and tapes',
+  'Art and craft supplies',
+  'Audio and Visual equipment',
+  'Audio and Visual tools',
+  'Batteries and accessories',
+  'Cables and Connectors',
+  'Chem',
+  'Cleaning Supplies',
+  'Cutting and shaping tools',
+  'Development Boards',
+  'Digital fabrication',
+  'Electronic components',
+  'Electronic modules',
+  'Essentials',
+  'Fasteners',
+  'Hand tools',
+  'Lab Apparatus',
+  'Laboratory instrument',
+  'LED bulb kit',
+  'Motors and wheels',
+  'Plumbing Kit',
+  'Prototyping materials',
+  'Safety items',
+  'Sensor modules',
+  'Sewing kit',
+  'Soldering kit',
+  'Tools'
+];
+
+const PREDEFINED_SECTIONS = [
+  "Craft station", "Digital Fabrication", "Electronics Work station",
+  "Essentials", "Media station", "Safety corner", "Science Lab Corner",
+  "Tools Display Board"
+];
+
+const PREDEFINED_LABELS = [
+  "3D printing", "Adhesive and Tape", "Aluminium", "Arduino Modules", 
+  "Arduino Shield", "Battery", "Breadboard", "Cables and Connectors", 
+  "Capacitor", "Clay", "Cleaning", "Consumables", "Cutting and shaping tools", 
+  "DIY LED Bulb Accessaries", "Diode", "Display", "ESP", "Fasteners", 
+  "Foams", "Hand tools", "Heat Sleeve", "Hook-up Wire", "IC", 
+  "Jumper Cables", "LED", "Lab Glass apparatus", "Lab Plastic apparatus", 
+  "Lab apparatus", "Laser", "MOSFET", "Measuring devices", "Media", 
+  "Microscopy", "Motor essentials", "Optics", "Painting", "Plotter", 
+  "Plumbing Items", "Potentiometers", "Power supply", "Raspberry Pi Pico & Shield", 
+  "Resistors", "Rulers", "Safety", "Sensor modules", "Sewing", 
+  "Sheet", "Soldering kit", "Sound", "Switchs", "Transistors", 
+  "USB Cable A to B", "USB Cable Micro", "lab"
+];
 
 export default function StockForms({ onActionComplete }) {
   const [activeTab, setActiveTab] = useState('create'); // 'create', 'bulkUpload', 'bulkUpdate'
@@ -9,16 +60,37 @@ export default function StockForms({ onActionComplete }) {
 
   // Form states
   const [createForm, setCreateForm] = useState({
-    itemName: '', category: '', serialNumber: '', quantity: 1, district: [], brc: []
+    itemName: '', category: '', uniqueId: '', quantity: 1, district: [], brc: [],
+    section: '', label: '', imgFile: null
   });
   
+  const [recentCreations, setRecentCreations] = useState([]);
+  const [editingStock, setEditingStock] = useState(null);
+  
   const [file, setFile] = useState(null);
-  const [updateForm, setUpdateForm] = useState({ itemName: '', brc: '', status: '', category: '' });
+  const [bulkUploadForm, setBulkUploadForm] = useState({ district: [], brc: [] });
 
   const [brcs, setBrcs] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [uniqueItemNames, setUniqueItemNames] = useState([]);
-  const [uniqueCategories, setUniqueCategories] = useState([]);
+  const [uniqueCategories, setUniqueCategories] = useState(PREDEFINED_CATEGORIES);
+
+  useEffect(() => {
+    if (activeTab === 'create') {
+      fetchRecentCreations();
+    }
+  }, [activeTab]);
+
+  const fetchRecentCreations = async () => {
+    try {
+      const res = await api.get('/stocks?source=MANUAL&limit=10');
+      if (res.data?.data?.stocks) {
+        setRecentCreations(res.data.data.stocks);
+      }
+    } catch (err) {
+      console.error('Failed to fetch recent stocks:', err);
+    }
+  };
 
   useEffect(() => {
     api.get('/brcs').then(res => {
@@ -33,8 +105,8 @@ export default function StockForms({ onActionComplete }) {
       if (res.data?.data?.stocks) {
         const itemNames = [...new Set(res.data.data.stocks.map(s => s.itemName))].filter(Boolean);
         setUniqueItemNames(itemNames);
-        const categories = [...new Set(res.data.data.stocks.map(s => s.category))].filter(Boolean);
-        setUniqueCategories(categories);
+        const dbCategories = [...new Set(res.data.data.stocks.map(s => s.category))].filter(Boolean);
+        setUniqueCategories(prev => [...new Set([...prev, ...dbCategories])].sort());
       }
     }).catch(console.error);
   }, []);
@@ -56,20 +128,132 @@ export default function StockForms({ onActionComplete }) {
         targets.push({ district: '', brc: '' });
       } else {
         dists.forEach(d => targets.push({ district: d, brc: '' }));
-        brcsList.forEach(b => targets.push({ district: '', brc: b }));
+        brcsList.forEach(b => targets.push({ district: '', brc: b.split('|')[0] }));
       }
 
-      await Promise.all(targets.map(t => 
-        api.post('/stocks', { ...createForm, district: t.district, brc: t.brc })
+      let imgUrl = '';
+      if (createForm.imgFile) {
+        const formData = new FormData();
+        formData.append('img', createForm.imgFile);
+        const uploadRes = await api.post('/stocks/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        if (uploadRes.data.success) {
+          imgUrl = uploadRes.data.url;
+        }
+      }
+
+      const responses = await Promise.all(targets.map(t => 
+        api.post('/stocks', { 
+          ...createForm, 
+          district: t.district, 
+          brc: t.brc,
+          newQty: createForm.quantity,
+          availableQty: createForm.quantity,
+          ...(imgUrl ? { img: imgUrl } : {})
+        })
       ));
+      
+      const newStocks = responses.map(r => r.data.data.stock);
+      setRecentCreations(prev => [...newStocks, ...prev]);
 
       showMessage('Stock item(s) created successfully!');
-      setCreateForm({ itemName: '', category: '', serialNumber: '', quantity: 1, district: [], brc: [] });
+      setCreateForm({ itemName: '', category: '', uniqueId: '', quantity: 1, district: [], brc: [], section: '', label: '', imgFile: null });
       if (onActionComplete) onActionComplete();
     } catch (err) {
       showMessage(err.response?.data?.message || 'Failed to create stock', 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const groupedCreations = useMemo(() => {
+    const groups = {};
+    recentCreations.forEach(stock => {
+      const key = `${stock.itemName}-${stock.uniqueId}-${stock.category}-${stock.quantity}`;
+      if (!groups[key]) {
+        groups[key] = {
+          ...stock,
+          ids: [stock.id],
+          brcs: stock.brc ? [`${stock.brc}|${stock.district}`] : [],
+          districts: stock.district ? [stock.district] : [],
+        };
+      } else {
+        groups[key].ids.push(stock.id);
+        if (stock.brc) {
+          const bVal = `${stock.brc}|${stock.district}`;
+          if (!groups[key].brcs.includes(bVal)) groups[key].brcs.push(bVal);
+        }
+        if (stock.district && !groups[key].districts.includes(stock.district)) groups[key].districts.push(stock.district);
+      }
+    });
+    return Object.values(groups);
+  }, [recentCreations]);
+
+  const handleDeleteRecent = async (ids) => {
+    if (!window.confirm('Are you sure you want to delete this stock from all locations?')) return;
+    try {
+      await Promise.all(ids.map(id => api.delete(`/stocks/${id}`)));
+      setRecentCreations(prev => prev.filter(s => !ids.includes(s.id)));
+      showMessage('Stock deleted successfully');
+    } catch (err) {
+      showMessage(err.response?.data?.message || 'Failed to delete stock', 'error');
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      // Delete old ones
+      await Promise.all(editingStock.ids.map(id => api.delete(`/stocks/${id}`)));
+      
+      const dists = Array.isArray(editingStock.districts) ? editingStock.districts : (editingStock.districts ? [editingStock.districts] : []);
+      const brcsList = Array.isArray(editingStock.brcs) ? editingStock.brcs : (editingStock.brcs ? [editingStock.brcs] : []);
+      
+      const targets = [];
+      if (dists.length === 0 && brcsList.length === 0) {
+        targets.push({ district: '', brc: '' });
+      } else {
+        dists.forEach(d => targets.push({ district: d, brc: '' }));
+        brcsList.forEach(b => targets.push({ district: b.split('|')[1], brc: b.split('|')[0] }));
+      }
+
+      let imgUrl = editingStock.img || '';
+      if (editingStock.imgFile) {
+        const formData = new FormData();
+        formData.append('img', editingStock.imgFile);
+        const uploadRes = await api.post('/stocks/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        if (uploadRes.data.success) {
+          imgUrl = uploadRes.data.url;
+        }
+      }
+
+      const responses = await Promise.all(targets.map(t => 
+        api.post('/stocks', { 
+          itemName: editingStock.itemName,
+          category: editingStock.category,
+          uniqueId: editingStock.uniqueId,
+          quantity: editingStock.quantity,
+          newQty: editingStock.quantity,
+          availableQty: editingStock.quantity,
+          section: editingStock.section,
+          label: editingStock.label,
+          district: t.district, 
+          brc: t.brc,
+          ...(imgUrl ? { img: imgUrl } : {})
+        })
+      ));
+      
+      const newStocks = responses.map(r => r.data.data.stock);
+      setRecentCreations(prev => {
+        const filtered = prev.filter(s => !editingStock.ids.includes(s.id));
+        return [...newStocks, ...filtered];
+      });
+      setEditingStock(null);
+      showMessage('Stock updated successfully');
+    } catch (err) {
+      showMessage(err.response?.data?.message || 'Failed to update stock', 'error');
     }
   };
 
@@ -79,6 +263,8 @@ export default function StockForms({ onActionComplete }) {
 
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('districts', JSON.stringify(bulkUploadForm.district));
+    formData.append('brcs', JSON.stringify(bulkUploadForm.brc.map(b => b.split('|')[0])));
 
     setLoading(true);
     try {
@@ -87,6 +273,7 @@ export default function StockForms({ onActionComplete }) {
       });
       showMessage('Bulk upload completed successfully!');
       setFile(null);
+      setBulkUploadForm({ district: [], brc: [] });
       if (onActionComplete) onActionComplete();
     } catch (err) {
       showMessage(err.response?.data?.message || 'Failed to upload bulk stocks', 'error');
@@ -95,23 +282,12 @@ export default function StockForms({ onActionComplete }) {
     }
   };
 
-  const handleBulkUpdate = async (e) => {
-    e.preventDefault();
-    if (!updateForm.status && !updateForm.category) {
-      return showMessage('Please select a field to update', 'error');
-    }
-
-    setLoading(true);
-    try {
-      const res = await api.put('/stocks/bulk-update', updateForm);
-      showMessage(res.data.message || 'Bulk update successful');
-      setUpdateForm({ itemName: '', brc: '', status: '', category: '' });
-      if (onActionComplete) onActionComplete();
-    } catch (err) {
-      showMessage(err.response?.data?.message || 'Failed to perform bulk update', 'error');
-    } finally {
-      setLoading(false);
-    }
+  const handleDistrictChange = (newDistricts, currentBrcs, updateFormState) => {
+    const validBrcs = (currentBrcs || []).filter(brcVal => {
+      const [code, district] = brcVal.split('|');
+      return newDistricts.includes(district);
+    });
+    updateFormState(newDistricts, newDistricts.length === 0 ? [] : validBrcs);
   };
 
   return (
@@ -130,12 +306,6 @@ export default function StockForms({ onActionComplete }) {
           onClick={() => setActiveTab('bulkUpload')}
         >
           Bulk Upload
-        </button>
-        <button 
-          className={`pb-2 px-4 font-medium text-sm ${activeTab === 'bulkUpdate' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
-          onClick={() => setActiveTab('bulkUpdate')}
-        >
-          Bulk Update
         </button>
       </div>
 
@@ -166,7 +336,7 @@ export default function StockForms({ onActionComplete }) {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Unique No</label>
               <input type="text" className="w-full border rounded px-3 py-2" 
-                value={createForm.serialNumber} onChange={e => setCreateForm({...createForm, serialNumber: e.target.value})} />
+                value={createForm.uniqueId} onChange={e => setCreateForm({...createForm, uniqueId: e.target.value})} />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Quantity</label>
@@ -174,21 +344,55 @@ export default function StockForms({ onActionComplete }) {
                 value={createForm.quantity} onChange={e => setCreateForm({...createForm, quantity: parseInt(e.target.value)})} />
             </div>
             <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Section</label>
+              <select className="w-full border rounded px-3 py-2 bg-white" 
+                value={createForm.section} onChange={e => setCreateForm({...createForm, section: e.target.value})}>
+                <option value="">-- Select Section --</option>
+                {PREDEFINED_SECTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Label</label>
+              <select className="w-full border rounded px-3 py-2 bg-white" 
+                value={createForm.label} onChange={e => setCreateForm({...createForm, label: e.target.value})}>
+                <option value="">-- Select Label --</option>
+                {PREDEFINED_LABELS.map(l => <option key={l} value={l}>{l}</option>)}
+              </select>
+            </div>
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-slate-700 mb-1">Photo (Optional)</label>
+              <input type="file" accept="image/*" className="w-full border rounded px-3 py-2" 
+                onChange={e => setCreateForm({...createForm, imgFile: e.target.files[0]})} />
+            </div>
+            <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">District (Multiple)</label>
               <MultiSelect 
                 options={districts.map(d => ({ value: d, label: d }))}
                 selected={createForm.district}
-                onChange={(newSelected) => setCreateForm({...createForm, district: newSelected})}
+                onChange={(newSelected) => handleDistrictChange(newSelected, createForm.brc, (d, b) => setCreateForm({...createForm, district: d, brc: b}))}
                 placeholder="-- Select Districts --"
+                showSelectAll={true}
+                selectAllLabel="All Districts"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">BRC (Multiple)</label>
               <MultiSelect 
-                options={brcs.map(b => ({ value: b.code, label: b.name }))}
+                options={(createForm.district?.length > 0 ? brcs.filter(b => createForm.district.includes(b.district)) : brcs).map(b => ({ value: `${b.code}|${b.district}`, label: b.name }))}
                 selected={createForm.brc}
-                onChange={(newSelected) => setCreateForm({...createForm, brc: newSelected})}
+                onChange={(newSelected) => {
+                  const selectedDistricts = new Set(createForm.district || []);
+                  newSelected.forEach(brcVal => {
+                    const [code, district] = brcVal.split('|');
+                    if (district) {
+                      selectedDistricts.add(district);
+                    }
+                  });
+                  setCreateForm({...createForm, brc: newSelected, district: Array.from(selectedDistricts)});
+                }}
                 placeholder="-- Select BRCs --"
+                showSelectAll={true}
+                selectAllLabel="All BRCs"
               />
             </div>
           </div>
@@ -198,12 +402,196 @@ export default function StockForms({ onActionComplete }) {
         </form>
       )}
 
+      {/* RECENTLY CREATED TABLE */}
+      {activeTab === 'create' && recentCreations.length > 0 && (
+        <div className="mt-10 border-t border-slate-200 pt-6">
+          <h3 className="text-lg font-bold text-slate-800 mb-4">Recently Created Stocks (Session)</h3>
+          <div className="overflow-x-auto rounded-lg border border-slate-200">
+            <table className="min-w-full text-sm text-left">
+              <thead className="bg-slate-50 text-slate-600 font-medium">
+                <tr>
+                  <th className="px-4 py-3">Item Name</th>
+                  <th className="px-4 py-3">Unique No</th>
+                  <th className="px-4 py-3">Category</th>
+                  <th className="px-4 py-3">BRC</th>
+                  <th className="px-4 py-3 text-center">Qty</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {groupedCreations.map(group => (
+                  <tr key={group.ids.join(',')} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-4 py-3 font-medium text-slate-800">{group.itemName}</td>
+                    <td className="px-4 py-3 text-slate-600">{group.uniqueId}</td>
+                    <td className="px-4 py-3 text-slate-600">
+                      <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">{group.category}</span>
+                    </td>
+                    <td className="px-4 py-3 text-slate-600">
+                      {group.brcs.length > 0 
+                        ? group.brcs.map(b => brcs.find(x => `${x.code}|${x.district}` === b)?.name || b.split('|')[0]).join(', ') 
+                        : group.districts.join(', ')}
+                    </td>
+                    <td className="px-4 py-3 text-center font-semibold text-slate-700">{group.quantity}</td>
+                    <td className="px-4 py-3 text-right space-x-3">
+                       <button onClick={() => setEditingStock(group)} className="text-blue-600 hover:text-blue-800 font-medium transition-colors">Edit</button>
+                       <button onClick={() => handleDeleteRecent(group.ids)} className="text-red-600 hover:text-red-800 font-medium transition-colors">Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT MODAL */}
+      {editingStock && (
+        <div className="fixed inset-0 bg-black/60 flex items-start justify-center z-[100] p-4 pt-16 pb-16 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white p-6 rounded-xl w-full max-w-2xl shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-bold text-xl text-slate-800">Edit Created Stock</h3>
+              <button onClick={() => setEditingStock(null)} className="text-slate-400 hover:text-slate-600">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+               <div className="col-span-2">
+                 <label className="block text-sm font-medium text-slate-700 mb-1">Item Name</label>
+                 <input autoFocus type="text" className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none" 
+                   value={editingStock.itemName} onChange={e => setEditingStock({...editingStock, itemName: e.target.value})} />
+               </div>
+               
+               <div>
+                 <label className="block text-sm font-medium text-slate-700 mb-1">Unique No</label>
+                 <input type="text" className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none" 
+                   value={editingStock.uniqueId || ''} onChange={e => setEditingStock({...editingStock, uniqueId: e.target.value})} />
+               </div>
+               <div>
+                 <label className="block text-sm font-medium text-slate-700 mb-1">Quantity</label>
+                 <input type="number" className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none" 
+                   value={editingStock.quantity} onChange={e => setEditingStock({...editingStock, quantity: Number(e.target.value)})} />
+               </div>
+               
+               <div>
+                 <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+                 <select className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white" 
+                   value={editingStock.category} onChange={e => setEditingStock({...editingStock, category: e.target.value})}>
+                   {uniqueCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                 </select>
+               </div>
+               <div>
+                 <label className="block text-sm font-medium text-slate-700 mb-1">Section</label>
+                 <select className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white" 
+                   value={editingStock.section || ''} onChange={e => setEditingStock({...editingStock, section: e.target.value})}>
+                   <option value="">-- Select Section --</option>
+                   {PREDEFINED_SECTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                 </select>
+               </div>
+               
+               <div className="col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Label</label>
+                  <select className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white" 
+                    value={editingStock.label || ''} onChange={e => setEditingStock({...editingStock, label: e.target.value})}>
+                    <option value="">-- Select Label --</option>
+                    {PREDEFINED_LABELS.map(l => <option key={l} value={l}>{l}</option>)}
+                  </select>
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Update Photo (Optional)</label>
+                  {editingStock.img && (
+                    <div className="mb-2">
+                      <img src={editingStock.img} alt="Current" className="h-16 w-16 object-cover rounded border" />
+                    </div>
+                  )}
+                  <input type="file" accept="image/*" className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white" 
+                    onChange={e => setEditingStock({...editingStock, imgFile: e.target.files[0]})} />
+                </div>
+               
+               <div className="col-span-2 sm:col-span-1">
+                 <label className="block text-sm font-medium text-slate-700 mb-1">District (Multiple)</label>
+                 <MultiSelect 
+                   options={districts.map(d => ({ value: d, label: d }))}
+                   selected={editingStock.districts}
+                   onChange={(newSelected) => handleDistrictChange(newSelected, editingStock.brcs, (d, b) => setEditingStock({...editingStock, districts: d, brcs: b}))}
+                   placeholder="-- Select Districts --"
+                   showSelectAll={true}
+                   selectAllLabel="All Districts"
+                 />
+               </div>
+               <div className="col-span-2 sm:col-span-1">
+                 <label className="block text-sm font-medium text-slate-700 mb-1">BRC (Multiple)</label>
+                 <MultiSelect 
+                   options={(editingStock.districts?.length > 0 ? brcs.filter(b => editingStock.districts.includes(b.district)) : brcs).map(b => ({ value: `${b.code}|${b.district}`, label: b.name }))}
+                   selected={editingStock.brcs}
+                   onChange={(newSelected) => {
+                     const selectedDistricts = new Set(editingStock.districts || []);
+                     newSelected.forEach(brcVal => {
+                       const [code, district] = brcVal.split('|');
+                       if (district) {
+                         selectedDistricts.add(district);
+                       }
+                     });
+                     setEditingStock({...editingStock, brcs: newSelected, districts: Array.from(selectedDistricts)});
+                   }}
+                   placeholder="-- Select BRCs --"
+                   showSelectAll={true}
+                   selectAllLabel="All BRCs"
+                 />
+               </div>
+            </div>
+            
+            <div className="mt-8 flex justify-end space-x-3">
+               <button onClick={() => setEditingStock(null)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                 Cancel
+               </button>
+               <button onClick={handleSaveEdit} className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors">
+                 Save Changes
+               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* BULK UPLOAD TAB */}
       {activeTab === 'bulkUpload' && (
         <form onSubmit={handleBulkUpload} className="space-y-4 max-w-lg">
           <p className="text-sm text-slate-600">
             Upload an Excel (.xlsx) or CSV file containing stock data. Alternatively, if you have a PDF, you can try uploading it here.
           </p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">District (Multiple)</label>
+              <MultiSelect 
+                options={districts.map(d => ({ value: d, label: d }))}
+                selected={bulkUploadForm.district}
+                onChange={(newSelected) => handleDistrictChange(newSelected, bulkUploadForm.brc, (d, b) => setBulkUploadForm({...bulkUploadForm, district: d, brc: b}))}
+                placeholder="-- Select Districts --"
+                showSelectAll={true}
+                selectAllLabel="All Districts"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">BRC (Multiple)</label>
+              <MultiSelect 
+                options={(bulkUploadForm.district?.length > 0 ? brcs.filter(b => bulkUploadForm.district.includes(b.district)) : brcs).map(b => ({ value: `${b.code}|${b.district}`, label: b.name }))}
+                selected={bulkUploadForm.brc}
+                onChange={(newSelected) => {
+                  const selectedDistricts = new Set(bulkUploadForm.district || []);
+                  newSelected.forEach(brcVal => {
+                    const [code, district] = brcVal.split('|');
+                    if (district) {
+                      selectedDistricts.add(district);
+                    }
+                  });
+                  setBulkUploadForm({...bulkUploadForm, brc: newSelected, district: Array.from(selectedDistricts)});
+                }}
+                placeholder="-- Select BRCs --"
+                showSelectAll={true}
+                selectAllLabel="All BRCs"
+              />
+            </div>
+          </div>
           <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:bg-slate-50 transition-colors">
             <input 
               type="file" 
@@ -218,45 +606,7 @@ export default function StockForms({ onActionComplete }) {
         </form>
       )}
 
-      {/* BULK UPDATE TAB */}
-      {activeTab === 'bulkUpdate' && (
-        <form onSubmit={handleBulkUpdate} className="space-y-4 max-w-lg">
-          <p className="text-sm text-slate-600">
-            Update properties for specific items across all hubs, or restrict to a single hub.
-          </p>
-          <div className="grid grid-cols-1 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Target Item Name (Optional)</label>
-              <select className="w-full border rounded px-3 py-2 bg-white" 
-                value={updateForm.itemName} onChange={e => setUpdateForm({...updateForm, itemName: e.target.value})}>
-                <option value="">-- All Items --</option>
-                {uniqueItemNames.map(name => <option key={name} value={name}>{name}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Target BRC Hub (Optional)</label>
-              <select className="w-full border rounded px-3 py-2 bg-white" 
-                value={updateForm.brc} onChange={e => setUpdateForm({...updateForm, brc: e.target.value})}>
-                <option value="">-- All Hubs --</option>
-                {brcs.map(b => <option key={b.code} value={b.code}>{b.name}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Change All Status To</label>
-              <select className="w-full border rounded px-3 py-2 bg-white" 
-                value={updateForm.status} onChange={e => setUpdateForm({...updateForm, status: e.target.value})}>
-                <option value="">-- Do Not Change --</option>
-                <option value="ACTIVE">Active</option>
-                <option value="DEFECTIVE">Defective</option>
-                <option value="IN_REPAIR">In Repair</option>
-              </select>
-            </div>
-          </div>
-          <button disabled={loading} type="submit" className="bg-primary text-on-primary px-4 py-2 rounded font-bold hover:opacity-90 disabled:opacity-50 transition-all">
-            {loading ? 'Updating...' : 'Update Selected Hubs'}
-          </button>
-        </form>
-      )}
+
     </div>
   );
 }

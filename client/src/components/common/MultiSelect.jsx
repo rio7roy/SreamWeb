@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-export default function MultiSelect({ options, selected, onChange, placeholder = "Select options..." }) {
+export default function MultiSelect({ options, selected, onChange, placeholder = "Select options...", showSelectAll, selectAllLabel = "Select All" }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
 
@@ -25,6 +25,14 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
   const removeOption = (e, value) => {
     e.stopPropagation();
     onChange(selected.filter(item => item !== value));
+  };
+
+  const handleSelectAll = () => {
+    if (selected.length === options.length && options.length > 0) {
+      onChange([]);
+    } else {
+      onChange(options.map(opt => opt.value));
+    }
   };
 
   return (
@@ -58,24 +66,37 @@ export default function MultiSelect({ options, selected, onChange, placeholder =
       </div>
       
       {isOpen && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-md shadow-lg max-h-60 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
           {options.length === 0 ? (
             <div className="px-4 py-3 text-sm text-slate-500">No options available</div>
           ) : (
-            options.map(opt => (
-              <label 
-                key={opt.value} 
-                className="flex items-center px-4 py-2 hover:bg-slate-50 cursor-pointer text-sm"
-              >
-                <input 
-                  type="checkbox" 
-                  className="mr-3 rounded text-blue-600 focus:ring-blue-500"
-                  checked={selected.includes(opt.value)}
-                  onChange={() => toggleOption(opt.value)}
-                />
-                <span className="text-slate-700">{opt.label}</span>
-              </label>
-            ))
+            <>
+              {showSelectAll && (
+                <label className="flex items-center px-4 py-2 hover:bg-slate-50 cursor-pointer text-sm border-b border-slate-100 font-medium">
+                  <input 
+                    type="checkbox" 
+                    className="mr-3 rounded text-blue-600 focus:ring-blue-500"
+                    checked={selected.length === options.length && options.length > 0}
+                    onChange={handleSelectAll}
+                  />
+                  <span className="text-slate-800">{selectAllLabel}</span>
+                </label>
+              )}
+              {options.map(opt => (
+                <label 
+                  key={opt.value} 
+                  className="flex items-center px-4 py-2 hover:bg-slate-50 cursor-pointer text-sm"
+                >
+                  <input 
+                    type="checkbox" 
+                    className="mr-3 rounded text-blue-600 focus:ring-blue-500"
+                    checked={selected.includes(opt.value)}
+                    onChange={() => toggleOption(opt.value)}
+                  />
+                  <span className="text-slate-700">{opt.label}</span>
+                </label>
+              ))}
+            </>
           )}
         </div>
       )}

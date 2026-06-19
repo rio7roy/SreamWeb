@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../lib/api';
 
-export default function StockMonitoring({ viewType }) {
+export default function StockMonitoring() {
   const [stocks, setStocks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({ search: '', status: '', district: '', brc: '' });
@@ -19,21 +19,34 @@ export default function StockMonitoring({ viewType }) {
 
   useEffect(() => {
     fetchStocks();
-  }, [filters, sortConfig, viewType]);
+  }, [filters, sortConfig]);
 
   const fetchStocks = async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
+      params.append('limit', '2000'); // Fetch enough stocks so changes aren't paginated out
       if (filters.search) params.append('search', filters.search);
       if (filters.status) params.append('status', filters.status);
-      if (viewType === 'district' && filters.district) params.append('district', filters.district);
-      if (viewType === 'brc' && filters.brc) params.append('brc', filters.brc);
+      if (filters.district) params.append('district', filters.district);
+      if (filters.brc) params.append('brc', filters.brc);
       
       const response = await api.get(`/stocks?${params.toString()}`);
       if (response.data?.success) {
         let fetchedData = response.data.data.stocks || [];
         
+        fetchedData = fetchedData.filter(stock => {
+          const original = Number(stock.newQty ?? stock.quantity ?? 0);
+          const current = stock.availableQty !== undefined ? Number(stock.availableQty) : original;
+          return (
+            Number(stock.damagedQty || 0) > 0 || 
+            Number(stock.usedQty || 0) > 0 || 
+            Number(stock.consumedQty || 0) > 0 ||
+            (stock.status && stock.status !== 'ACTIVE') ||
+            current !== original
+          );
+        });
+
         // Sorting logic client-side for simplicity in demo
         if (sortConfig.key) {
           fetchedData.sort((a, b) => {
@@ -63,9 +76,7 @@ export default function StockMonitoring({ viewType }) {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">
-          {viewType === 'district' ? 'District Wise Monitoring' : 'BRC Wise Monitoring'}
-        </h2>
+        <h2 className="text-xl font-semibold">Hub Stocks Monitoring</h2>
         <div className="flex gap-2">
           <input
             type="text"
@@ -74,25 +85,32 @@ export default function StockMonitoring({ viewType }) {
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
           />
-          {viewType === 'district' ? (
-            <select
-              className="border rounded px-3 py-1 text-sm bg-white"
-              value={filters.district}
-              onChange={(e) => setFilters({ ...filters, district: e.target.value })}
-            >
-              <option value="">All Districts</option>
-              {districts.map(d => <option key={d} value={d}>{d}</option>)}
-            </select>
-          ) : (
-            <select
-              className="border rounded px-3 py-1 text-sm bg-white"
-              value={filters.brc}
-              onChange={(e) => setFilters({ ...filters, brc: e.target.value })}
-            >
-              <option value="">All BRCs</option>
-              {brcs.map(b => <option key={b.code} value={b.code}>{b.name}</option>)}
-            </select>
-          )}
+          <select
+            className="border rounded px-3 py-1 text-sm bg-white"
+            value={filters.district}
+            onChange={(e) => setFilters({ ...filters, district: e.target.value, brc: '' })}
+          >
+            <option value="">All Districts</option>
+            {districts.map(d => <option key={d} value={d}>{d}</option>)}
+          </select>
+          <select
+            className="border rounded px-3 py-1 text-sm bg-white max-w-[200px]"
+            value={filters.brc}
+            onChange={(e) => {
+              const selectedBrcCode = e.target.value;
+              if (selectedBrcCode) {
+                const brcObj = brcs.find(b => b.code === selectedBrcCode);
+                setFilters({ ...filters, brc: selectedBrcCode, district: brcObj ? brcObj.district : filters.district });
+              } else {
+                setFilters({ ...filters, brc: '' });
+              }
+            }}
+          >
+            <option value="">All BRCs</option>
+            {brcs
+              .filter(b => !filters.district || b.district === filters.district)
+              .map(b => <option key={b.code} value={b.code}>{b.name}</option>)}
+          </select>
           <select 
             className="border rounded px-3 py-1 text-sm bg-white"
             value={filters.status}
@@ -111,7 +129,7 @@ export default function StockMonitoring({ viewType }) {
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50">
               <tr>
-                {['itemName', 'category', 'serialNumber', 'quantity', viewType, 'status'].map((col) => (
+                {['itemName', 'category', 'serialNumber', 'availableQty', 'damagedQty', 'usedQty', 'consumedQty', 'district', 'brc', 'status'].map((col) => (
                   <th 
                     key={col}
                     onClick={() => handleSort(col)}
@@ -125,17 +143,24 @@ export default function StockMonitoring({ viewType }) {
             </thead>
             <tbody className="bg-white divide-y divide-slate-200">
               {loading ? (
-                <tr><td colSpan="6" className="text-center py-8 text-slate-500">Loading stocks...</td></tr>
+                <tr><td colSpan="10" className="text-center py-8 text-slate-500">Loading stocks...</td></tr>
               ) : stocks.length === 0 ? (
-                <tr><td colSpan="6" className="text-center py-8 text-slate-500">No stock found matching filters.</td></tr>
+                <tr><td colSpan="10" className="text-center py-8 text-slate-500">No changed stock found matching filters.</td></tr>
               ) : (
                 stocks.map((stock) => (
                   <tr key={stock.id} className="hover:bg-slate-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">{stock.itemName}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.category}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.serialNumber || 'N/A'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.quantity}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{viewType === 'district' ? stock.district : stock.brc}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                      <span className="font-medium text-slate-900">{stock.availableQty !== undefined ? stock.availableQty : (stock.newQty ?? stock.quantity)}</span>
+                      <span className="text-slate-400 text-xs ml-1">/ {stock.newQty ?? stock.quantity ?? 0}</span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-medium">{stock.damagedQty || 0}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-medium">{stock.usedQty || 0}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-orange-600 font-medium">{stock.consumedQty || 0}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.district || 'NA'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.brc || 'NA'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         stock.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :

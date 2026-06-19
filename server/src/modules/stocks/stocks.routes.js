@@ -19,6 +19,15 @@ router.post('/', upload.single('img'), compressImage, stocksController.createSto
 // Update single stock
 router.put('/:id', stocksController.updateStock);
 
+// Upload image for stocks
+router.post('/upload', upload.single('img'), compressImage, (req, res) => {
+  if (req.file) {
+    res.json({ success: true, url: `/api/uploads/${req.file.filename}` });
+  } else {
+    res.status(400).json({ success: false, message: 'No image uploaded' });
+  }
+});
+
 // Bulk upload
 router.post('/bulk-upload', upload.single('file'), stocksController.bulkUploadStocks);
 

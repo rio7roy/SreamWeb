@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import api from '../../lib/api';
+import { useAuth } from '../../features/auth/AuthContext';
 
 const STATUSES = ['All Status', 'ACTIVE', 'CONSUMED', 'USED', 'DAMAGED'];
 
@@ -49,6 +50,7 @@ const resolveImgUrl = (img) => {
 };
 
 export default function StockManagementModal({ brcCode, brcName, onClose, inline = false }) {
+  const { user } = useAuth();
   const [stocks, setStocks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isClosing, setIsClosing] = useState(false);
@@ -557,7 +559,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
                             {alertSending === stock.id ? 'hourglass_top' : isOutOfStock ? 'error' : 'notification_important'}
                           </span>
                         </button>
-                        {stock.source === 'MANUAL' && (
+                        {user?.role === 'ADMIN' && (
                           <button onClick={() => handleDeleteItem(stock.id)} className="flex items-center justify-center p-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-colors" title="Delete custom item">
                             <span className="material-symbols-outlined text-[14px]">delete</span>
                           </button>

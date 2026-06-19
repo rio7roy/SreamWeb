@@ -20,7 +20,11 @@ export default function BroadcastLogsTab() {
         api.get('/brcs').catch(() => ({ data: [] }))
       ]);
       if (msgRes.data) {
-        setMessages(msgRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+        const sentMessages = msgRes.data.filter(msg => {
+          const toArray = Array.isArray(msg.to) ? msg.to : (msg.to ? [msg.to] : []);
+          return !toArray.includes('ADMIN');
+        });
+        setMessages(sentMessages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
       }
       if (brcRes.data) {
         setAllBrcs(brcRes.data);

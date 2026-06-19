@@ -11,6 +11,8 @@ router.put('/users/experts/:id/brcs', adminController.updateExpertBrcs);
 // Messaging Routes
 router.get('/messages', adminController.getMessages);
 router.post('/messages', adminController.broadcastMessage);
+router.delete('/messages/:id', adminController.deleteMessage);
+router.put('/messages/:id/read', adminController.markMessageRead);
 
 // Onboarding Routes
 router.get('/onboard/:token', adminController.validateInvite);

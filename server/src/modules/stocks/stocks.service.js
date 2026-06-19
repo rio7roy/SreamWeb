@@ -3,7 +3,7 @@ const { db } = require('../../config/database');
 /**
  * Get stocks with pagination and filters
  */
-async function listStocks({ page = 1, limit = 20, district, brc, status, category, search }) {
+async function listStocks({ page = 1, limit = 20, district, brc, status, category, search, source }) {
   const skip = (page - 1) * limit;
 
   const where = {};
@@ -12,6 +12,7 @@ async function listStocks({ page = 1, limit = 20, district, brc, status, categor
   if (status) where.status = status;
   if (category) where.category = category;
   if (search) where.search = search;
+  if (source) where.source = source;
 
   const { data: stocks, total } = db.stocks.findMany({
     where,

@@ -347,6 +347,7 @@ const db = {
       if (where.brc) result = result.filter(s => s.brc === where.brc);
       if (where.status) result = result.filter(s => s.status === where.status);
       if (where.category) result = result.filter(s => s.category === where.category);
+      if (where.source) result = result.filter(s => s.source === where.source);
       if (where.search) {
         const search = where.search.toLowerCase();
         result = result.filter(s => 
