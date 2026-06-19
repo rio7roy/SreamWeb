@@ -37,6 +37,7 @@ export default function AdminDashboardPage() {
   const [selectedExpertId, setSelectedExpertId] = useState('');
   const [selectedExpertMonth, setSelectedExpertMonth] = useState('');
   const [showExpertManageModal, setShowExpertManageModal] = useState(false);
+  const [showReportMonthModal, setShowReportMonthModal] = useState(false);
 
   // Fetch BRCs and Experts on mount
   useEffect(() => {
@@ -65,6 +66,8 @@ export default function AdminDashboardPage() {
       url += `?month=${selectedExpertMonth}&year=${new Date().getFullYear()}`;
     }
 
+    setShowReportMonthModal(false);
+
     api.get(url, { responseType: 'blob' })
       .then(res => {
         const blob = res.data;
@@ -78,6 +81,7 @@ export default function AdminDashboardPage() {
         a.click();
         a.remove();
         window.URL.revokeObjectURL(downloadUrl);
+        setSelectedExpertMonth(''); // Reset for next time
       })
       .catch(err => {
         console.error('Download error:', err);
@@ -336,21 +340,6 @@ export default function AdminDashboardPage() {
                   </span>
                 </div>
                 <div className="flex shrink-0 gap-2">
-                  <div className="relative">
-                    <select
-                      value={selectedExpertMonth}
-                      onChange={(e) => setSelectedExpertMonth(e.target.value)}
-                      className="h-full bg-surface-container-low border border-outline/30 rounded-xl pl-4 pr-8 py-3 text-sm focus:border-[#d32f2f] focus:ring-1 focus:ring-[#d32f2f] outline-none transition-all appearance-none cursor-pointer"
-                    >
-                      <option value="">All Months</option>
-                      {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
-                        <option key={m} value={m}>{new Date(0, m - 1).toLocaleString('default', { month: 'short' })}</option>
-                      ))}
-                    </select>
-                    <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-secondary pointer-events-none text-sm">
-                      arrow_drop_down
-                    </span>
-                  </div>
                   <button
                     onClick={() => setShowExpertManageModal(true)}
                     disabled={!selectedExpertId}
@@ -360,7 +349,7 @@ export default function AdminDashboardPage() {
                     Manage
                   </button>
                   <button
-                    onClick={handleExpertReportDownload}
+                    onClick={() => setShowReportMonthModal(true)}
                     disabled={!selectedExpertId}
                     className="px-6 py-3 bg-[#d32f2f] text-white font-bold rounded-xl shadow hover:opacity-90 transition-all disabled:opacity-50 disabled:shadow-none flex items-center gap-2"
                   >
@@ -474,6 +463,48 @@ export default function AdminDashboardPage() {
           initialUserId={selectedExpertId}
           onClose={() => setShowExpertManageModal(false)}
         />
+      )}
+
+      {showReportMonthModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowReportMonthModal(false)}></div>
+          <div className="relative bg-white rounded-2xl w-full max-w-sm shadow-xl p-6 animate-fade-in-up">
+            <h3 className="text-xl font-bold text-on-surface mb-4">Select Report Month</h3>
+            <div className="mb-6">
+              <label className="block text-xs font-bold text-secondary uppercase tracking-wider mb-2">Month</label>
+              <div className="relative">
+                <select
+                  value={selectedExpertMonth}
+                  onChange={(e) => setSelectedExpertMonth(e.target.value)}
+                  className="w-full bg-surface-container-low border border-outline/30 rounded-xl pl-4 pr-8 py-3 text-sm focus:border-[#d32f2f] focus:ring-1 focus:ring-[#d32f2f] outline-none transition-all appearance-none cursor-pointer"
+                >
+                  <option value="">All Time</option>
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                    <option key={m} value={m}>{new Date(0, m - 1).toLocaleString('default', { month: 'long' })}</option>
+                  ))}
+                </select>
+                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary pointer-events-none text-sm">
+                  arrow_drop_down
+                </span>
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowReportMonthModal(false)}
+                className="px-4 py-2 rounded-xl text-secondary hover:bg-surface-container font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleExpertReportDownload}
+                className="px-6 py-2 bg-[#d32f2f] text-white rounded-xl font-bold hover:bg-[#b71c1c] shadow transition-colors flex items-center gap-2"
+              >
+                <span className="material-symbols-outlined text-sm">download</span>
+                Download
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
