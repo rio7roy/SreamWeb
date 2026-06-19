@@ -101,6 +101,8 @@ export default function ReportsPage() {
       console.error('Download error:', err);
       alert('Failed to download report. Please try again.');
     });
+  };
+
   const handleMonthEndDownload = () => {
     const token = localStorage.getItem('token');
     if (!token) return;
