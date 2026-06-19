@@ -9,7 +9,32 @@ export default function ExpertAttendanceTab({ user }) {
   const [selectedMonth, setSelectedMonth] = useState((new Date().getMonth() + 1).toString());
   const [showModal, setShowModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  
+  // Independent state for the dashboard badge
+  const [currentMonthUniqueDays, setCurrentMonthUniqueDays] = useState(0);
 
+  // Fetch current month stats ONCE for the badge
+  useEffect(() => {
+    const fetchCurrentMonthStats = async () => {
+      try {
+        const currentMonthStr = (new Date().getMonth() + 1).toString();
+        const res = await api.get(`/events?mine=true&month=${currentMonthStr}`);
+        const currentMonthEvents = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+        
+        const dates = new Set(currentMonthEvents.map(e => {
+          let timestamp = e.locationTimestamp || e.createdAt;
+          if (timestamp && !isNaN(Number(timestamp))) timestamp = Number(timestamp);
+          return new Date(timestamp).toLocaleDateString();
+        }));
+        setCurrentMonthUniqueDays(dates.size);
+      } catch (err) {
+        console.error("Failed to fetch current month stats", err);
+      }
+    };
+    fetchCurrentMonthStats();
+  }, []);
+
+  // Fetch events based on the selected filter for the table
   useEffect(() => {
     fetchEvents();
   }, [selectedMonth]);
@@ -80,13 +105,13 @@ export default function ExpertAttendanceTab({ user }) {
         <div>
           <h2 className="text-4xl font-black text-primary mb-2 group-hover:scale-105 transform origin-left transition-transform">My Attendance</h2>
           <p className="text-secondary text-sm">
-            This count represents the total number of unique days you have successfully reported an event. Click to view full details.
+            This count represents the total number of unique days you have successfully reported an event this month. Click to view full details.
           </p>
         </div>
         <div className="shrink-0 flex items-center justify-center bg-white shadow-xl rounded-2xl p-6 min-w-[200px] border border-outline/10 group-hover:-translate-y-1 transition-transform">
           <div className="flex flex-col items-center">
             <span className="material-symbols-outlined text-primary text-4xl mb-2">calendar_month</span>
-            <span className="text-5xl font-black text-on-surface">{uniqueDaysCount}</span>
+            <span className="text-5xl font-black text-on-surface">{currentMonthUniqueDays}</span>
             <span className="text-xs font-bold text-secondary uppercase tracking-widest mt-1">Unique Days</span>
           </div>
         </div>
