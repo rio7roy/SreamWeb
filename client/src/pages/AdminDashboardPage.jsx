@@ -35,6 +35,7 @@ export default function AdminDashboardPage() {
   const [events, setEvents] = useState([]);
   const [experts, setExperts] = useState([]);
   const [selectedExpertId, setSelectedExpertId] = useState('');
+  const [selectedExpertMonth, setSelectedExpertMonth] = useState('');
   const [showExpertManageModal, setShowExpertManageModal] = useState(false);
 
   // Fetch BRCs and Experts on mount
@@ -59,14 +60,20 @@ export default function AdminDashboardPage() {
   const handleExpertReportDownload = () => {
     if (!selectedExpertId) return;
     
-    api.get(`/reports/expert/${selectedExpertId}/pdf`, { responseType: 'blob' })
+    let url = `/reports/expert/${selectedExpertId}/pdf`;
+    if (selectedExpertMonth) {
+      url += `?month=${selectedExpertMonth}&year=${new Date().getFullYear()}`;
+    }
+
+    api.get(url, { responseType: 'blob' })
       .then(res => {
         const blob = res.data;
         const downloadUrl = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = downloadUrl;
         const expertName = experts.find(e => e.id === selectedExpertId)?.name || 'expert';
-        a.download = `${expertName}_Activity_Report.pdf`;
+        const mName = selectedExpertMonth ? `_Month_${selectedExpertMonth}` : '';
+        a.download = `${expertName}_Activity_Report${mName}.pdf`;
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -329,6 +336,21 @@ export default function AdminDashboardPage() {
                   </span>
                 </div>
                 <div className="flex shrink-0 gap-2">
+                  <div className="relative">
+                    <select
+                      value={selectedExpertMonth}
+                      onChange={(e) => setSelectedExpertMonth(e.target.value)}
+                      className="h-full bg-surface-container-low border border-outline/30 rounded-xl pl-4 pr-8 py-3 text-sm focus:border-[#d32f2f] focus:ring-1 focus:ring-[#d32f2f] outline-none transition-all appearance-none cursor-pointer"
+                    >
+                      <option value="">All Months</option>
+                      {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                        <option key={m} value={m}>{new Date(0, m - 1).toLocaleString('default', { month: 'short' })}</option>
+                      ))}
+                    </select>
+                    <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-secondary pointer-events-none text-sm">
+                      arrow_drop_down
+                    </span>
+                  </div>
                   <button
                     onClick={() => setShowExpertManageModal(true)}
                     disabled={!selectedExpertId}

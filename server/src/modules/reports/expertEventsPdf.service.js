@@ -17,9 +17,11 @@ const readData = (file) => {
 /**
  * Generate an Expert's Individual Event PDF Report
  * @param {string} expertId - The ID of the expert
+ * @param {string} month - Optional month (1-12)
+ * @param {string} year - Optional year
  * @returns {Promise<Buffer>} PDF buffer
  */
-async function generateExpertEventsPdfReport(expertId) {
+async function generateExpertEventsPdfReport(expertId, month, year) {
   const events = readData(EVENTS_FILE);
   const experts = readData(EXPERTS_FILE);
 
@@ -29,7 +31,14 @@ async function generateExpertEventsPdfReport(expertId) {
   }
 
   // Filter events for this expert
-  const expertEvents = events.filter(e => e.status === 'SUBMITTED' && e.createdBy === expertId);
+  let expertEvents = events.filter(e => e.status === 'SUBMITTED' && e.createdBy === expertId);
+
+  if (month && year) {
+    expertEvents = expertEvents.filter(e => {
+      const d = new Date(e.date || e.createdAt);
+      return d.getMonth() + 1 === parseInt(month) && d.getFullYear() === parseInt(year);
+    });
+  }
 
   // Sort events chronologically
   expertEvents.sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt));
@@ -63,8 +72,12 @@ async function generateExpertEventsPdfReport(expertId) {
     doc.on('error', reject);
 
     // Header
+    const periodStr = (month && year) 
+      ? ` - ${new Date(year, month - 1).toLocaleString('default', { month: 'long', year: 'numeric' })}` 
+      : '';
+
     doc.fillColor('#785900').fontSize(24).font('Helvetica-Bold').text('STREAM Ecosystem', { align: 'left' });
-    doc.fillColor('#5f5e5e').fontSize(16).font('Helvetica').text('Expert Activity Report', { align: 'left' });
+    doc.fillColor('#5f5e5e').fontSize(16).font('Helvetica').text(`Expert Activity Report${periodStr}`, { align: 'left' });
     doc.fillColor('#999999').fontSize(9).text(`Generated: ${new Date().toLocaleString()}`, { align: 'left' });
     doc.moveDown(1.5);
     doc.strokeColor('#FFC107').lineWidth(2).moveTo(50, doc.y).lineTo(545, doc.y).stroke();

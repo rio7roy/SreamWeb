@@ -57,10 +57,15 @@ const { generateExpertEventsPdfReport } = require('./expertEventsPdf.service');
 async function getExpertEventsPdf(req, res, next) {
   try {
     const { expertId } = req.params;
-    const buffer = await generateExpertEventsPdfReport(expertId);
+    const { month, year } = req.query;
+    const buffer = await generateExpertEventsPdfReport(expertId, month, year);
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=expert-activity-${expertId}.pdf`);
+    let filename = `expert-activity-${expertId}`;
+    if (month) filename += `-m${month}`;
+    if (year) filename += `-y${year}`;
+    
+    res.setHeader('Content-Disposition', `attachment; filename=${filename}.pdf`);
     return res.send(buffer);
   } catch (err) {
     if (err.message === 'Expert not found') {
