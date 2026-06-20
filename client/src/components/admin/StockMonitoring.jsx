@@ -109,7 +109,7 @@ export default function StockMonitoring() {
             <option value="">All BRCs</option>
             {brcs
               .filter(b => !filters.district || b.district === filters.district)
-              .map(b => <option key={b.code} value={b.code}>{b.name}</option>)}
+              .map(b => <option key={b.code} value={b.code}>{b.location}/ {b.name}</option>)}
           </select>
           <select 
             className="border rounded px-3 py-1 text-sm bg-white"

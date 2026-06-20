@@ -226,7 +226,7 @@ export default function AdminFormDashboard({ onClose }) {
               className="bg-white border border-outline/20 rounded-xl px-4 py-2 text-sm outline-none focus:border-primary shadow-sm min-w-[200px]"
             >
               <option value="">All BRCs</option>
-              {brcs.map(b => <option key={b.code} value={b.code}>{b.name} ({b.code})</option>)}
+              {brcs.map(b => <option key={b.code} value={b.code}>{b.location}/ {b.name}</option>)}
             </select>
           </div>
         </div>

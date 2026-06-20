@@ -783,7 +783,7 @@ export default function ExpertDashboardPage() {
                 <option value="OTHER">Other (Custom)</option>
                 <optgroup label="Registered BRCs">
                   {brcData.map(b => (
-                    <option key={b.code} value={b.code}>{b.name} ({b.code})</option>
+                    <option key={b.code} value={b.code}>{b.location}/ {b.name}</option>
                   ))}
                 </optgroup>
               </select>

@@ -287,7 +287,7 @@ export default function AdminDashboardPage() {
                     <option value="">Select BRC Hub...</option>
                     {filteredBrcs.map(brc => (
                       <option key={brc.code} value={brc.code}>
-                        {brc.name} ({brc.code})
+                        {brc.location}/ {brc.name}
                       </option>
                     ))}
                   </select>
