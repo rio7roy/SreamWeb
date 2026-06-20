@@ -459,6 +459,30 @@ exports.exportEventsPdf = async (req, res) => {
     doc.moveDown();
 
     doc.fontSize(12).font('Helvetica').text(`Generated on: ${new Date().toLocaleString()}`, { align: 'center' });
+    
+    // Add filters used to the heading
+    const filterParts = [];
+    if (district) filterParts.push(`District: ${district}`);
+    if (brcCode) filterParts.push(`Hub Code: ${brcCode}`);
+    if (month) filterParts.push(`Month: ${new Date(0, month - 1).toLocaleString('default', { month: 'long' })}`);
+    
+    // For expert name, we can try to fetch it if expertId is present
+    if (expertId) {
+      try {
+        const EXPERTS_FILE = require('path').join(__dirname, '../../../data/experts.json');
+        const experts = JSON.parse(fs.readFileSync(EXPERTS_FILE, 'utf8'));
+        const expertName = experts.find(e => e.id === expertId)?.name || expertId;
+        filterParts.push(`Expert: ${expertName}`);
+      } catch (e) {
+        filterParts.push(`Expert ID: ${expertId}`);
+      }
+    }
+    
+    if (filterParts.length > 0) {
+      doc.moveDown(0.5);
+      doc.fontSize(10).font('Helvetica-Oblique').text(`Filters Applied: ${filterParts.join(' | ')}`, { align: 'center' });
+    }
+    
     doc.moveDown(2);
 
     if (events.length === 0) {
