@@ -302,7 +302,8 @@ exports.getEvents = (req, res) => {
 
     const eventsWithNames = events.map(e => ({
       ...e,
-      brcName: brcMap[e.brcCode]?.name || e.brcCode
+      brcName: brcMap[e.brcCode]?.name || e.brcCode,
+      brcLocation: brcMap[e.brcCode]?.location || e.brcCode
     }));
 
     res.json(eventsWithNames);
@@ -366,6 +367,7 @@ exports.exportEventsExcel = async (req, res) => {
     worksheet.columns = [
       { header: 'Event Date', key: 'date', width: 15 },
       { header: 'Event Name', key: 'name', width: 30 },
+      { header: 'BRC Location', key: 'brcLocation', width: 20 },
       { header: 'GPS Timestamp', key: 'gpsTime', width: 25 },
       { header: 'Venue Type', key: 'venueType', width: 15 },
       { header: 'Venue Value', key: 'venueValue', width: 25 },
@@ -387,16 +389,18 @@ exports.exportEventsExcel = async (req, res) => {
     // Add rows
     events.forEach(e => {
       const brc = brcMap[e.brcCode];
+      const isOther = e.venueType === 'OTHER_BRC' || e.tag === 'other event';
       worksheet.addRow({
         date: new Date(e.date || e.createdAt).toLocaleDateString(),
         name: e.name || 'Untitled Event',
+        brcLocation: (brc ? brc.location : e.brcCode) + (isOther ? ' [OTHER]' : ''),
         gpsTime: e.locationTimestamp ? new Date(parseInt(e.locationTimestamp)).toLocaleString() : 'N/A',
         venueType: e.venueType || 'SELECTED_BRC',
         venueValue: e.venueValue || e.brcCode,
         district: brc ? brc.district : 'N/A',
         teachers: e.teachersCount || 0,
         students: e.studentsCount || 0,
-        tag: e.venueType === 'OTHER_BRC' ? 'OTHER' : (e.tag === 'other event' ? (e.customTag || 'OTHER') : e.tag || 'N/A'),
+        tag: isOther ? 'OTHER' : (e.tag === 'other event' ? (e.customTag || 'OTHER') : e.tag || 'N/A'),
         desc: e.description || '',
       });
     });
@@ -491,7 +495,10 @@ exports.exportEventsPdf = async (req, res) => {
       events.forEach((event, index) => {
         doc.fontSize(14).font('Helvetica-Bold').text(`${index + 1}. ${event.name}`);
         doc.fontSize(10).font('Helvetica').text(`Date: ${new Date(event.date || event.createdAt).toLocaleDateString()}`);
-        doc.text(`Hub: ${event.brcCode} ${brcMap[event.brcCode] ? `(${brcMap[event.brcCode].name})` : ''}`);
+        const pdfBrc = brcMap[event.brcCode];
+        const pdfBrcLabel = pdfBrc ? pdfBrc.location : event.brcCode;
+        const pdfIsOther = event.venueType === 'OTHER_BRC' || event.tag === 'other event';
+        doc.text(`BRC: ${pdfBrcLabel}${pdfIsOther ? ' [OTHER]' : ''}`);
         const displayTag = event.venueType === 'OTHER_BRC' ? 'OTHER' : (event.tag === 'other event' ? (event.customTag || 'OTHER') : event.tag || 'N/A');
         doc.text(`Tag: ${displayTag}`);
         doc.text(`Attendance: ${event.teachersCount} Teachers, ${event.studentsCount} Students`);

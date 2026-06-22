@@ -5,6 +5,7 @@ const PDFDocument = require('pdfkit');
 const DATA_DIR = path.join(__dirname, '../../../data');
 const EVENTS_FILE = path.join(DATA_DIR, 'events.json');
 const EXPERTS_FILE = path.join(DATA_DIR, 'experts.json');
+const BRCS_FILE = path.join(DATA_DIR, 'brcs.json');
 
 const readData = (file) => {
   try {
@@ -24,6 +25,9 @@ const readData = (file) => {
 async function generateExpertEventsPdfReport(expertId, month, year) {
   const events = readData(EVENTS_FILE);
   const experts = readData(EXPERTS_FILE);
+  const brcs = readData(BRCS_FILE);
+  const brcMap = {};
+  brcs.forEach(b => brcMap[b.code] = b);
 
   const expert = experts.find(e => e.id === expertId);
   if (!expert) {
@@ -113,13 +117,14 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
     doc.moveDown(1);
 
     const tableTop = doc.y;
-    const colX = [50, 200, 320, 480]; // Event Name, GPS Date, GPS Location, Footfall
+    const colX = [50, 150, 245, 365, 470]; // Event Name, BRC, GPS Date, GPS Location, Footfall
 
     doc.fillColor('#785900').fontSize(10).font('Helvetica-Bold');
     doc.text('Event Name', colX[0], tableTop);
-    doc.text('GPS Marked Date', colX[1], tableTop);
-    doc.text('GPS Location', colX[2], tableTop);
-    doc.text('Footfall', colX[3], tableTop);
+    doc.text('BRC', colX[1], tableTop);
+    doc.text('GPS Marked Date', colX[2], tableTop);
+    doc.text('GPS Location', colX[3], tableTop);
+    doc.text('Footfall', colX[4], tableTop);
 
     doc.moveDown(0.5);
     doc.strokeColor('#E0E0E0').lineWidth(1).moveTo(50, doc.y).lineTo(545, doc.y).stroke();
@@ -136,9 +141,10 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
           // redraw header
           doc.fillColor('#785900').fontSize(10).font('Helvetica-Bold');
           doc.text('Event Name', colX[0], doc.y);
-          doc.text('GPS Marked Date', colX[1], doc.y);
-          doc.text('GPS Location', colX[2], doc.y);
-          doc.text('Footfall', colX[3], doc.y);
+          doc.text('BRC', colX[1], doc.y);
+          doc.text('GPS Marked Date', colX[2], doc.y);
+          doc.text('GPS Location', colX[3], doc.y);
+          doc.text('Footfall', colX[4], doc.y);
           doc.moveDown(0.5);
           doc.strokeColor('#E0E0E0').lineWidth(1).moveTo(50, doc.y).lineTo(545, doc.y).stroke();
           doc.moveDown(0.5);
@@ -168,11 +174,19 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
 
         const evFootfall = (e.studentsCount || 0) + (e.teachersCount || 0);
 
+        // BRC Location with OTHER tag
+        const brc = brcMap[e.brcCode];
+        let brcLabel = brc ? brc.location : e.brcCode;
+        if (e.venueType === 'OTHER_BRC' || e.tag === 'other event') {
+          brcLabel += ' [OTHER]';
+        }
+
         // Limit the strings to 1 line (lineBreak: false) so they don't wrap and overlap the next row
-        doc.text(e.name || 'Unnamed Event', colX[0], rowY, { width: 140, lineBreak: false, ellipsis: true });
-        doc.text(gpsDateStr, colX[1], rowY, { width: 110, lineBreak: false, ellipsis: true });
-        doc.text(gpsLocStr, colX[2], rowY, { width: 150, lineBreak: false, ellipsis: true });
-        doc.text(evFootfall.toString(), colX[3], rowY, { width: 50, lineBreak: false, ellipsis: true });
+        doc.text(e.name || 'Unnamed Event', colX[0], rowY, { width: 95, lineBreak: false, ellipsis: true });
+        doc.text(brcLabel, colX[1], rowY, { width: 90, lineBreak: false, ellipsis: true });
+        doc.text(gpsDateStr, colX[2], rowY, { width: 115, lineBreak: false, ellipsis: true });
+        doc.text(gpsLocStr, colX[3], rowY, { width: 100, lineBreak: false, ellipsis: true });
+        doc.text(evFootfall.toString(), colX[4], rowY, { width: 50, lineBreak: false, ellipsis: true });
 
         doc.moveDown(0.5);
       });

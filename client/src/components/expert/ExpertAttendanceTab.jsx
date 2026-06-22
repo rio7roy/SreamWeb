@@ -81,7 +81,7 @@ export default function ExpertAttendanceTab({ user }) {
     const query = searchQuery.toLowerCase();
     return events.filter(e => {
       const nameMatch = (e.name || '').toLowerCase().includes(query);
-      const brcMatch = (e.brcName || e.brcCode || '').toLowerCase().includes(query);
+      const brcMatch = (e.brcLocation || e.brcName || e.brcCode || '').toLowerCase().includes(query);
       return nameMatch || brcMatch;
     });
   }, [events, searchQuery]);
@@ -214,7 +214,7 @@ export default function ExpertAttendanceTab({ user }) {
                         <tr>
                           <th className="px-6 py-3 font-semibold">Date</th>
                           <th className="px-6 py-3 font-semibold">Event Name</th>
-                          <th className="px-6 py-3 font-semibold">BRC Name</th>
+                          <th className="px-6 py-3 font-semibold">BRC Location</th>
                           <th className="px-6 py-3 font-semibold">Status</th>
                         </tr>
                       </thead>
@@ -229,7 +229,12 @@ export default function ExpertAttendanceTab({ user }) {
                               {new Date(e.locationTimestamp && !isNaN(Number(e.locationTimestamp)) ? Number(e.locationTimestamp) : (e.locationTimestamp || e.createdAt)).toLocaleDateString()}
                             </td>
                             <td className="px-6 py-4 truncate max-w-[300px]" title={e.name}>{e.name}</td>
-                            <td className="px-6 py-4 font-mono text-xs text-secondary">{e.brcName}</td>
+                            <td className="px-6 py-4 font-mono text-xs text-secondary flex items-center gap-2">
+                              {e.brcLocation || e.brcName}
+                              {(e.venueType === 'OTHER_BRC' || e.tag === 'other event') && (
+                                <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-[10px] font-bold uppercase tracking-widest">OTHER</span>
+                              )}
+                            </td>
                             <td className="px-6 py-4">
                               <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${e.status === 'SUBMITTED' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
                                 {e.status}
@@ -254,8 +259,11 @@ export default function ExpertAttendanceTab({ user }) {
                     <h3 className="text-xl font-bold text-on-surface" style={{ fontFamily: "'Hanken Grotesk', sans-serif" }}>
                       {selectedEvent.name}
                     </h3>
-                    <p className="text-sm text-secondary font-medium">
-                      {new Date(selectedEvent.locationTimestamp && !isNaN(Number(selectedEvent.locationTimestamp)) ? Number(selectedEvent.locationTimestamp) : (selectedEvent.locationTimestamp || selectedEvent.createdAt)).toLocaleDateString()} &bull; Hub: {selectedEvent.brcName || selectedEvent.brcCode}
+                    <p className="text-sm text-secondary font-medium flex items-center gap-2">
+                      {new Date(selectedEvent.locationTimestamp && !isNaN(Number(selectedEvent.locationTimestamp)) ? Number(selectedEvent.locationTimestamp) : (selectedEvent.locationTimestamp || selectedEvent.createdAt)).toLocaleDateString()} &bull; BRC: {selectedEvent.brcLocation || selectedEvent.brcName || selectedEvent.brcCode}
+                      {(selectedEvent.venueType === 'OTHER_BRC' || selectedEvent.tag === 'other event') && (
+                        <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-[10px] font-bold uppercase tracking-widest">OTHER</span>
+                      )}
                     </p>
                     {(selectedEvent.locationTimestamp || selectedEvent.createdAt) && (
                       <p className="text-xs text-primary/80 font-mono mt-1 flex items-center gap-1">
