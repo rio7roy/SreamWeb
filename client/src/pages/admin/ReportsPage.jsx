@@ -225,40 +225,94 @@ export default function ReportsPage() {
               No reports found for the selected filters.
             </div>
           ) : (
-            <table className="w-full text-left text-sm whitespace-nowrap">
-              <thead className="bg-surface-container-high sticky top-0 shadow-sm z-10">
-                <tr>
-                  <th className="px-6 py-3 font-semibold">Date</th>
-                  <th className="px-6 py-3 font-semibold">Event Name</th>
-                  <th className="px-6 py-3 font-semibold">BRC Name</th>
-                  <th className="px-6 py-3 font-semibold">Teachers</th>
-                  <th className="px-6 py-3 font-semibold">Students</th>
-                  <th className="px-6 py-3 font-semibold">Tag</th>
-                  <th className="px-6 py-3 font-semibold">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-outline/10">
-                {previewEvents.map(e => (
-                  <tr 
-                    key={e.id} 
-                    className="hover:bg-surface-container-low transition-colors cursor-pointer"
-                    onClick={() => setSelectedEvent(e)}
-                  >
-                    <td className="px-6 py-3">{new Date(e.date || e.createdAt).toLocaleDateString()}</td>
-                    <td className="px-6 py-3 truncate max-w-[200px]" title={e.name}>{e.name}</td>
-                    <td className="px-6 py-3 font-mono text-xs text-secondary">{e.brcName || e.brcCode}</td>
-                    <td className="px-6 py-3 text-secondary">{e.teachersCount || 0}</td>
-                    <td className="px-6 py-3 text-secondary">{e.studentsCount || 0}</td>
-                    <td className="px-6 py-3 capitalize text-secondary">{e.customTag || e.tag || 'N/A'}</td>
-                    <td className="px-6 py-3">
-                      <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${e.status === 'SUBMITTED' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-                        {e.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="flex flex-col">
+              {/* Standard Events Table */}
+              {previewEvents.filter(e => e.creatorRole !== 'STREAM_LAB').length > 0 && (
+                <div className="mb-6">
+                  <div className="bg-surface-container-highest px-6 py-2 sticky top-0 z-10">
+                    <h4 className="text-sm font-bold text-on-surface uppercase tracking-wider">Programs Conducted</h4>
+                  </div>
+                  <table className="w-full text-left text-sm whitespace-nowrap">
+                    <thead className="bg-surface-container-high border-b border-outline/10">
+                      <tr>
+                        <th className="px-6 py-3 font-semibold">Date</th>
+                        <th className="px-6 py-3 font-semibold">Event Name</th>
+                        <th className="px-6 py-3 font-semibold">BRC Name</th>
+                        <th className="px-6 py-3 font-semibold">Teachers</th>
+                        <th className="px-6 py-3 font-semibold">Students</th>
+                        <th className="px-6 py-3 font-semibold">Tag</th>
+                        <th className="px-6 py-3 font-semibold">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-outline/10">
+                      {previewEvents.filter(e => e.creatorRole !== 'STREAM_LAB').map(e => (
+                        <tr 
+                          key={e.id} 
+                          className="hover:bg-surface-container-low transition-colors cursor-pointer"
+                          onClick={() => setSelectedEvent(e)}
+                        >
+                          <td className="px-6 py-3">{new Date(e.date || e.createdAt).toLocaleDateString()}</td>
+                          <td className="px-6 py-3 truncate max-w-[200px]" title={e.name}>{e.name}</td>
+                          <td className="px-6 py-3 font-mono text-xs text-secondary">{e.brcName || e.brcCode}</td>
+                          <td className="px-6 py-3 text-secondary">{e.teachersCount || 0}</td>
+                          <td className="px-6 py-3 text-secondary">{e.studentsCount || 0}</td>
+                          <td className="px-6 py-3 capitalize text-secondary">{e.customTag || e.tag || 'N/A'}</td>
+                          <td className="px-6 py-3">
+                            <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${e.status === 'SUBMITTED' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                              {e.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Separate Hub Events Table */}
+              {previewEvents.filter(e => e.creatorRole === 'STREAM_LAB').length > 0 && (
+                <div>
+                  <div className="bg-amber-50 border-y border-amber-200 px-6 py-2 sticky top-0 z-10 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-amber-600 text-sm">hub</span>
+                    <h4 className="text-sm font-bold text-amber-900 uppercase tracking-wider">Separate Hub Events</h4>
+                  </div>
+                  <table className="w-full text-left text-sm whitespace-nowrap">
+                    <thead className="bg-amber-50/50 border-b border-amber-100 text-amber-900">
+                      <tr>
+                        <th className="px-6 py-3 font-semibold">Date</th>
+                        <th className="px-6 py-3 font-semibold">Event Name</th>
+                        <th className="px-6 py-3 font-semibold">BRC Name</th>
+                        <th className="px-6 py-3 font-semibold">Teachers</th>
+                        <th className="px-6 py-3 font-semibold">Students</th>
+                        <th className="px-6 py-3 font-semibold">Tag</th>
+                        <th className="px-6 py-3 font-semibold">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-amber-100 bg-amber-50/20">
+                      {previewEvents.filter(e => e.creatorRole === 'STREAM_LAB').map(e => (
+                        <tr 
+                          key={e.id} 
+                          className="hover:bg-amber-100/50 transition-colors cursor-pointer"
+                          onClick={() => setSelectedEvent(e)}
+                        >
+                          <td className="px-6 py-3 text-amber-900">{new Date(e.date || e.createdAt).toLocaleDateString()}</td>
+                          <td className="px-6 py-3 truncate max-w-[200px] font-bold text-amber-900" title={e.name}>{e.name}</td>
+                          <td className="px-6 py-3 font-mono text-xs text-amber-700">{e.brcName || e.brcCode}</td>
+                          <td className="px-6 py-3 text-amber-800">{e.teachersCount || 0}</td>
+                          <td className="px-6 py-3 text-amber-800">{e.studentsCount || 0}</td>
+                          <td className="px-6 py-3 capitalize text-amber-800">{e.customTag || e.tag || 'N/A'}</td>
+                          <td className="px-6 py-3">
+                            <span className="px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-200 text-amber-800">
+                              HUB UPLOAD
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>

@@ -50,7 +50,8 @@ exports.createEvent = (req, res) => {
       photos,
       status: status || 'DRAFT', // 'DRAFT' or 'SUBMITTED'
       createdAt: new Date().toISOString(),
-      createdBy: req.user.id
+      createdBy: req.user.id,
+      creatorRole: req.user.role || 'UNKNOWN'
     };
 
     const events = readEvents();
