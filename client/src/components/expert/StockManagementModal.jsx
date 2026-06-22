@@ -50,7 +50,7 @@ const resolveImgUrl = (img) => {
   return `${apiBase}/${img}`;
 };
 
-export default function StockManagementModal({ brcCode, brcName, onClose, inline = false }) {
+export default function StockManagementModal({ brcCode, brcName, onClose, inline = false, isViewOnly = false }) {
   const { user } = useAuth();
   const [stocks, setStocks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -287,7 +287,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
   const getStatusStyle = (s) => STATUS_CONFIG[s] || STATUS_CONFIG.ACTIVE;
 
   // Grid template for all columns: #, UniqueID, IMG, Item, Category, NewQty, Available, Used, Damaged, Consumed, Remarks, Section, Label, Actions
-  const gridCols = '30px minmax(65px, 0.8fr) 35px minmax(120px, 1.5fr) minmax(70px, 1fr) minmax(40px, 0.6fr) minmax(40px, 0.6fr) minmax(40px, 0.6fr) minmax(40px, 0.6fr) minmax(40px, 0.6fr) minmax(100px, 1.2fr) minmax(60px, 1fr) minmax(60px, 1fr) 60px';
+  const gridCols = `30px minmax(65px, 0.8fr) 35px minmax(120px, 1.5fr) minmax(70px, 1fr) minmax(40px, 0.6fr) minmax(40px, 0.6fr) minmax(40px, 0.6fr) minmax(40px, 0.6fr) minmax(40px, 0.6fr) minmax(100px, 1.2fr) minmax(60px, 1fr) minmax(60px, 1fr)${isViewOnly ? '' : ' 60px'}`;
 
   const content = (
     <div className={`relative bg-white w-full overflow-hidden flex flex-col ${inline ? 'h-[75vh] border border-slate-200 rounded-2xl shadow-sm' : `max-w-[1500px] rounded-2xl shadow-2xl h-[94vh] ${isClosing ? 'animate-fade-out-down' : 'animate-fade-in-up'}`}`}>
@@ -346,9 +346,11 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
               {MONTHS[new Date().getMonth()]}
             </div>
           </div>
-          <button onClick={() => setIsAddingItem(true)} className="w-9 h-9 flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors shadow-sm" title="Add New Item">
-            <span className="material-symbols-outlined text-xl">add</span>
-          </button>
+          {!isViewOnly && (
+            <button onClick={() => setIsAddingItem(true)} className="w-9 h-9 flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors shadow-sm" title="Add New Item">
+              <span className="material-symbols-outlined text-xl">add</span>
+            </button>
+          )}
           <span className="ml-auto text-[10px] text-gray-400 font-medium">
             {filteredStocks.length} of {stocks.length} items
           </span>
@@ -465,7 +467,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
                 <span>Remarks</span>
                 <span>Section</span>
                 <span>Label</span>
-                <span className="text-center">Actions</span>
+                {!isViewOnly && <span className="text-center">Actions</span>}
               </div>
             </div>
 
@@ -534,56 +536,76 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
 
                       {/* Available Qty (inline editable) */}
                       <div className="flex justify-center">
-                        <input type="number" min="0" max={stock.newQty || stock.quantity}
-                          key={`avail-${stock.id}-${stock.availableQty}`}
-                          defaultValue={stock.availableQty ?? stock.newQty ?? stock.quantity ?? 0}
-                          className="w-full min-w-0 text-center text-[11px] font-bold border rounded py-0.5 outline-none focus:border-green-500 focus:bg-green-50"
-                          onBlur={(e) => handleQuantityUpdate(stock, 'availableQty', e.target.value)}
-                          onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
+                        {isViewOnly ? (
+                          <span className="text-[11px] font-bold text-gray-700">{stock.availableQty ?? stock.newQty ?? stock.quantity ?? 0}</span>
+                        ) : (
+                          <input type="number" min="0" max={stock.newQty || stock.quantity}
+                            key={`avail-${stock.id}-${stock.availableQty}`}
+                            defaultValue={stock.availableQty ?? stock.newQty ?? stock.quantity ?? 0}
+                            className="w-full min-w-0 text-center text-[11px] font-bold border rounded py-0.5 outline-none focus:border-green-500 focus:bg-green-50"
+                            onBlur={(e) => handleQuantityUpdate(stock, 'availableQty', e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
+                        )}
                       </div>
 
                       {/* Used Qty */}
                       <div className="flex justify-center">
-                        <input type="number" min="0"
-                          defaultValue={stock.usedQty || 0}
-                          className="w-full min-w-0 text-center text-[11px] font-semibold border rounded py-0.5 outline-none focus:border-blue-500 focus:bg-blue-50 text-blue-700"
-                          onBlur={(e) => handleQuantityUpdate(stock, 'usedQty', e.target.value)}
-                          onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
+                        {isViewOnly ? (
+                          <span className="text-[11px] font-bold text-blue-700">{stock.usedQty || 0}</span>
+                        ) : (
+                          <input type="number" min="0"
+                            defaultValue={stock.usedQty || 0}
+                            className="w-full min-w-0 text-center text-[11px] font-semibold border rounded py-0.5 outline-none focus:border-blue-500 focus:bg-blue-50 text-blue-700"
+                            onBlur={(e) => handleQuantityUpdate(stock, 'usedQty', e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
+                        )}
                       </div>
 
                       {/* Damaged Qty */}
                       <div className="flex justify-center">
-                        <input type="number" min="0"
-                          defaultValue={stock.damagedQty || 0}
-                          className="w-full min-w-0 text-center text-[11px] font-semibold border rounded py-0.5 outline-none focus:border-red-500 focus:bg-red-50 text-red-700"
-                          onBlur={(e) => handleQuantityUpdate(stock, 'damagedQty', e.target.value)}
-                          onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
+                        {isViewOnly ? (
+                          <span className="text-[11px] font-bold text-red-700">{stock.damagedQty || 0}</span>
+                        ) : (
+                          <input type="number" min="0"
+                            defaultValue={stock.damagedQty || 0}
+                            className="w-full min-w-0 text-center text-[11px] font-semibold border rounded py-0.5 outline-none focus:border-red-500 focus:bg-red-50 text-red-700"
+                            onBlur={(e) => handleQuantityUpdate(stock, 'damagedQty', e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
+                        )}
                       </div>
 
                       {/* Consumed Qty */}
                       <div className="flex justify-center">
-                        <input type="number" min="0"
-                          defaultValue={stock.consumedQty || 0}
-                          className="w-full min-w-0 text-center text-[11px] font-semibold border rounded py-0.5 outline-none focus:border-orange-500 focus:bg-orange-50 text-orange-700"
-                          onBlur={(e) => handleQuantityUpdate(stock, 'consumedQty', e.target.value)}
-                          onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
+                        {isViewOnly ? (
+                          <span className="text-[11px] font-bold text-orange-700">{stock.consumedQty || 0}</span>
+                        ) : (
+                          <input type="number" min="0"
+                            defaultValue={stock.consumedQty || 0}
+                            className="w-full min-w-0 text-center text-[11px] font-semibold border rounded py-0.5 outline-none focus:border-orange-500 focus:bg-orange-50 text-orange-700"
+                            onBlur={(e) => handleQuantityUpdate(stock, 'consumedQty', e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
+                        )}
                       </div>
 
                       {/* Remarks */}
                       <div>
-                        <input type="text"
-                          defaultValue={stock.remarks || ''}
-                          placeholder="Add remark..."
-                          className="w-full min-w-0 text-[10px] border rounded px-1.5 py-0.5 outline-none focus:border-amber-400 focus:bg-amber-50"
-                          onBlur={(e) => {
-                            if (e.target.value !== (stock.remarks || '')) {
-                              updateStockField(stock.id, { remarks: e.target.value });
-                              if (e.target.value.trim() !== '') {
-                                sendRemarkMessage(stock, e.target.value);
+                        {isViewOnly ? (
+                          <span className="text-[10px] text-gray-700 truncate block w-full" title={stock.remarks}>{stock.remarks || '—'}</span>
+                        ) : (
+                          <input type="text"
+                            defaultValue={stock.remarks || ''}
+                            placeholder="Add remark..."
+                            className="w-full min-w-0 text-[10px] border rounded px-1.5 py-0.5 outline-none focus:border-amber-400 focus:bg-amber-50"
+                            onBlur={(e) => {
+                              if (e.target.value !== (stock.remarks || '')) {
+                                updateStockField(stock.id, { remarks: e.target.value });
+                                if (e.target.value.trim() !== '') {
+                                  sendRemarkMessage(stock, e.target.value);
+                                }
                               }
-                            }
-                          }}
-                          onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
+                            }}
+                            onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />
+                        )}
                       </div>
 
                       {/* Section */}
@@ -593,21 +615,23 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
                       <span className="text-[9px] text-gray-500 font-mono truncate" title={stock.label}>{stock.label || '—'}</span>
 
                       {/* Actions */}
-                      <div className="flex justify-center gap-1">
-                        <button onClick={() => sendLowStockAlert(stock)} disabled={alertSending === stock.id}
-                          className={`flex items-center justify-center p-1.5 rounded-lg text-xs font-bold transition-all ${
-                            isOutOfStock ? 'bg-red-700 text-white hover:bg-red-800 shadow-md ring-2 ring-red-300 animate-pulse' : isLow ? 'bg-red-600 text-white hover:bg-red-700 shadow-sm' : 'bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600'
-                          }`} title={isOutOfStock ? 'OUT OF STOCK — Send urgent alert to admin' : 'Send low stock alert to admin'}>
-                          <span className="material-symbols-outlined text-[14px]">
-                            {alertSending === stock.id ? 'hourglass_top' : isOutOfStock ? 'error' : 'notification_important'}
-                          </span>
-                        </button>
-                        {user?.role === 'ADMIN' && (
-                          <button onClick={() => handleDeleteItem(stock.id)} className="flex items-center justify-center p-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-colors" title="Delete custom item">
-                            <span className="material-symbols-outlined text-[14px]">delete</span>
+                      {!isViewOnly && (
+                        <div className="flex justify-center gap-1">
+                          <button onClick={() => sendLowStockAlert(stock)} disabled={alertSending === stock.id}
+                            className={`flex items-center justify-center p-1.5 rounded-lg text-xs font-bold transition-all ${
+                              isOutOfStock ? 'bg-red-700 text-white hover:bg-red-800 shadow-md ring-2 ring-red-300 animate-pulse' : isLow ? 'bg-red-600 text-white hover:bg-red-700 shadow-sm' : 'bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600'
+                            }`} title={isOutOfStock ? 'OUT OF STOCK — Send urgent alert to admin' : 'Send low stock alert to admin'}>
+                            <span className="material-symbols-outlined text-[14px]">
+                              {alertSending === stock.id ? 'hourglass_top' : isOutOfStock ? 'error' : 'notification_important'}
+                            </span>
                           </button>
-                        )}
-                      </div>
+                          {user?.role === 'ADMIN' && (
+                            <button onClick={() => handleDeleteItem(stock.id)} className="flex items-center justify-center p-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-colors" title="Delete custom item">
+                              <span className="material-symbols-outlined text-[14px]">delete</span>
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
