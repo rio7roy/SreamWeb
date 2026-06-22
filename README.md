@@ -109,7 +109,11 @@ You can log in using the following credentials:
 - **Event Reports**: Differentiates between standard "Programs Conducted" by experts and "Separate Hub Events" uploaded by BRCs.
 - **User Management**: Create, edit, and deactivate users. Manage role assignments.
 - **Broadcast System**: Push global notifications and announcements to specific roles.
-- **Stock Administration**: View and manage the inventory of different Hubs.
+- **Stock Administration**: 
+  - **Comprehensive Management**: View and manage the inventory of different Hubs, export reports, and compare stock allocations.
+  - **Intelligent Bulk Uploads**: CSV upload system that automatically identifies duplicates, matches existing items by `uniqueId`, and smartly increments stock quantities without duplicating database entries.
+  - **Cascading Assignments**: Auto-filters and syncs BRC selection lists based on dynamically selected Districts to ensure accurate inventory assignment.
+  - **Location Formatting**: Distinct `Location/Name` displays across all stock tables, dropdowns, and comparison tools to ensure clarity when multiple BRCs share similar names.
 - **Report Exports**: Generate and download deeply formatted PDF and Excel reports for all ecosystem activities.
 
 ### 3. Event & Attendance Tracking
