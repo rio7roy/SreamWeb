@@ -396,7 +396,7 @@ exports.exportEventsExcel = async (req, res) => {
         district: brc ? brc.district : 'N/A',
         teachers: e.teachersCount || 0,
         students: e.studentsCount || 0,
-        tag: e.tag === 'other event' ? e.customTag : e.tag || 'N/A',
+        tag: e.venueType === 'OTHER_BRC' ? 'OTHER' : (e.tag === 'other event' ? (e.customTag || 'OTHER') : e.tag || 'N/A'),
         desc: e.description || '',
       });
     });
@@ -492,7 +492,8 @@ exports.exportEventsPdf = async (req, res) => {
         doc.fontSize(14).font('Helvetica-Bold').text(`${index + 1}. ${event.name}`);
         doc.fontSize(10).font('Helvetica').text(`Date: ${new Date(event.date || event.createdAt).toLocaleDateString()}`);
         doc.text(`Hub: ${event.brcCode} ${brcMap[event.brcCode] ? `(${brcMap[event.brcCode].name})` : ''}`);
-        doc.text(`Tag: ${event.customTag || event.tag || 'N/A'}`);
+        const displayTag = event.venueType === 'OTHER_BRC' ? 'OTHER' : (event.tag === 'other event' ? (event.customTag || 'OTHER') : event.tag || 'N/A');
+        doc.text(`Tag: ${displayTag}`);
         doc.text(`Attendance: ${event.teachersCount} Teachers, ${event.studentsCount} Students`);
         
         if (event.description) {

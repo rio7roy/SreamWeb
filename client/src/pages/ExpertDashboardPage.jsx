@@ -64,6 +64,7 @@ export default function ExpertDashboardPage() {
 
   const [showEventModal, setShowEventModal] = useState(false);
   const [showOtherBrcModal, setShowOtherBrcModal] = useState(false);
+  const [otherLocationSelected, setOtherLocationSelected] = useState("");
   const [otherBrcSelected, setOtherBrcSelected] = useState("");
   const [customBrcText, setCustomBrcText] = useState("");
   const [otherBrcForReport, setOtherBrcForReport] = useState(null);
@@ -136,6 +137,16 @@ export default function ExpertDashboardPage() {
 
   const assignedBrcCodes = user?.assignedBrcs || [];
   const allowedBrcs = brcData.filter((b) => assignedBrcCodes.includes(b.code));
+
+  const uniqueLocations = useMemo(() => {
+    const locs = new Set(brcData.map(b => b.location).filter(Boolean));
+    return Array.from(locs).sort();
+  }, [brcData]);
+
+  const filteredOtherBrcs = useMemo(() => {
+    if (!otherLocationSelected) return [];
+    return brcData.filter(b => b.location === otherLocationSelected);
+  }, [brcData, otherLocationSelected]);
 
   // Fetch global stats for all allowed BRCs when NOT in a session
   useEffect(() => {
@@ -770,33 +781,59 @@ export default function ExpertDashboardPage() {
             </div>
             <p className="text-secondary text-sm mb-6">Select the BRC where you conducted this event. This will be automatically tagged as an 'other event'.</p>
             
-            <div className="mb-6">
-              <label className="block text-sm font-bold text-secondary mb-2">Target Venue / BRC</label>
-              <select 
-                value={otherBrcSelected} 
-                onChange={(e) => setOtherBrcSelected(e.target.value)}
-                className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 outline-none transition-all mb-3"
-              >
-                <option value="" disabled>Select Venue...</option>
-                <option value="CUSAT">CUSAT</option>
-                <option value="BRC Office">BRC Office</option>
-                <option value="OTHER">Other (Custom)</option>
-                <optgroup label="Registered BRCs">
-                  {brcData.map(b => (
-                    <option key={b.code} value={b.code}>{b.location}/ {b.name}</option>
-                  ))}
-                </optgroup>
-              </select>
+            <div className="mb-6 space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-secondary mb-2">Hub Location</label>
+                <select 
+                  value={otherLocationSelected} 
+                  onChange={(e) => {
+                    setOtherLocationSelected(e.target.value);
+                    setOtherBrcSelected("");
+                    setCustomBrcText("");
+                  }}
+                  className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 outline-none transition-all"
+                >
+                  <option value="" disabled>Select Location...</option>
+                  <option value="OTHER">Other (Custom Venue)</option>
+                  <optgroup label="Registered Locations">
+                    {uniqueLocations.map(loc => (
+                      <option key={loc} value={loc}>{loc}</option>
+                    ))}
+                  </optgroup>
+                </select>
+              </div>
+
+              {(otherLocationSelected && otherLocationSelected !== 'OTHER') && (
+                <div className="animate-fade-in-up">
+                  <label className="block text-sm font-bold text-secondary mb-2">BRC School</label>
+                  <select 
+                    value={otherBrcSelected} 
+                    onChange={(e) => setOtherBrcSelected(e.target.value)}
+                    className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 outline-none transition-all"
+                  >
+                    <option value="" disabled>Select BRC School...</option>
+                    <option value="OTHER">Other School in {otherLocationSelected}</option>
+                    <optgroup label="Registered BRCs">
+                      {filteredOtherBrcs.map(b => (
+                        <option key={b.code} value={b.code}>{b.name}</option>
+                      ))}
+                    </optgroup>
+                  </select>
+                </div>
+              )}
               
-              {otherBrcSelected === 'OTHER' && (
-                <input
-                  type="text"
-                  placeholder="Enter custom venue name"
-                  value={customBrcText}
-                  onChange={(e) => setCustomBrcText(e.target.value)}
-                  className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none"
-                  autoFocus
-                />
+              {(otherLocationSelected === 'OTHER' || otherBrcSelected === 'OTHER') && (
+                <div className="animate-fade-in-up mt-3">
+                  <label className="block text-sm font-bold text-secondary mb-2">Custom Venue Name</label>
+                  <input
+                    type="text"
+                    placeholder="Enter custom venue name"
+                    value={customBrcText}
+                    onChange={(e) => setCustomBrcText(e.target.value)}
+                    className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 focus:border-primary outline-none"
+                    autoFocus
+                  />
+                </div>
               )}
             </div>
             
@@ -808,11 +845,20 @@ export default function ExpertDashboardPage() {
                 Cancel
               </button>
               <button 
-                disabled={!otherBrcSelected || (otherBrcSelected === 'OTHER' && !customBrcText.trim())}
+                disabled={(!otherLocationSelected) || (otherLocationSelected !== 'OTHER' && !otherBrcSelected) || ((otherLocationSelected === 'OTHER' || otherBrcSelected === 'OTHER') && !customBrcText.trim())}
                 onClick={() => {
-                  let brc = brcData.find(b => b.code === otherBrcSelected);
+                  let venueName = "";
+                  
+                  if (otherLocationSelected === 'OTHER') {
+                    venueName = customBrcText.trim();
+                  } else if (otherBrcSelected === 'OTHER') {
+                    venueName = `${customBrcText.trim()} (${otherLocationSelected})`;
+                  } else {
+                    venueName = otherBrcSelected; // This is the BRC code
+                  }
+
+                  let brc = brcData.find(b => b.code === venueName);
                   if (!brc) {
-                    const venueName = otherBrcSelected === 'OTHER' ? customBrcText.trim() : otherBrcSelected;
                     brc = { code: venueName, name: venueName };
                   }
                   
