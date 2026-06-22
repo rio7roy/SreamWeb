@@ -62,6 +62,7 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
   const [editingStock, setEditingStock] = useState(null);
   const [alertSending, setAlertSending] = useState(null);
   const [isAddingItem, setIsAddingItem] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [newItemForm, setNewItemForm] = useState({
     uniqueId: '', itemName: '', category: '', newQty: '', availableQty: 0,
     usedQty: 0, damagedQty: 0, consumedQty: 0, remarks: '', section: '', label: '', imgFile: null
@@ -116,6 +117,24 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
     return result;
   }, [stocks, selectedCategory, selectedStatus, searchQuery]);
 
+  const sendRemarkMessage = async (stock, newRemark) => {
+    if (!newRemark || newRemark.trim() === '') return;
+    try {
+      const content = `📦 Item: ${stock.itemName} (${stock.category})\n📍 Location: ${brcName}, ${stock.district || 'NA'}\n💬 Remark: "${newRemark.trim()}"`;
+      await api.post('/messages', {
+        type: 'STOCK_REMARK',
+        title: `📝 New Remark: ${stock.itemName}`,
+        content: content,
+        to: ['ADMIN'],
+        message: content,
+        brc: brcCode,
+        priority: 'NORMAL',
+      });
+    } catch (e) {
+      console.error('Failed to send remark message', e);
+    }
+  };
+
   const categoryCounts = useMemo(() => {
     const c = {};
     stocks.forEach(s => { const cat = s.category || 'Other'; c[cat] = (c[cat] || 0) + 1; });
@@ -166,12 +185,14 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
 
   const handleAddItem = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
     if (!newItemForm.itemName || !newItemForm.uniqueId) return showFeedback('error', 'Item Name and Unique ID are required');
     if (!newItemForm.imgFile) return showFeedback('error', 'Please upload a photo of the equipment');
     
     const finalCategory = newItemForm.category === 'Other' ? (newItemForm.customCategory || 'Other') : newItemForm.category;
     if (!finalCategory) return showFeedback('error', 'Please select or enter a category');
 
+    setIsSubmitting(true);
     try {
       const formData = new FormData();
       formData.append('uniqueId', newItemForm.uniqueId);
@@ -210,6 +231,8 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
       }
     } catch (err) {
       showFeedback('error', 'Failed to add new item.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -414,9 +437,9 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
                 </div>
               </div>
               <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-2">
-                <button type="button" onClick={() => setIsAddingItem(false)} className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-lg">Cancel</button>
-                <button type="submit" className="px-5 py-2 text-xs font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg flex items-center gap-1">
-                  <span className="material-symbols-outlined text-sm">save</span> Add Item
+                <button type="button" disabled={isSubmitting} onClick={() => setIsAddingItem(false)} className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-lg disabled:opacity-50">Cancel</button>
+                <button type="submit" disabled={isSubmitting} className="px-5 py-2 text-xs font-bold bg-amber-500 text-white hover:bg-amber-600 rounded-lg flex items-center gap-1 disabled:opacity-50">
+                  <span className="material-symbols-outlined text-sm">save</span> {isSubmitting ? 'Adding...' : 'Add Item'}
                 </button>
               </div>
             </form>
@@ -555,6 +578,9 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
                           onBlur={(e) => {
                             if (e.target.value !== (stock.remarks || '')) {
                               updateStockField(stock.id, { remarks: e.target.value });
+                              if (e.target.value.trim() !== '') {
+                                sendRemarkMessage(stock, e.target.value);
+                              }
                             }
                           }}
                           onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }} />

@@ -100,10 +100,16 @@ async function bulkUpsertStocks(items) {
     if (existing.data && existing.data.length > 0) {
       // Update existing item (add quantity)
       const ex = existing.data[0];
+      
+      const currentNewQty = ex.newQty !== undefined ? ex.newQty : ex.quantity;
+      const currentAvailableQty = ex.availableQty !== undefined ? ex.availableQty : currentNewQty;
+      
       db.stocks.update({
         where: { id: ex.id },
         data: {
           quantity: ex.quantity + item.quantity,
+          newQty: currentNewQty + item.quantity,
+          availableQty: currentAvailableQty + item.quantity,
           category: item.category || ex.category,
           serialNumber: item.serialNumber || ex.serialNumber,
           district: item.district || ex.district,
@@ -115,6 +121,8 @@ async function bulkUpsertStocks(items) {
       db.stocks.create({
         data: {
           status: 'ACTIVE',
+          newQty: item.quantity,
+          availableQty: item.quantity,
           ...item
         }
       });
@@ -133,9 +141,15 @@ async function bulkUpdateStocks(data, where = {}) {
   return result;
 }
 
+async function getStockHistory(filters = {}) {
+  const { data } = db.stockHistory.findMany({ where: filters });
+  return data;
+}
+
 module.exports = {
   listStocks,
   getAllStocks,
+  getStockHistory,
   createStock,
   getStockById,
   updateStockById,

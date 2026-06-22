@@ -22,6 +22,11 @@ export default function StockMonitoring() {
   }, [filters, sortConfig]);
 
   const fetchStocks = async () => {
+    if (!filters.district && !filters.brc) {
+      setStocks([]);
+      return;
+    }
+
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -38,7 +43,12 @@ export default function StockMonitoring() {
         fetchedData = fetchedData.filter(stock => {
           const original = Number(stock.newQty ?? stock.quantity ?? 0);
           const current = stock.availableQty !== undefined ? Number(stock.availableQty) : original;
+          
+          // Consider "newly added" if created within the last 24 hours
+          const isRecentlyAdded = (new Date() - new Date(stock.createdAt)) < 24 * 60 * 60 * 1000;
+          
           return (
+            isRecentlyAdded ||
             Number(stock.damagedQty || 0) > 0 || 
             Number(stock.usedQty || 0) > 0 || 
             Number(stock.consumedQty || 0) > 0 ||
@@ -141,11 +151,21 @@ export default function StockMonitoring() {
                 ))}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-slate-200">
+            <tbody className="divide-y divide-slate-100">
               {loading ? (
                 <tr><td colSpan="10" className="text-center py-8 text-slate-500">Loading stocks...</td></tr>
+              ) : (!filters.district && !filters.brc) ? (
+                <tr>
+                  <td colSpan="10" className="text-center py-10 text-slate-500 font-medium">
+                    Please select a District or BRC to view stocks.
+                  </td>
+                </tr>
               ) : stocks.length === 0 ? (
-                <tr><td colSpan="10" className="text-center py-8 text-slate-500">No changed stock found matching filters.</td></tr>
+                <tr>
+                  <td colSpan="10" className="text-center py-10 text-slate-500 font-medium">
+                    No stock found matching filters.
+                  </td>
+                </tr>
               ) : (
                 stocks.map((stock) => (
                   <tr key={stock.id} className="hover:bg-slate-50">

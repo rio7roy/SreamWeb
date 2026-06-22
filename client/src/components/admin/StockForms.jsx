@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import api from '../../lib/api';
 import MultiSelect from '../common/MultiSelect';
 
@@ -57,6 +57,7 @@ export default function StockForms({ onActionComplete }) {
   const [activeTab, setActiveTab] = useState('create'); // 'create', 'bulkUpload', 'bulkUpdate'
   const [message, setMessage] = useState({ text: '', type: '' });
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef(null);
 
   // Form states
   const [createForm, setCreateForm] = useState({
@@ -127,8 +128,11 @@ export default function StockForms({ onActionComplete }) {
       if (dists.length === 0 && brcsList.length === 0) {
         targets.push({ district: '', brc: '' });
       } else {
-        dists.forEach(d => targets.push({ district: d, brc: '' }));
-        brcsList.forEach(b => targets.push({ district: '', brc: b.split('|')[0] }));
+        const brcDistricts = brcsList.map(b => b.split('|')[1]);
+        dists.forEach(d => {
+          if (!brcDistricts.includes(d)) targets.push({ district: d, brc: '' });
+        });
+        brcsList.forEach(b => targets.push({ district: b.split('|')[1], brc: b.split('|')[0] }));
       }
 
       let imgUrl = '';
@@ -213,7 +217,10 @@ export default function StockForms({ onActionComplete }) {
       if (dists.length === 0 && brcsList.length === 0) {
         targets.push({ district: '', brc: '' });
       } else {
-        dists.forEach(d => targets.push({ district: d, brc: '' }));
+        const brcDistricts = brcsList.map(b => b.split('|')[1]);
+        dists.forEach(d => {
+          if (!brcDistricts.includes(d)) targets.push({ district: d, brc: '' });
+        });
         brcsList.forEach(b => targets.push({ district: b.split('|')[1], brc: b.split('|')[0] }));
       }
 
@@ -257,6 +264,29 @@ export default function StockForms({ onActionComplete }) {
     }
   };
 
+  const handleDownloadTemplate = () => {
+    const headers = ['Item Name', 'Category', 'Serial Number', 'Quantity', 'District', 'BRC'];
+    const sampleRows = [
+      ['Sample Arduino Uno', 'Development Boards', 'SN-1001', '10', 'ALAPPUZHA', '1234567890'],
+      ['Sample Resistors 10k', 'Electronic components', '', '100', 'ALAPPUZHA', '1234567890']
+    ];
+    
+    const csvContent = [
+      headers.join(','),
+      ...sampleRows.map(row => row.join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'Stock_Bulk_Upload_Template.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleBulkUpload = async (e) => {
     e.preventDefault();
     if (!file) return showMessage('Please select a file to upload', 'error');
@@ -264,7 +294,7 @@ export default function StockForms({ onActionComplete }) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('districts', JSON.stringify(bulkUploadForm.district));
-    formData.append('brcs', JSON.stringify(bulkUploadForm.brc.map(b => b.split('|')[0])));
+    formData.append('brcs', JSON.stringify(bulkUploadForm.brc));
 
     setLoading(true);
     try {
@@ -273,6 +303,7 @@ export default function StockForms({ onActionComplete }) {
       });
       showMessage('Bulk upload completed successfully!');
       setFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
       setBulkUploadForm({ district: [], brc: [] });
       if (onActionComplete) onActionComplete();
     } catch (err) {
@@ -285,9 +316,9 @@ export default function StockForms({ onActionComplete }) {
   const handleDistrictChange = (newDistricts, currentBrcs, updateFormState) => {
     const validBrcs = (currentBrcs || []).filter(brcVal => {
       const [code, district] = brcVal.split('|');
-      return newDistricts.includes(district);
+      return newDistricts.length === 0 || newDistricts.includes(district);
     });
-    updateFormState(newDistricts, newDistricts.length === 0 ? [] : validBrcs);
+    updateFormState(newDistricts, validBrcs);
   };
 
   return (
@@ -380,16 +411,7 @@ export default function StockForms({ onActionComplete }) {
               <MultiSelect 
                 options={(createForm.district?.length > 0 ? brcs.filter(b => createForm.district.includes(b.district)) : brcs).map(b => ({ value: `${b.code}|${b.district}`, label: b.name }))}
                 selected={createForm.brc}
-                onChange={(newSelected) => {
-                  const selectedDistricts = new Set(createForm.district || []);
-                  newSelected.forEach(brcVal => {
-                    const [code, district] = brcVal.split('|');
-                    if (district) {
-                      selectedDistricts.add(district);
-                    }
-                  });
-                  setCreateForm({...createForm, brc: newSelected, district: Array.from(selectedDistricts)});
-                }}
+                onChange={(newSelected) => setCreateForm({...createForm, brc: newSelected})}
                 placeholder="-- Select BRCs --"
                 showSelectAll={true}
                 selectAllLabel="All BRCs"
@@ -524,16 +546,7 @@ export default function StockForms({ onActionComplete }) {
                  <MultiSelect 
                    options={(editingStock.districts?.length > 0 ? brcs.filter(b => editingStock.districts.includes(b.district)) : brcs).map(b => ({ value: `${b.code}|${b.district}`, label: b.name }))}
                    selected={editingStock.brcs}
-                   onChange={(newSelected) => {
-                     const selectedDistricts = new Set(editingStock.districts || []);
-                     newSelected.forEach(brcVal => {
-                       const [code, district] = brcVal.split('|');
-                       if (district) {
-                         selectedDistricts.add(district);
-                       }
-                     });
-                     setEditingStock({...editingStock, brcs: newSelected, districts: Array.from(selectedDistricts)});
-                   }}
+                   onChange={(newSelected) => setEditingStock({...editingStock, brcs: newSelected})}
                    placeholder="-- Select BRCs --"
                    showSelectAll={true}
                    selectAllLabel="All BRCs"
@@ -576,16 +589,7 @@ export default function StockForms({ onActionComplete }) {
               <MultiSelect 
                 options={(bulkUploadForm.district?.length > 0 ? brcs.filter(b => bulkUploadForm.district.includes(b.district)) : brcs).map(b => ({ value: `${b.code}|${b.district}`, label: b.name }))}
                 selected={bulkUploadForm.brc}
-                onChange={(newSelected) => {
-                  const selectedDistricts = new Set(bulkUploadForm.district || []);
-                  newSelected.forEach(brcVal => {
-                    const [code, district] = brcVal.split('|');
-                    if (district) {
-                      selectedDistricts.add(district);
-                    }
-                  });
-                  setBulkUploadForm({...bulkUploadForm, brc: newSelected, district: Array.from(selectedDistricts)});
-                }}
+                onChange={(newSelected) => setBulkUploadForm({...bulkUploadForm, brc: newSelected})}
                 placeholder="-- Select BRCs --"
                 showSelectAll={true}
                 selectAllLabel="All BRCs"
@@ -595,14 +599,21 @@ export default function StockForms({ onActionComplete }) {
           <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:bg-slate-50 transition-colors">
             <input 
               type="file" 
+              ref={fileInputRef}
               accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, application/pdf"
               onChange={(e) => setFile(e.target.files[0])}
               className="w-full"
             />
           </div>
-          <button disabled={loading} type="submit" className="bg-primary text-on-primary px-4 py-2 rounded font-bold hover:opacity-90 disabled:opacity-50 transition-all">
-            {loading ? 'Uploading...' : 'Process Upload'}
-          </button>
+          <div className="flex gap-4">
+            <button disabled={loading} type="submit" className="bg-primary text-on-primary px-4 py-2 rounded font-bold hover:opacity-90 disabled:opacity-50 transition-all">
+              {loading ? 'Uploading...' : 'Process Upload'}
+            </button>
+            <button type="button" onClick={handleDownloadTemplate} className="bg-slate-100 text-slate-700 border border-slate-300 px-4 py-2 rounded font-medium hover:bg-slate-200 transition-all flex items-center gap-2">
+              <span className="material-symbols-outlined text-[18px]">download</span>
+              Download CSV Template
+            </button>
+          </div>
         </form>
       )}
 

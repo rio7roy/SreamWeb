@@ -24,6 +24,7 @@ function generateId() {
 // In-memory arrays — seeded on startup
 let users = [];
 let stocks = [];
+let stockHistory = [];
 
 /**
  * Seed initial demo users.
@@ -125,14 +126,26 @@ async function seedDatabase() {
     } else {
       // Seed the items for every single BRC so they show up everywhere
       allBrcs.forEach(b => {
-        stocks.push(...initialStocks.map(s => ({
+        const seededStocks = initialStocks.map(s => ({
           id: generateId(),
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: new Date('2026-06-01T00:00:00Z'),
+          updatedAt: new Date('2026-06-01T00:00:00Z'),
           ...s,
           brc: b.code,
           district: b.district
-        })));
+        }));
+        stocks.push(...seededStocks);
+
+        // Seed history for June 1st
+        seededStocks.forEach(s => {
+          stockHistory.push({
+             stockId: s.id,
+             availableQty: s.availableQty !== undefined ? s.availableQty : (s.newQty ?? s.quantity),
+             updatedAt: s.updatedAt,
+             brc: s.brc,
+             district: s.district
+          });
+        });
       });
     }
   }
@@ -343,11 +356,15 @@ const db = {
     findMany: ({ where = {}, skip = 0, take, orderBy, select } = {}) => {
       let result = [...stocks];
 
-      if (where.district) result = result.filter(s => s.district === where.district);
-      if (where.brc) result = result.filter(s => s.brc === where.brc);
+      if (where.district) result = result.filter(s => !s.district || s.district === where.district);
+      if (where.brc) result = result.filter(s => !s.brc || s.brc === where.brc);
       if (where.status) result = result.filter(s => s.status === where.status);
       if (where.category) result = result.filter(s => s.category === where.category);
       if (where.source) result = result.filter(s => s.source === where.source);
+      if (where.itemName) {
+        const queryName = where.itemName.toLowerCase();
+        result = result.filter(s => s.itemName && s.itemName.toLowerCase() === queryName);
+      }
       if (where.search) {
         const search = where.search.toLowerCase();
         result = result.filter(s => 
@@ -411,7 +428,17 @@ const db = {
         throw err;
       }
       stocks[index] = { ...stocks[index], ...data, updatedAt: new Date() };
-      return { ...stocks[index] };
+      
+      const updatedStock = stocks[index];
+      stockHistory.push({
+         stockId: updatedStock.id,
+         availableQty: updatedStock.availableQty !== undefined ? updatedStock.availableQty : (updatedStock.newQty ?? updatedStock.quantity),
+         updatedAt: updatedStock.updatedAt,
+         brc: updatedStock.brc,
+         district: updatedStock.district
+      });
+
+      return { ...updatedStock };
     },
     
     updateMany: ({ data } = {}) => {
@@ -434,6 +461,16 @@ const db = {
       }
       stocks.splice(index, 1);
       return true;
+    }
+  },
+
+  stockHistory: {
+    findMany: ({ where = {} } = {}) => {
+      let filtered = [...stockHistory];
+      if (where.brc) filtered = filtered.filter(item => item.brc === where.brc);
+      if (where.district) filtered = filtered.filter(item => item.district === where.district);
+      if (where.stockId) filtered = filtered.filter(item => item.stockId === where.stockId);
+      return { data: filtered };
     }
   }
 };

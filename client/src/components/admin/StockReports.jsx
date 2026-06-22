@@ -1,27 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../lib/api';
 
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const currentMonthIndex = new Date().getMonth();
+
 export default function StockReports() {
   const [filters, setFilters] = useState({
     district: '',
     brc: '',
     status: '',
-    category: ''
+    category: '',
+    month: MONTHS[currentMonthIndex]
   });
   const [loading, setLoading] = useState(false);
   const [stocks, setStocks] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
+  const [brcs, setBrcs] = useState([]);
+  const [districts, setDistricts] = useState([]);
+
+  const CATEGORIES = [
+    "Adhesive and tapes", "Art and craft supplies", "Audio and Visual equipment",
+    "Audio and Visual tools", "Batteries and accessaries", "Cables and Connectors",
+    "Chem", "Cleaning Supplies", "Cutting and shaping tools", "Development Boards",
+    "Digital fabrication", "Electronic components", "Electronic modules",
+    "Essentials", "Fasteners", "Hand tools", "LED bulb kit", "Lab apparatus",
+    "Laboratory instrument", "Motors and wheels", "Plumbing Kit",
+    "Prototyping materials", "Safety items", "Sensor modules", "Sewing kit",
+    "Soldering kit", "Tools"
+  ];
+
+  useEffect(() => {
+    api.get('/brcs').then(res => {
+      setBrcs(res.data);
+      const uniqueDistricts = [...new Set(res.data.map(b => b.district))].filter(Boolean);
+      setDistricts(uniqueDistricts);
+    }).catch(console.error);
+  }, []);
 
   useEffect(() => {
     fetchReportData();
   }, [filters, sortConfig]);
 
   const fetchReportData = async () => {
+    if (!filters.brc) {
+      setStocks([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const params = new URLSearchParams(filters);
-      if (filters.district) params.append('district', filters.district);
-      if (filters.brc) params.append('brc', filters.brc);
+      // filters object already contains district, brc, status, category, month
+      // Clean up empty filters before sending
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([_, v]) => v !== '')
+      );
+      const params = new URLSearchParams(cleanFilters);
 
       const response = await api.get(`/stocks?${params.toString()}&limit=1000`); // fetch up to 1000 for report view
       if (response.data?.success) {
@@ -51,12 +84,17 @@ export default function StockReports() {
   };
 
   const handleDownload = async (format) => {
+    if (!filters.brc) {
+      alert("Please select a District and BRC to download the report.");
+      return;
+    }
     setLoading(true);
     try {
-      const params = new URLSearchParams(filters);
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([_, v]) => v !== '')
+      );
+      const params = new URLSearchParams(cleanFilters);
       params.append('format', format);
-      if (filters.district) params.append('district', filters.district);
-      if (filters.brc) params.append('brc', filters.brc);
 
       const response = await api.get(`/stocks/reports/download?${params.toString()}`, {
         responseType: 'blob'
@@ -81,26 +119,63 @@ export default function StockReports() {
     <div className="bg-white p-6 rounded-lg shadow border border-slate-200">
       <h2 className="text-xl font-semibold mb-4">Stock Reports</h2>
       
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">District</label>
-          <input 
-            type="text" 
-            placeholder="e.g. North District"
-            className="w-full border rounded px-3 py-2 text-sm"
+          <select 
+            className="w-full border rounded px-3 py-2 text-sm bg-white"
             value={filters.district}
-            onChange={(e) => setFilters({...filters, district: e.target.value})}
-          />
+            onChange={(e) => setFilters({...filters, district: e.target.value, brc: ''})}
+          >
+            <option value="" disabled>Select District</option>
+            {districts.map(d => <option key={d} value={d}>{d}</option>)}
+          </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">BRC</label>
-          <input 
-            type="text" 
-            placeholder="e.g. Block A"
-            className="w-full border rounded px-3 py-2 text-sm"
+          <select 
+            className="w-full border rounded px-3 py-2 text-sm bg-white"
             value={filters.brc}
-            onChange={(e) => setFilters({...filters, brc: e.target.value})}
-          />
+            onChange={(e) => {
+              const selectedBrcCode = e.target.value;
+              if (selectedBrcCode) {
+                const brcObj = brcs.find(b => b.code === selectedBrcCode);
+                setFilters({ ...filters, brc: selectedBrcCode, district: brcObj ? brcObj.district : filters.district });
+              } else {
+                setFilters({ ...filters, brc: '' });
+              }
+            }}
+          >
+            <option value="" disabled>Select BRC</option>
+            {brcs
+              .filter(b => !filters.district || b.district === filters.district)
+              .map(b => <option key={b.code} value={b.code}>{b.name}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Month</label>
+          <select 
+            className="w-full border rounded px-3 py-2 text-sm bg-white"
+            value={filters.month}
+            onChange={(e) => setFilters({...filters, month: e.target.value})}
+          >
+            {MONTHS.map((m, idx) => (
+              <option key={m} value={m} disabled={idx > currentMonthIndex}>
+                {m}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+          <select 
+            className="w-full border rounded px-3 py-2 text-sm bg-white"
+            value={filters.category}
+            onChange={(e) => setFilters({...filters, category: e.target.value})}
+          >
+            <option value="">All Categories</option>
+            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
@@ -114,16 +189,6 @@ export default function StockReports() {
             <option value="DEFECTIVE">Defective</option>
             <option value="IN_REPAIR">In Repair</option>
           </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
-          <input 
-            type="text" 
-            placeholder="e.g. Equipment"
-            className="w-full border rounded px-3 py-2 text-sm"
-            value={filters.category}
-            onChange={(e) => setFilters({...filters, category: e.target.value})}
-          />
         </div>
       </div>
 
@@ -149,7 +214,7 @@ export default function StockReports() {
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50 sticky top-0">
               <tr>
-                {['itemName', 'category', 'serialNumber', 'quantity', 'brc', 'status'].map((col) => (
+                {['itemName', 'category', 'status', 'serialNumber', 'newQty', 'availableQty', 'district', 'brc', 'remarks'].map((col) => (
                   <th 
                     key={col}
                     onClick={() => handleSort(col)}
@@ -162,18 +227,19 @@ export default function StockReports() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-slate-200">
-              {loading && stocks.length === 0 ? (
-                <tr><td colSpan="6" className="text-center py-8 text-slate-500">Loading report data...</td></tr>
+              {!filters.brc ? (
+                <tr><td colSpan="9" className="text-center py-8 text-slate-500">Please select a District and BRC to view the stock report.</td></tr>
+              ) : filters.month && MONTHS.indexOf(filters.month) < 5 ? (
+                <tr><td colSpan="9" className="text-center py-8 text-red-500 font-medium">Stock not entered for this month.</td></tr>
+              ) : loading && stocks.length === 0 ? (
+                <tr><td colSpan="9" className="text-center py-8 text-slate-500">Loading report data...</td></tr>
               ) : stocks.length === 0 ? (
-                <tr><td colSpan="6" className="text-center py-8 text-slate-500">No stock found matching filters.</td></tr>
+                <tr><td colSpan="9" className="text-center py-8 text-slate-500">No stock found matching filters.</td></tr>
               ) : (
                 stocks.map((stock) => (
                   <tr key={stock.id} className="hover:bg-slate-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">{stock.itemName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.category}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.serialNumber || 'N/A'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.quantity}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.brc || stock.district}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-slate-900 max-w-[200px] truncate" title={stock.itemName}>{stock.itemName}</td>
+                    <td className="px-6 py-4 text-sm text-slate-500 max-w-[150px] truncate" title={stock.category}>{stock.category}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         stock.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
@@ -183,6 +249,12 @@ export default function StockReports() {
                         {stock.status || 'ACTIVE'}
                       </span>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.serialNumber || 'N/A'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.newQty ?? stock.quantity}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">{stock.availableQty !== undefined ? stock.availableQty : (stock.newQty ?? stock.quantity)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.district || 'NA'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.brc || 'NA'}</td>
+                    <td className="px-6 py-4 text-sm text-slate-500 max-w-[200px] truncate" title={stock.remarks}>{stock.remarks || '-'}</td>
                   </tr>
                 ))
               )}

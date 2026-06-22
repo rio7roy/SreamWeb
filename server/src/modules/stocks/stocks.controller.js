@@ -1,4 +1,5 @@
 const ExcelJS = require('exceljs');
+const PDFDocument = require('pdfkit');
 const { success, error } = require('../../utils/response');
 const stocksService = require('./stocks.service');
 const fs = require('fs');
@@ -142,8 +143,35 @@ module.exports = {
 
   downloadStockReport: async (req, res, next) => {
     try {
-      const { brc } = req.query;
-      const stocksData = await stocksService.getAllStocks({ brc });
+      const { brc, district, format } = req.query;
+      const stocksData = await stocksService.getAllStocks({ brc, district });
+
+      if (format === 'pdf') {
+        const doc = new PDFDocument({ margin: 40, size: 'A4' });
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="Stock_Report_${brc || 'All'}.pdf"`);
+        doc.pipe(res);
+
+        doc.fontSize(20).text('Stock Report', { align: 'center' });
+        doc.moveDown(0.5);
+        doc.fontSize(12).text(`District: ${district || 'All'} | BRC: ${brc || 'All'}`, { align: 'center' });
+        doc.moveDown(2);
+
+        if (stocksData.length === 0) {
+          doc.fontSize(12).text('No stocks found for the selected filters.', { align: 'center' });
+        } else {
+          stocksData.forEach((stock, i) => {
+            const qty = stock.availableQty !== undefined ? stock.availableQty : (stock.newQty ?? stock.quantity);
+            doc.fontSize(11).text(`${i + 1}. ${stock.itemName}`, { continued: true }).text(`  [${stock.category || 'N/A'}]`, { align: 'right' });
+            doc.fontSize(10).fillColor('gray').text(`    Status: ${stock.status || 'ACTIVE'} | Qty: ${qty} | Serial: ${stock.serialNumber || 'N/A'}`);
+            doc.moveDown(0.5);
+            doc.fillColor('black');
+          });
+        }
+
+        doc.end();
+        return;
+      }
 
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Stock Report');
@@ -152,13 +180,28 @@ module.exports = {
         { header: 'ID', key: 'uniqueId', width: 15 },
         { header: 'Item Name', key: 'itemName', width: 35 },
         { header: 'Category', key: 'category', width: 20 },
-        { header: 'Serial Number', key: 'serialNumber', width: 20 },
-        { header: 'Quantity', key: 'quantity', width: 10 },
+        { header: 'District', key: 'district', width: 15 },
+        { header: 'BRC', key: 'brc', width: 15 },
+        { header: 'New Qty', key: 'newQty', width: 10 },
+        { header: 'Available', key: 'availableQty', width: 10 },
+        { header: 'Used', key: 'usedQty', width: 10 },
+        { header: 'Damaged', key: 'damagedQty', width: 10 },
+        { header: 'Consumed', key: 'consumedQty', width: 10 },
+        { header: 'Month', key: 'month', width: 15 },
+        { header: 'Remarks', key: 'remarks', width: 30 },
         { header: 'Status', key: 'status', width: 15 },
       ];
 
       stocksData.forEach(stock => {
-        worksheet.addRow(stock);
+        worksheet.addRow({
+          ...stock,
+          newQty: stock.newQty ?? stock.quantity,
+          availableQty: stock.availableQty ?? stock.newQty ?? stock.quantity,
+          usedQty: stock.usedQty || 0,
+          damagedQty: stock.damagedQty || 0,
+          consumedQty: stock.consumedQty || 0,
+          month: stock.month || 'N/A'
+        });
       });
 
       worksheet.getRow(1).font = { bold: true };
@@ -203,8 +246,11 @@ module.exports = {
       if (reqDistricts.length === 0 && reqBrcs.length === 0) {
         targets.push({ district: '', brc: '' });
       } else {
-        reqDistricts.forEach(d => targets.push({ district: d, brc: '' }));
-        reqBrcs.forEach(b => targets.push({ district: '', brc: b }));
+        const brcDistricts = reqBrcs.map(b => b.split('|')[1]);
+        reqDistricts.forEach(d => {
+          if (!brcDistricts.includes(d)) targets.push({ district: d, brc: '' });
+        });
+        reqBrcs.forEach(b => targets.push({ district: b.split('|')[1], brc: b.split('|')[0] }));
       }
 
       worksheet.eachRow((row, rowNumber) => {
@@ -286,6 +332,57 @@ module.exports = {
       sendGeneralStockNotification(`Bulk Update Completed: Applied changes (${updateStr}) ${targetStr}.`);
 
       return success(res, result, 200, 'Bulk update successful');
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  compareStocks: async (req, res, next) => {
+    try {
+      const { brc, district, months } = req.query;
+      const monthsArray = months ? months.split(',') : [];
+      const stocksData = await stocksService.getAllStocks({ brc, district });
+
+      const stockHistoryAll = await stocksService.getStockHistory({ brc, district });
+
+      const comparisonData = stocksData.map(stock => {
+        const history = {};
+        const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        
+        // Filter history for just this stock
+        const thisStockHistory = stockHistoryAll.filter(h => h.stockId === stock.id);
+
+        monthsArray.forEach(m => {
+          const monthIndex = MONTHS.indexOf(m);
+          if (monthIndex < 5) {
+            history[m] = "Not Entered";
+          } else {
+            // Find the end date of the month `m` in the current year
+            const currentYear = new Date().getFullYear();
+            const endOfMonth = new Date(currentYear, monthIndex + 1, 0, 23, 59, 59, 999);
+            
+            // Find the latest history entry before or on endOfMonth
+            const validHistory = thisStockHistory
+              .filter(h => new Date(h.updatedAt) <= endOfMonth)
+              .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+            if (validHistory.length > 0) {
+              history[m] = validHistory[0].availableQty;
+            } else {
+              // If no history exists before end of month (e.g. not updated yet), default to current qty if it's the current month, otherwise Not Entered
+              const currentMonthIndex = new Date().getMonth();
+              const currentQty = stock.availableQty !== undefined ? stock.availableQty : (stock.newQty ?? stock.quantity);
+              history[m] = monthIndex === currentMonthIndex ? currentQty : "Not Entered";
+            }
+          }
+        });
+        return {
+          ...stock,
+          history
+        };
+      });
+
+      return success(res, { stocks: comparisonData }, 200, 'Comparison data fetched successfully');
     } catch (err) {
       next(err);
     }

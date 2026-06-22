@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Layers, Activity, Settings, FileText, AlertTriangle, Bell } from 'lucide-react';
+import { Layers, Activity, Settings, FileText, AlertTriangle, Bell, MessageSquare } from 'lucide-react';
 import StockMonitoring from '../../components/admin/StockMonitoring';
 import StockForms from '../../components/admin/StockForms';
 import StockReports from '../../components/admin/StockReports';
+import StockCompare from '../../components/admin/StockCompare';
 import api from '../../lib/api';
 
 export default function StockAdministrationPage() {
-  const [activeTab, setActiveTab] = useState('monitoring'); // monitoring, management, reports
+  const [activeTab, setActiveTab] = useState('monitoring'); // monitoring, management, reports, compare
   const [alerts, setAlerts] = useState([]);
 
   const [showNotifications, setShowNotifications] = useState(false);
@@ -25,7 +26,7 @@ export default function StockAdministrationPage() {
         // Filter messages for System Alerts directed to ADMIN and only stock alerts
         const systemAlerts = res.data.filter(m => 
           m.to && m.to.includes('ADMIN') &&
-          (m.type === 'LOW_STOCK_ALERT' || m.type === 'OUT_OF_STOCK_ALERT')
+          (m.type === 'LOW_STOCK_ALERT' || m.type === 'OUT_OF_STOCK_ALERT' || m.type === 'STOCK_REMARK')
         ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setAlerts(systemAlerts.slice(0, 10)); // Keep latest 10
         
@@ -139,18 +140,20 @@ export default function StockAdministrationPage() {
                   <div className="divide-y divide-white/50 bg-white">
                     {alerts.map(alert => {
                       const isOutOfStock = alert.type === 'OUT_OF_STOCK_ALERT';
-                      const bgColor = isOutOfStock ? 'bg-red-600' : 'bg-red-50';
-                      const textColor = isOutOfStock ? 'text-white' : 'text-red-800';
-                      const iconColor = isOutOfStock ? 'text-white' : 'text-red-500';
+                      const isRemark = alert.type === 'STOCK_REMARK';
+                      const bgColor = isOutOfStock ? 'bg-red-600' : isRemark ? 'bg-blue-50' : 'bg-red-50';
+                      const textColor = isOutOfStock ? 'text-white' : isRemark ? 'text-blue-900' : 'text-red-800';
+                      const iconColor = isOutOfStock ? 'text-white' : isRemark ? 'text-blue-500' : 'text-red-500';
                       const opacity = alert.read ? 'opacity-70' : 'opacity-100';
+                      const Icon = isRemark ? MessageSquare : AlertTriangle;
                       
                       return (
                         <div key={alert.id} className={`p-4 ${bgColor} transition-colors border-b border-red-200/50 ${opacity}`}>
                           <div className="flex gap-3 items-start justify-between">
                             <div className="flex gap-3 items-start">
-                              <AlertTriangle className={`w-5 h-5 ${iconColor} shrink-0 mt-0.5`} />
+                              <Icon className={`w-5 h-5 ${iconColor} shrink-0 mt-0.5`} />
                               <div>
-                                <p className={`font-medium text-sm ${textColor}`}>{alert.content}</p>
+                                <p className={`font-medium text-sm ${textColor} whitespace-pre-wrap leading-relaxed`}>{alert.content}</p>
                                 <p className={`text-xs mt-1 ${isOutOfStock ? 'text-red-100' : 'text-red-600/70'}`}>{new Date(alert.createdAt).toLocaleString()}</p>
                               </div>
                             </div>
@@ -214,6 +217,12 @@ export default function StockAdministrationPage() {
         >
           <FileText className="w-4 h-4" /> Reports
         </button>
+        <button
+          className={`pb-3 px-6 font-medium text-sm flex items-center gap-2 ${activeTab === 'compare' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+          onClick={() => setActiveTab('compare')}
+        >
+          <Layers className="w-4 h-4" /> Compare
+        </button>
       </div>
 
       <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 min-h-[75vh]">
@@ -229,6 +238,10 @@ export default function StockAdministrationPage() {
 
         {activeTab === 'reports' && (
           <StockReports />
+        )}
+
+        {activeTab === 'compare' && (
+          <StockCompare />
         )}
       </div>
     </div>

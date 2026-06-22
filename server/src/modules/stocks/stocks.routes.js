@@ -37,6 +37,9 @@ router.put('/bulk-update', stocksController.bulkUpdateStocks);
 // Download stock report
 router.get('/reports/download', stocksController.downloadStockReport);
 
+// Compare stocks
+router.get('/compare', stocksController.compareStocks);
+
 // Delete single stock
 router.delete('/:id', stocksController.deleteStock);
 
