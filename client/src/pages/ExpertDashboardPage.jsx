@@ -783,7 +783,7 @@ export default function ExpertDashboardPage() {
             
             <div className="mb-6 space-y-4">
               <div>
-                <label className="block text-sm font-bold text-secondary mb-2">Hub Location</label>
+                <label className="block text-sm font-bold text-secondary mb-2">BRC</label>
                 <select 
                   value={otherLocationSelected} 
                   onChange={(e) => {
@@ -793,9 +793,9 @@ export default function ExpertDashboardPage() {
                   }}
                   className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 outline-none transition-all"
                 >
-                  <option value="" disabled>Select Location...</option>
+                  <option value="" disabled>Select BRC...</option>
                   <option value="OTHER">Other (Custom Venue)</option>
-                  <optgroup label="Registered Locations">
+                  <optgroup label="Registered BRCs">
                     {uniqueLocations.map(loc => (
                       <option key={loc} value={loc}>{loc}</option>
                     ))}
@@ -805,13 +805,13 @@ export default function ExpertDashboardPage() {
 
               {(otherLocationSelected && otherLocationSelected !== 'OTHER') && (
                 <div className="animate-fade-in-up">
-                  <label className="block text-sm font-bold text-secondary mb-2">BRC School</label>
+                  <label className="block text-sm font-bold text-secondary mb-2">School</label>
                   <select 
                     value={otherBrcSelected} 
                     onChange={(e) => setOtherBrcSelected(e.target.value)}
                     className="w-full bg-surface-container-low border border-outline/20 rounded-xl px-4 py-3 focus:border-primary focus:ring-1 outline-none transition-all"
                   >
-                    <option value="" disabled>Select BRC School...</option>
+                    <option value="" disabled>Select School...</option>
                     <option value="OTHER">Other School in {otherLocationSelected}</option>
                     <optgroup label="Registered BRCs">
                       {filteredOtherBrcs.map(b => (
