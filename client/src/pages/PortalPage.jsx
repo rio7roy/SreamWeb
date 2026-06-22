@@ -11,7 +11,7 @@ import api from '../lib/api';
 const PORTALS = [
   { role: 'ADMIN', label: 'Admin', icon: 'admin_panel_settings', defaultEmail: 'admin@stream.edu', defaultPassword: 'Admin@123' },
   { role: 'EXPERT', label: 'STREAM Expert', icon: 'school', defaultEmail: 'rio7roy@gmail.com', defaultPassword: '123rio' },
-  { role: 'STREAM_LAB', label: 'STREAM Hub', icon: 'biotech', defaultEmail: 'stream_lab@stream.edu', defaultPassword: 'Demo@123' },
+  { role: 'STREAM_LAB', label: 'STREAM Hub', icon: 'biotech', defaultEmail: '', defaultPassword: '', isHub: true },
   { role: 'ILAB', label: 'iLab Corner', icon: 'computer', defaultEmail: 'ilab@stream.edu', defaultPassword: 'Demo@123' },
   { role: 'CREATIVE_CORNER', label: 'Creative Corner', icon: 'auto_awesome', defaultEmail: 'creative_corners@stream.edu', defaultPassword: 'Demo@123' },
 ];
@@ -32,6 +32,7 @@ export default function PortalPage() {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotSuccess, setForgotSuccess] = useState(null);
+  const [rememberMe, setRememberMe] = useState(false);
 
   // Automatically logout if arriving at the portal page while authenticated
   useEffect(() => {
@@ -42,8 +43,24 @@ export default function PortalPage() {
 
   const openLoginModal = (portal) => {
     setSelectedPortal(portal);
-    setIdentifier(portal.defaultEmail || '');
-    setPassword(portal.defaultPassword || '');
+    const savedId = localStorage.getItem(`stream_login_${portal.role}_id`);
+    const savedPwd = localStorage.getItem(`stream_login_${portal.role}_pwd`);
+    
+    if (savedId && savedPwd) {
+      setIdentifier(savedId);
+      setPassword(savedPwd);
+      setRememberMe(true);
+    } else {
+      if (portal.isHub) {
+        const savedHubCode = localStorage.getItem('stream_hub_code') || '';
+        setIdentifier(savedHubCode);
+        setPassword('');
+      } else {
+        setIdentifier(portal.defaultEmail || '');
+        setPassword(portal.defaultPassword || '');
+      }
+      setRememberMe(false);
+    }
     setError('');
     setIsModalOpen(true);
   };
@@ -76,8 +93,21 @@ export default function PortalPage() {
         return;
       }
 
+      if (rememberMe) {
+        localStorage.setItem(`stream_login_${selectedPortal.role}_id`, identifier);
+        localStorage.setItem(`stream_login_${selectedPortal.role}_pwd`, password);
+      } else {
+        localStorage.removeItem(`stream_login_${selectedPortal.role}_id`);
+        localStorage.removeItem(`stream_login_${selectedPortal.role}_pwd`);
+      }
+
+      // Save hub code for auto-fill on next login (legacy support)
+      if (selectedPortal?.isHub) {
+        localStorage.setItem('stream_hub_code', identifier);
+      }
+
       // Route to role-specific dashboard
-      const destination = userData.role === 'EXPERT' ? '/expert' : userData.role === 'ADMIN' ? '/admin' : '/dashboard';
+      const destination = userData.role === 'EXPERT' ? '/expert' : userData.role === 'ADMIN' ? '/admin' : userData.role === 'STREAM_LAB' ? '/hub' : '/dashboard';
       navigate(destination);
     } catch (err) {
       const message = err.response?.data?.message || 'Login failed. Please try again.';
@@ -245,10 +275,10 @@ export default function PortalPage() {
           <form className="space-y-6" onSubmit={handleLogin}>
             <Input
               id="login-identifier"
-              label="Username / Email"
+              label={selectedPortal?.isHub ? 'Hub Code' : 'Username / Email'}
               type="text"
-              icon="alternate_email"
-              placeholder="Enter your unique ID"
+              icon={selectedPortal?.isHub ? 'tag' : 'alternate_email'}
+              placeholder={selectedPortal?.isHub ? 'Enter your BRC Hub Code' : 'Enter your unique ID'}
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               autoFocus
@@ -263,6 +293,19 @@ export default function PortalPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+
+            <div className="flex items-center gap-2 px-1">
+              <input
+                type="checkbox"
+                id="remember-me"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 text-primary bg-surface-container border-on-surface/20 rounded focus:ring-primary focus:ring-2 cursor-pointer"
+              />
+              <label htmlFor="remember-me" className="text-sm text-secondary font-medium cursor-pointer select-none">
+                Remember me
+              </label>
+            </div>
 
             {error && (
               <div className="bg-error-container/30 border border-error/20 rounded-xl px-4 py-3 animate-fade-in">
