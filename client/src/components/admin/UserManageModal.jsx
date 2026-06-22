@@ -245,7 +245,7 @@ export default function UserManageModal({ type, entityName, onClose, initialUser
                                     className="w-full text-left px-3 py-2 rounded-lg hover:bg-primary-container flex items-center justify-between group transition-colors"
                                   >
                                     <div>
-                                      <p className="font-bold text-on-surface text-sm truncate">{brc.name}</p>
+                                      <p className="font-bold text-on-surface text-sm truncate">{brc.location}/{brc.name}</p>
                                       <p className="text-[10px] text-secondary mt-0.5">{brc.code} • {brc.district}</p>
                                     </div>
                                     <span className="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity text-sm">add_circle</span>
@@ -268,7 +268,7 @@ export default function UserManageModal({ type, entityName, onClose, initialUser
                           key={brc.code}
                           className="px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-2 border bg-primary-container text-on-primary-container border-primary/30 group"
                         >
-                          <span className="truncate max-w-[200px]">{brc.name}</span>
+                          <span className="truncate max-w-[200px]">{brc.location}/{brc.name}</span>
                           <button 
                             onClick={() => handleToggleBrc(brc.code)}
                             className="w-5 h-5 rounded-full hover:bg-error/20 flex items-center justify-center text-secondary hover:text-error transition-colors"

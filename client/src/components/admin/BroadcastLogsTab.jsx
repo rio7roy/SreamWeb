@@ -42,7 +42,7 @@ export default function BroadcastLogsTab() {
       cleanCode = targetCode.split(':')[1];
     }
     const brc = allBrcs.find(b => b.code === cleanCode);
-    return brc ? brc.name : targetCode;
+    return brc ? brc.location + '/' + brc.name : targetCode;
   };
 
   const uniqueTargets = useMemo(() => {

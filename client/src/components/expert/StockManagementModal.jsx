@@ -153,7 +153,8 @@ export default function StockManagementModal({ brcCode, brcName, onClose, inline
         showFeedback('success', 'Stock updated.');
       }
     } catch (err) {
-      showFeedback('error', 'Failed to update stock.');
+      console.error(err);
+      showFeedback('error', err.response?.data?.message || err.message || 'Failed to update stock.');
     }
     setEditingStock(null);
   };

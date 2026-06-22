@@ -66,6 +66,7 @@ export default function StockForms({ onActionComplete }) {
   });
   
   const [recentCreations, setRecentCreations] = useState([]);
+  const [recentBulkUploads, setRecentBulkUploads] = useState([]);
   const [editingStock, setEditingStock] = useState(null);
   
   const [file, setFile] = useState(null);
@@ -174,13 +175,15 @@ export default function StockForms({ onActionComplete }) {
   const groupedCreations = useMemo(() => {
     const groups = {};
     recentCreations.forEach(stock => {
-      const key = `${stock.itemName}-${stock.uniqueId}-${stock.category}-${stock.quantity}`;
+      const displayQty = stock.newQty ?? stock.quantity;
+      const key = `${stock.itemName}-${stock.uniqueId}-${stock.category}-${displayQty}`;
       if (!groups[key]) {
         groups[key] = {
           ...stock,
           ids: [stock.id],
           brcs: stock.brc ? [`${stock.brc}|${stock.district}`] : [],
           districts: stock.district ? [stock.district] : [],
+          isNewItem: stock._isNew
         };
       } else {
         groups[key].ids.push(stock.id);
@@ -194,11 +197,41 @@ export default function StockForms({ onActionComplete }) {
     return Object.values(groups);
   }, [recentCreations]);
 
-  const handleDeleteRecent = async (ids) => {
+  const groupedBulkUploads = useMemo(() => {
+    const groups = {};
+    recentBulkUploads.forEach(stock => {
+      const displayQty = stock.newQty ?? stock.quantity;
+      const key = `${stock.itemName}-${stock.uniqueId}-${stock.category}-${displayQty}`;
+      if (!groups[key]) {
+        groups[key] = {
+          ...stock,
+          ids: [stock.id],
+          brcs: stock.brc ? [`${stock.brc}|${stock.district}`] : [],
+          districts: stock.district ? [stock.district] : [],
+          isNewItem: stock._isNew,
+          isBulk: true
+        };
+      } else {
+        groups[key].ids.push(stock.id);
+        if (stock.brc) {
+          const bVal = `${stock.brc}|${stock.district}`;
+          if (!groups[key].brcs.includes(bVal)) groups[key].brcs.push(bVal);
+        }
+        if (stock.district && !groups[key].districts.includes(stock.district)) groups[key].districts.push(stock.district);
+      }
+    });
+    return Object.values(groups);
+  }, [recentBulkUploads]);
+
+  const handleDeleteRecent = async (ids, isBulk = false) => {
     if (!window.confirm('Are you sure you want to delete this stock from all locations?')) return;
     try {
       await Promise.all(ids.map(id => api.delete(`/stocks/${id}`)));
-      setRecentCreations(prev => prev.filter(s => !ids.includes(s.id)));
+      if (isBulk) {
+        setRecentBulkUploads(prev => prev.filter(s => !ids.includes(s.id)));
+      } else {
+        setRecentCreations(prev => prev.filter(s => !ids.includes(s.id)));
+      }
       showMessage('Stock deleted successfully');
     } catch (err) {
       showMessage(err.response?.data?.message || 'Failed to delete stock', 'error');
@@ -253,10 +286,18 @@ export default function StockForms({ onActionComplete }) {
       ));
       
       const newStocks = responses.map(r => r.data.data.stock);
-      setRecentCreations(prev => {
-        const filtered = prev.filter(s => !editingStock.ids.includes(s.id));
-        return [...newStocks, ...filtered];
-      });
+      
+      if (editingStock.isBulk) {
+        setRecentBulkUploads(prev => {
+          const filtered = prev.filter(s => !editingStock.ids.includes(s.id));
+          return [...newStocks, ...filtered];
+        });
+      } else {
+        setRecentCreations(prev => {
+          const filtered = prev.filter(s => !editingStock.ids.includes(s.id));
+          return [...newStocks, ...filtered];
+        });
+      }
       setEditingStock(null);
       showMessage('Stock updated successfully');
     } catch (err) {
@@ -298,10 +339,15 @@ export default function StockForms({ onActionComplete }) {
 
     setLoading(true);
     try {
-      await api.post('/stocks/bulk-upload', formData, {
+      const response = await api.post('/stocks/bulk-upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       showMessage('Bulk upload completed successfully!');
+      
+      if (response.data?.data?.stocks) {
+        setRecentBulkUploads(prev => [...response.data.data.stocks, ...prev]);
+      }
+      
       setFile(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
       setBulkUploadForm({ district: [], brc: [] });
@@ -316,9 +362,16 @@ export default function StockForms({ onActionComplete }) {
   const handleDistrictChange = (newDistricts, currentBrcs, updateFormState) => {
     const validBrcs = (currentBrcs || []).filter(brcVal => {
       const [code, district] = brcVal.split('|');
-      return newDistricts.length === 0 || newDistricts.includes(district);
+      // Only keep BRCs whose district is currently selected
+      return newDistricts.includes(district);
     });
     updateFormState(newDistricts, validBrcs);
+  };
+
+  const handleBrcChange = (newBrcs, currentDistricts, updateFormState) => {
+    const brcDistricts = [...new Set(newBrcs.map(brcVal => brcVal.split('|')[1]))].filter(Boolean);
+    const mergedDistricts = [...new Set([...(currentDistricts || []), ...brcDistricts])];
+    updateFormState(mergedDistricts, newBrcs);
   };
 
   return (
@@ -409,9 +462,9 @@ export default function StockForms({ onActionComplete }) {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">BRC (Multiple)</label>
               <MultiSelect 
-                options={(createForm.district?.length > 0 ? brcs.filter(b => createForm.district.includes(b.district)) : brcs).map(b => ({ value: `${b.code}|${b.district}`, label: b.name }))}
+                options={(createForm.district?.length > 0 ? brcs.filter(b => createForm.district.includes(b.district)) : brcs).map(b => ({ value: `${b.code}|${b.district}`, label: `${b.location}/${b.name}` }))}
                 selected={createForm.brc}
-                onChange={(newSelected) => setCreateForm({...createForm, brc: newSelected})}
+                onChange={(newSelected) => handleBrcChange(newSelected, createForm.district, (d, b) => setCreateForm({...createForm, district: d, brc: b}))}
                 placeholder="-- Select BRCs --"
                 showSelectAll={true}
                 selectAllLabel="All BRCs"
@@ -450,10 +503,10 @@ export default function StockForms({ onActionComplete }) {
                     </td>
                     <td className="px-4 py-3 text-slate-600">
                       {group.brcs.length > 0 
-                        ? group.brcs.map(b => brcs.find(x => `${x.code}|${x.district}` === b)?.name || b.split('|')[0]).join(', ') 
+                        ? group.brcs.map(b => { const found = brcs.find(x => `${x.code}|${x.district}` === b); return found ? `${found.location}/${found.name}` : b.split('|')[0]; }).join(', ') 
                         : group.districts.join(', ')}
                     </td>
-                    <td className="px-4 py-3 text-center font-semibold text-slate-700">{group.quantity}</td>
+                    <td className="px-4 py-3 text-center font-semibold text-slate-700">{group.newQty ?? group.quantity}</td>
                     <td className="px-4 py-3 text-right space-x-3">
                        <button onClick={() => setEditingStock(group)} className="text-blue-600 hover:text-blue-800 font-medium transition-colors">Edit</button>
                        <button onClick={() => handleDeleteRecent(group.ids)} className="text-red-600 hover:text-red-800 font-medium transition-colors">Delete</button>
@@ -480,32 +533,32 @@ export default function StockForms({ onActionComplete }) {
             <div className="grid grid-cols-2 gap-4">
                <div className="col-span-2">
                  <label className="block text-sm font-medium text-slate-700 mb-1">Item Name</label>
-                 <input autoFocus type="text" className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none" 
-                   value={editingStock.itemName} onChange={e => setEditingStock({...editingStock, itemName: e.target.value})} />
+                 <input autoFocus={!editingStock.isBulk} type="text" className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-100 disabled:text-slate-500" 
+                   value={editingStock.itemName} onChange={e => setEditingStock({...editingStock, itemName: e.target.value})} disabled={editingStock.isBulk} />
                </div>
                
                <div>
                  <label className="block text-sm font-medium text-slate-700 mb-1">Unique No</label>
-                 <input type="text" className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none" 
-                   value={editingStock.uniqueId || ''} onChange={e => setEditingStock({...editingStock, uniqueId: e.target.value})} />
+                 <input type="text" className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-100 disabled:text-slate-500" 
+                   value={editingStock.uniqueId || ''} onChange={e => setEditingStock({...editingStock, uniqueId: e.target.value})} disabled={editingStock.isBulk} />
                </div>
                <div>
                  <label className="block text-sm font-medium text-slate-700 mb-1">Quantity</label>
-                 <input type="number" className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none" 
-                   value={editingStock.quantity} onChange={e => setEditingStock({...editingStock, quantity: Number(e.target.value)})} />
+                 <input type="number" className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-100 disabled:text-slate-500" 
+                   value={editingStock.quantity} onChange={e => setEditingStock({...editingStock, quantity: Number(e.target.value)})} disabled={editingStock.isBulk} />
                </div>
                
                <div>
                  <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
-                 <select className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white" 
-                   value={editingStock.category} onChange={e => setEditingStock({...editingStock, category: e.target.value})}>
+                 <select className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white disabled:bg-slate-100 disabled:text-slate-500" 
+                   value={editingStock.category} onChange={e => setEditingStock({...editingStock, category: e.target.value})} disabled={editingStock.isBulk}>
                    {uniqueCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                  </select>
                </div>
                <div>
                  <label className="block text-sm font-medium text-slate-700 mb-1">Section</label>
-                 <select className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white" 
-                   value={editingStock.section || ''} onChange={e => setEditingStock({...editingStock, section: e.target.value})}>
+                 <select className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white disabled:bg-slate-100 disabled:text-slate-500" 
+                   value={editingStock.section || ''} onChange={e => setEditingStock({...editingStock, section: e.target.value})} disabled={editingStock.isBulk}>
                    <option value="">-- Select Section --</option>
                    {PREDEFINED_SECTIONS.map(s => <option key={s} value={s}>{s}</option>)}
                  </select>
@@ -513,8 +566,8 @@ export default function StockForms({ onActionComplete }) {
                
                <div className="col-span-2">
                   <label className="block text-sm font-medium text-slate-700 mb-1">Label</label>
-                  <select className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white" 
-                    value={editingStock.label || ''} onChange={e => setEditingStock({...editingStock, label: e.target.value})}>
+                  <select className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white disabled:bg-slate-100 disabled:text-slate-500" 
+                    value={editingStock.label || ''} onChange={e => setEditingStock({...editingStock, label: e.target.value})} disabled={editingStock.isBulk}>
                     <option value="">-- Select Label --</option>
                     {PREDEFINED_LABELS.map(l => <option key={l} value={l}>{l}</option>)}
                   </select>
@@ -526,8 +579,8 @@ export default function StockForms({ onActionComplete }) {
                       <img src={editingStock.img} alt="Current" className="h-16 w-16 object-cover rounded border" />
                     </div>
                   )}
-                  <input type="file" accept="image/*" className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white" 
-                    onChange={e => setEditingStock({...editingStock, imgFile: e.target.files[0]})} />
+                  <input type="file" accept="image/*" className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white disabled:bg-slate-100 disabled:text-slate-500" 
+                    onChange={e => setEditingStock({...editingStock, imgFile: e.target.files[0]})} disabled={editingStock.isBulk} />
                 </div>
                
                <div className="col-span-2 sm:col-span-1">
@@ -544,9 +597,9 @@ export default function StockForms({ onActionComplete }) {
                <div className="col-span-2 sm:col-span-1">
                  <label className="block text-sm font-medium text-slate-700 mb-1">BRC (Multiple)</label>
                  <MultiSelect 
-                   options={(editingStock.districts?.length > 0 ? brcs.filter(b => editingStock.districts.includes(b.district)) : brcs).map(b => ({ value: `${b.code}|${b.district}`, label: b.name }))}
+                   options={(editingStock.districts?.length > 0 ? brcs.filter(b => editingStock.districts.includes(b.district)) : brcs).map(b => ({ value: `${b.code}|${b.district}`, label: `${b.location}/${b.name}` }))}
                    selected={editingStock.brcs}
-                   onChange={(newSelected) => setEditingStock({...editingStock, brcs: newSelected})}
+                   onChange={(newSelected) => handleBrcChange(newSelected, editingStock.districts, (d, b) => setEditingStock({...editingStock, districts: d, brcs: b}))}
                    placeholder="-- Select BRCs --"
                    showSelectAll={true}
                    selectAllLabel="All BRCs"
@@ -587,9 +640,9 @@ export default function StockForms({ onActionComplete }) {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">BRC (Multiple)</label>
               <MultiSelect 
-                options={(bulkUploadForm.district?.length > 0 ? brcs.filter(b => bulkUploadForm.district.includes(b.district)) : brcs).map(b => ({ value: `${b.code}|${b.district}`, label: b.name }))}
+                options={(bulkUploadForm.district?.length > 0 ? brcs.filter(b => bulkUploadForm.district.includes(b.district)) : brcs).map(b => ({ value: `${b.code}|${b.district}`, label: `${b.location}/${b.name}` }))}
                 selected={bulkUploadForm.brc}
-                onChange={(newSelected) => setBulkUploadForm({...bulkUploadForm, brc: newSelected})}
+                onChange={(newSelected) => handleBrcChange(newSelected, bulkUploadForm.district, (d, b) => setBulkUploadForm({...bulkUploadForm, district: d, brc: b}))}
                 placeholder="-- Select BRCs --"
                 showSelectAll={true}
                 selectAllLabel="All BRCs"
@@ -615,6 +668,48 @@ export default function StockForms({ onActionComplete }) {
             </button>
           </div>
         </form>
+      )}
+
+      {/* RECENTLY BULK UPLOADED TABLE */}
+      {activeTab === 'bulkUpload' && recentBulkUploads.length > 0 && (
+        <div className="mt-10 border-t border-slate-200 pt-6">
+          <h3 className="text-lg font-bold text-slate-800 mb-4">Recently Uploaded Stocks (Session)</h3>
+          <div className="overflow-x-auto rounded-lg border border-slate-200">
+            <table className="min-w-full text-sm text-left">
+              <thead className="bg-slate-50 text-slate-600 font-medium">
+                <tr>
+                  <th className="px-4 py-3">Item Name</th>
+                  <th className="px-4 py-3">Unique No</th>
+                  <th className="px-4 py-3">Category</th>
+                  <th className="px-4 py-3">BRC</th>
+                  <th className="px-4 py-3 text-center">Qty</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {groupedBulkUploads.map(group => (
+                  <tr key={group.ids.join(',')} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-4 py-3 font-medium text-slate-800">{group.itemName}</td>
+                    <td className="px-4 py-3 text-slate-600">{group.uniqueId}</td>
+                    <td className="px-4 py-3 text-slate-600">
+                      <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">{group.category}</span>
+                    </td>
+                    <td className="px-4 py-3 text-slate-600">
+                      {group.brcs.length > 0 
+                        ? group.brcs.map(b => { const found = brcs.find(x => `${x.code}|${x.district}` === b); return found ? `${found.location}/${found.name}` : b.split('|')[0]; }).join(', ') 
+                        : group.districts.join(', ')}
+                    </td>
+                    <td className="px-4 py-3 text-center font-semibold text-slate-700">{group.newQty ?? group.quantity}</td>
+                    <td className="px-4 py-3 text-right space-x-3">
+                       <button onClick={() => setEditingStock(group)} className="text-blue-600 hover:text-blue-800 font-medium transition-colors">Edit</button>
+                       <button onClick={() => handleDeleteRecent(group.ids, true)} className="text-red-600 hover:text-red-800 font-medium transition-colors">Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
 
 

@@ -128,7 +128,7 @@ export default function AdminDashboardPage() {
       .filter(b => b.issues && b.issues.trim() !== '')
       .map(b => ({
         code: b.code,
-        name: b.name,
+        name: b.location + '/' + b.name,
         district: b.district,
         issues: b.issues
       }))
@@ -287,7 +287,7 @@ export default function AdminDashboardPage() {
                     <option value="">Select BRC Hub...</option>
                     {filteredBrcs.map(brc => (
                       <option key={brc.code} value={brc.code}>
-                        {brc.location}/ {brc.name}
+                        {brc.location}/{brc.name}
                       </option>
                     ))}
                   </select>

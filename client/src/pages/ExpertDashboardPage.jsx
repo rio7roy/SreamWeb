@@ -303,7 +303,7 @@ export default function ExpertDashboardPage() {
                 <span className="material-symbols-outlined text-sm">
                   school
                 </span>
-                <span>{selectedBrc.name}</span>
+                <span>{selectedBrc.location}/{selectedBrc.name}</span>
               </div>
             )}
           </div>
@@ -480,7 +480,7 @@ export default function ExpertDashboardPage() {
                         lineHeight: 1.2,
                       }}
                     >
-                      {selectedBrc?.name}
+                      {selectedBrc?.location}/{selectedBrc?.name}
                     </h2>
                     <p className="text-secondary flex items-center gap-2">
                       <span className="material-symbols-outlined text-sm">
@@ -752,7 +752,7 @@ export default function ExpertDashboardPage() {
         {showEventModal && selectedBrc && (
           <EventReportModal
           brcCode={otherBrcForReport ? otherBrcForReport.code : selectedBrc?.code}
-          brcName={otherBrcForReport ? otherBrcForReport.name : selectedBrc?.name}
+          brcName={otherBrcForReport ? otherBrcForReport.location + '/' + otherBrcForReport.name : selectedBrc ? selectedBrc.location + '/' + selectedBrc.name : ''}
           existingEvent={selectedDraft}
           defaultTag={otherBrcForReport ? 'other event' : ''}
           venueType={otherBrcForReport ? 'OTHER_BRC' : 'SELECTED_BRC'}
@@ -815,7 +815,7 @@ export default function ExpertDashboardPage() {
                     <option value="OTHER">Other School in {otherLocationSelected}</option>
                     <optgroup label="Registered BRCs">
                       {filteredOtherBrcs.map(b => (
-                        <option key={b.code} value={b.code}>{b.name}</option>
+                        <option key={b.code} value={b.code}>{b.location}/{b.name}</option>
                       ))}
                     </optgroup>
                   </select>
@@ -890,7 +890,7 @@ export default function ExpertDashboardPage() {
         {showStockModal && selectedBrc && (
           <StockManagementModal
             brcCode={selectedBrc.code}
-            brcName={selectedBrc.name}
+            brcName={selectedBrc.location + '/' + selectedBrc.name}
             onClose={() => setShowStockModal(false)}
           />
         )}

@@ -22,7 +22,7 @@ export default function NotificationBar({ selectedBrc, assignedBrcs = [], onSele
       if (t.startsWith('BRC:')) {
         const code = t.split(':')[1];
         const brc = assignedBrcs.find(b => b.code === code);
-        return brc ? brc.name : code;
+        return brc ? brc.location + '/' + brc.name : code;
       }
       if (t.startsWith('DISTRICT:')) {
         return t.split(':')[1] + ' District';

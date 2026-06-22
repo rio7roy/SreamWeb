@@ -149,7 +149,7 @@ export default function StockReports() {
             <option value="" disabled>Select BRC</option>
             {brcs
               .filter(b => !filters.district || b.district === filters.district)
-              .map(b => <option key={b.code} value={b.code}>{b.name}</option>)}
+              .map(b => <option key={b.code} value={b.code}>{b.location}/{b.name}</option>)}
           </select>
         </div>
         <div>
@@ -185,9 +185,10 @@ export default function StockReports() {
             onChange={(e) => setFilters({...filters, status: e.target.value})}
           >
             <option value="">All Statuses</option>
-            <option value="ACTIVE">Active</option>
-            <option value="DEFECTIVE">Defective</option>
-            <option value="IN_REPAIR">In Repair</option>
+            <option value="AVAILABLE">Available</option>
+            <option value="USED">Used</option>
+            <option value="DAMAGED">Damaged</option>
+            <option value="CONSUMED">Consumed</option>
           </select>
         </div>
       </div>

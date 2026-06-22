@@ -159,7 +159,7 @@ export default function BrcManagementPage() {
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-bold text-secondary mb-1 uppercase tracking-wider">Hub Name</label>
-                    <p className="text-xl font-bold text-on-surface">{brc.name || 'N/A'}</p>
+                    <p className="text-xl font-bold text-on-surface">{brc.location ? brc.location + '/' + brc.name : brc.name || 'N/A'}</p>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -345,7 +345,7 @@ export default function BrcManagementPage() {
                                   {event.venueValue}
                                 </span>
                               ) : (
-                                <span>At {brc.name}</span>
+                                <span>At {brc.location}/{brc.name}</span>
                               )}
                               
                               {event.latitude && event.longitude && (

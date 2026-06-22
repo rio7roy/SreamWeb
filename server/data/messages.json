@@ -677,5 +677,251 @@
     "content": "New stock item created: m (1 units)",
     "scheduledFor": null,
     "createdAt": "2026-06-22T06:16:57.728Z"
+  },
+  {
+    "id": "e707ff3b-e8ae-4a49-8262-9963560ed416",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "Bulk Upload Completed: 2 created, 0 updated.",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T06:30:48.843Z"
+  },
+  {
+    "id": "38c56e18-e076-4cbd-8b38-df55d12c511a",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "LOW STOCK ALERT: m (Adhesive and tapes) at 32110100105SH is at 1 quantity.",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T06:33:44.222Z"
+  },
+  {
+    "id": "c75e0d75-61ff-4d88-b290-3cf3aadfb17f",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "New stock item created: m (1 units)",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T06:33:44.223Z"
+  },
+  {
+    "id": "b843e3e3-a684-4574-952e-fcf127060b05",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "Bulk Upload Completed: 0 created, 2 updated.",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T06:34:22.771Z"
+  },
+  {
+    "id": "e9eb78cd-fae0-4d2f-b10c-81ca4537b328",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "Bulk Upload Completed: 2 created, 0 updated.",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T06:36:10.060Z"
+  },
+  {
+    "id": "019b1497-3502-4c83-b14b-51f6a06d0c7e",
+    "type": "STOCK_REMARK",
+    "title": "📝 New Remark: Sewing Thread Cutter",
+    "content": "📦 Item: Sewing Thread Cutter (Sewing kit)\n📍 Location: GOVT VHSS ARYAD, ALAPPUZHA\n💬 Remark: \"hi\"",
+    "to": [
+      "ADMIN"
+    ],
+    "message": "📦 Item: Sewing Thread Cutter (Sewing kit)\n📍 Location: GOVT VHSS ARYAD, ALAPPUZHA\n💬 Remark: \"hi\"",
+    "brc": "32110100105SH",
+    "priority": "NORMAL",
+    "createdAt": "2026-06-22T06:38:07.456Z",
+    "read": true
+  },
+  {
+    "id": "71b952bc-f2c3-4d2a-9344-ff21ec98ff34",
+    "type": "LOW_STOCK_ALERT",
+    "title": "⚠️ Low Stock: Sewing Thread Cutter",
+    "content": "⚠️ Low Stock: \"Sewing Thread Cutter\" (SW05-T) at GOVT VHSS ARYAD. Available: 3 / Original: 5",
+    "to": [
+      "ADMIN"
+    ],
+    "message": "⚠️ Low Stock: \"Sewing Thread Cutter\" (SW05-T) at GOVT VHSS ARYAD. Available: 3 / Original: 5",
+    "brc": "32110100105SH",
+    "priority": "HIGH",
+    "createdAt": "2026-06-22T06:43:27.449Z",
+    "read": true
+  },
+  {
+    "id": "8e5e82c2-0bf5-426f-a068-0a19eb7929a7",
+    "type": "STOCK_REMARK",
+    "title": "📝 New Remark: Sewing Seam Ripper",
+    "content": "📦 Item: Sewing Seam Ripper (Sewing kit)\n📍 Location: GOVT VHSS ARYAD, ALAPPUZHA\n💬 Remark: \"ji\"",
+    "to": [
+      "ADMIN"
+    ],
+    "message": "📦 Item: Sewing Seam Ripper (Sewing kit)\n📍 Location: GOVT VHSS ARYAD, ALAPPUZHA\n💬 Remark: \"ji\"",
+    "brc": "32110100105SH",
+    "priority": "NORMAL",
+    "createdAt": "2026-06-22T06:44:21.037Z",
+    "read": false
+  },
+  {
+    "id": "5c58b30e-bf7c-46ca-a6d2-f6ca2327643a",
+    "type": "STOCK_REMARK",
+    "title": "📝 New Remark: m",
+    "content": "📦 Item: m (Adhesive and tapes)\n📍 Location: GOVT VHSS ARYAD, ALAPPUZHA\n💬 Remark: \"l\"",
+    "to": [
+      "ADMIN"
+    ],
+    "message": "📦 Item: m (Adhesive and tapes)\n📍 Location: GOVT VHSS ARYAD, ALAPPUZHA\n💬 Remark: \"l\"",
+    "brc": "32110100105SH",
+    "priority": "NORMAL",
+    "createdAt": "2026-06-22T06:44:39.829Z",
+    "read": false
+  },
+  {
+    "id": "e83cf28c-c47a-4ab4-b3f4-11ea895b2ccb",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "LOW STOCK ALERT: m (Art and craft supplies) at Hub is at 1 quantity.",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T06:51:34.578Z"
+  },
+  {
+    "id": "cf59f2a1-d8e5-4f42-a1f0-4b1fa5539600",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "New stock item created: m (1 units)",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T06:51:34.582Z"
+  },
+  {
+    "id": "19934827-afe8-4ba5-8f06-bde7e3892636",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "LOW STOCK ALERT: m (Art and craft supplies) at Hub is at 1 quantity.",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T06:51:47.098Z"
+  },
+  {
+    "id": "8cd56ad6-eba9-41c7-8245-ed0b5017de8f",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "New stock item created: Test Item (undefined units)",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T06:56:06.571Z"
+  },
+  {
+    "id": "622a44f3-b286-4632-85e7-fc978fa5fbd2",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "LOW STOCK ALERT: Test Item (Other) at 32110100105SH is at 1 quantity.",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T06:57:17.414Z"
+  },
+  {
+    "id": "5d4574c6-f1f4-42a3-aadc-939032361045",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "New stock item created: Test Item (1 units)",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T06:57:17.416Z"
+  },
+  {
+    "id": "3976c4d3-5d1a-4c14-b68a-9fdd4944631a",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "LOW STOCK ALERT: Test Item (Other) at 32110100105SH is at 1 quantity.",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T06:57:17.431Z"
+  },
+  {
+    "id": "ccc9b0f7-d371-4da2-b089-4ac6c0c31371",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "LOW STOCK ALERT: m (Electronic components) at Hub is at 1 quantity.",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T07:04:47.299Z"
+  },
+  {
+    "id": "ae2a581a-c2b2-43f7-820d-8d008a24e82a",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "New stock item created: m (1 units)",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T07:04:47.304Z"
+  },
+  {
+    "id": "a70ab997-3d0c-4d4e-9318-46f9da256c80",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "LOW STOCK ALERT: m (Electronic components) at Hub is at 1 quantity.",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T07:05:02.344Z"
+  },
+  {
+    "id": "d693e1c6-82d5-4248-82eb-3356760788bb",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "Bulk Upload Completed: 0 created, 105 updated.",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T07:15:54.877Z"
+  },
+  {
+    "id": "525832a3-0a2b-4de7-bf2c-00905c144d51",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "Bulk Upload Completed: 0 created, 105 updated.",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T07:32:29.434Z"
+  },
+  {
+    "id": "f05de5e5-040b-4213-8436-64967655a708",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "Bulk Upload Completed: 0 created, 105 updated.",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T08:21:02.924Z"
+  },
+  {
+    "id": "4776e515-14d8-4347-8fc0-293c62d171de",
+    "to": [
+      "ADMIN"
+    ],
+    "from": "System Alerts",
+    "content": "Bulk Upload Completed: 0 created, 105 updated.",
+    "scheduledFor": null,
+    "createdAt": "2026-06-22T08:22:11.811Z"
   }
 ]

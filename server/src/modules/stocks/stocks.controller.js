@@ -143,8 +143,15 @@ module.exports = {
 
   downloadStockReport: async (req, res, next) => {
     try {
-      const { brc, district, format } = req.query;
-      const stocksData = await stocksService.getAllStocks({ brc, district });
+      const { brc, district, format, status, category } = req.query;
+      
+      const filters = {};
+      if (brc) filters.brc = brc;
+      if (district) filters.district = district;
+      if (status) filters.status = status;
+      if (category) filters.category = category;
+      
+      const stocksData = await stocksService.getAllStocks(filters);
 
       if (format === 'pdf') {
         const doc = new PDFDocument({ margin: 40, size: 'A4' });
@@ -306,11 +313,11 @@ module.exports = {
         return error(res, 'No valid items found in upload', 400);
       }
 
-      const { createdCount, updatedCount } = await stocksService.bulkUpsertStocks(items);
+      const { createdCount, updatedCount, stocks: affectedStocks } = await stocksService.bulkUpsertStocks(items);
       
       sendGeneralStockNotification(`Bulk Upload Completed: ${createdCount} created, ${updatedCount} updated.`);
 
-      return success(res, { createdCount, updatedCount }, 201, 'Bulk upload successful');
+      return success(res, { createdCount, updatedCount, stocks: affectedStocks }, 201, 'Bulk upload successful');
     } catch (err) {
       next(err);
     }

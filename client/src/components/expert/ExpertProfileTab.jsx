@@ -239,7 +239,7 @@ export default function ExpertProfileTab({ user, brcData }) {
                         <span className="material-symbols-outlined">corporate_fare</span>
                       </div>
                       <div>
-                        <p className="font-bold text-on-surface leading-tight mb-1">{brc.name}</p>
+                        <p className="font-bold text-on-surface leading-tight mb-1">{brc.location}/{brc.name}</p>
                         <p className="text-xs text-secondary font-medium uppercase tracking-wide">{brc.district}</p>
                         <p className="text-xs text-secondary mt-1 opacity-70">Code: {brc.code}</p>
                       </div>

@@ -67,6 +67,18 @@ export default function StockCompare() {
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">District</label>
+          <select 
+            className="w-full border rounded px-3 py-2 text-sm bg-white"
+            value={filters.district}
+            onChange={(e) => setFilters({...filters, district: e.target.value, brc: ''})}
+          >
+            <option value="">All Districts</option>
+            {districts.map(d => <option key={d} value={d}>{d}</option>)}
+          </select>
+        </div>
+
+        <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">BRC</label>
           <select 
             className="w-full border rounded px-3 py-2 text-sm bg-white"
@@ -82,18 +94,9 @@ export default function StockCompare() {
             }}
           >
             <option value="" disabled>Select BRC</option>
-            {brcs.map(b => <option key={b.code} value={b.code}>{b.name}</option>)}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">District</label>
-          <select 
-            className="w-full border rounded px-3 py-2 text-sm bg-white bg-slate-50"
-            value={filters.district}
-            disabled
-          >
-            <option value="">{filters.district || 'Auto-selected from BRC'}</option>
+            {brcs
+              .filter(b => !filters.district || b.district === filters.district)
+              .map(b => <option key={b.code} value={b.code}>{b.location}/{b.name}</option>)}
           </select>
         </div>
 

@@ -226,7 +226,7 @@ export default function AdminFormDashboard({ onClose }) {
               className="bg-white border border-outline/20 rounded-xl px-4 py-2 text-sm outline-none focus:border-primary shadow-sm min-w-[200px]"
             >
               <option value="">All BRCs</option>
-              {brcs.map(b => <option key={b.code} value={b.code}>{b.location}/ {b.name}</option>)}
+              {brcs.map(b => <option key={b.code} value={b.code}>{b.location}/{b.name}</option>)}
             </select>
           </div>
         </div>
@@ -334,7 +334,7 @@ export default function AdminFormDashboard({ onClose }) {
                             else setAssignBrcs(assignBrcs.filter(code => code !== b.code));
                           }}
                         />
-                        {b.name} ({b.code})
+                        {b.location}/{b.name} ({b.code})
                       </label>
                     ))}
                     {brcs.length === 0 && <p className="text-sm text-secondary italic">No BRCs available.</p>}

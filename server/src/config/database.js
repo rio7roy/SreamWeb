@@ -358,7 +358,19 @@ const db = {
 
       if (where.district) result = result.filter(s => !s.district || s.district === where.district);
       if (where.brc) result = result.filter(s => !s.brc || s.brc === where.brc);
-      if (where.status) result = result.filter(s => s.status === where.status);
+      if (where.status) {
+        if (where.status === 'AVAILABLE' || where.status === 'ACTIVE') {
+          result = result.filter(s => (s.availableQty ?? s.newQty ?? s.quantity ?? 0) > 0);
+        } else if (where.status === 'CONSUMED') {
+          result = result.filter(s => (s.consumedQty || 0) > 0);
+        } else if (where.status === 'USED') {
+          result = result.filter(s => (s.usedQty || 0) > 0);
+        } else if (where.status === 'DAMAGED') {
+          result = result.filter(s => (s.damagedQty || 0) > 0);
+        } else {
+          result = result.filter(s => s.status === where.status);
+        }
+      }
       if (where.category) result = result.filter(s => s.category === where.category);
       if (where.source) result = result.filter(s => s.source === where.source);
       if (where.itemName) {

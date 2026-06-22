@@ -87,6 +87,7 @@ async function deleteStockById(id) {
 async function bulkUpsertStocks(items) {
   let updatedCount = 0;
   let createdCount = 0;
+  const affectedStocks = [];
 
   for (const item of items) {
     const existing = db.stocks.findMany({
@@ -101,13 +102,14 @@ async function bulkUpsertStocks(items) {
       // Update existing item (add quantity)
       const ex = existing.data[0];
       
-      const currentNewQty = ex.newQty !== undefined ? ex.newQty : ex.quantity;
+      const currentNewQty = ex.newQty !== undefined ? ex.newQty : (ex.quantity || 0);
       const currentAvailableQty = ex.availableQty !== undefined ? ex.availableQty : currentNewQty;
+      const currentQuantity = ex.quantity !== undefined ? ex.quantity : currentNewQty;
       
-      db.stocks.update({
+      const updated = db.stocks.update({
         where: { id: ex.id },
         data: {
-          quantity: ex.quantity + item.quantity,
+          quantity: currentQuantity + item.quantity,
           newQty: currentNewQty + item.quantity,
           availableQty: currentAvailableQty + item.quantity,
           category: item.category || ex.category,
@@ -115,10 +117,11 @@ async function bulkUpsertStocks(items) {
           district: item.district || ex.district,
         }
       });
+      affectedStocks.push({ ...updated, _isNew: false });
       updatedCount++;
     } else {
       // Create new
-      db.stocks.create({
+      const created = db.stocks.create({
         data: {
           status: 'ACTIVE',
           newQty: item.quantity,
@@ -126,11 +129,12 @@ async function bulkUpsertStocks(items) {
           ...item
         }
       });
+      affectedStocks.push({ ...created, _isNew: true });
       createdCount++;
     }
   }
 
-  return { createdCount, updatedCount };
+  return { createdCount, updatedCount, stocks: affectedStocks };
 }
 
 /**

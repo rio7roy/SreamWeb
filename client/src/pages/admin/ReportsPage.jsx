@@ -163,7 +163,7 @@ export default function ReportsPage() {
             >
               <option value="">All Hubs</option>
               {filteredBrcs.map(b => (
-                <option key={b.code} value={b.code}>{b.location}/ {b.name}</option>
+                <option key={b.code} value={b.code}>{b.location}/{b.name}</option>
               ))}
             </select>
           </div>

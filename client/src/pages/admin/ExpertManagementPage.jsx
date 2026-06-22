@@ -160,7 +160,7 @@ export default function ExpertManagementPage() {
                                 className="w-full text-left px-4 py-3 rounded-xl hover:bg-amber-50 flex items-center justify-between group transition-all"
                               >
                                 <div>
-                                  <p className="font-bold text-on-surface">{brc.name}</p>
+                                  <p className="font-bold text-on-surface">{brc.location}/{brc.name}</p>
                                   <p className="text-xs text-secondary mt-0.5">{brc.code} • {brc.district}</p>
                                 </div>
                                 <span className="material-symbols-outlined text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity">add_circle</span>
@@ -188,7 +188,7 @@ export default function ExpertManagementPage() {
                     {assignedBrcs.map(brc => (
                       <div key={brc.code} className="flex flex-col p-5 bg-white rounded-2xl shadow-sm border border-outline/10 group hover:border-amber-300 transition-colors animate-fade-in-up relative overflow-hidden">
                         <div className="flex-grow pr-10">
-                          <p className="font-bold text-on-surface text-lg leading-tight mb-3">{brc.name}</p>
+                          <p className="font-bold text-on-surface text-lg leading-tight mb-3">{brc.location}/{brc.name}</p>
                           <div className="flex flex-wrap gap-2 mt-auto">
                             <span className="px-2 py-1 bg-surface-container text-secondary rounded-lg text-[10px] font-bold uppercase tracking-wider">{brc.code}</span>
                             <span className="px-2 py-1 bg-amber-50 text-amber-700 rounded-lg text-[10px] font-bold uppercase tracking-wider">{brc.district}</span>

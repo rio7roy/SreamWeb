@@ -34,7 +34,7 @@ export default function MessageComposer() {
 
     // BRCs
     brcs.forEach(b => {
-      options.push({ type: 'brc', label: `${b.name} (${b.code})`, value: `BRC:${b.code}` });
+      options.push({ type: 'brc', label: `${b.location}/{b.name} (${b.code})`, value: `BRC:${b.code}` });
     });
 
     return options;
