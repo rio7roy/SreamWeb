@@ -3,7 +3,6 @@ import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../features/auth/AuthContext";
 import api from "../lib/api";
-import ExpertAttendanceTab from "../components/expert/ExpertAttendanceTab";
 import PdfReportModal from "../components/expert/PdfReportModal";
 import StockManagementModal from "../components/expert/StockManagementModal";
 
@@ -215,11 +214,6 @@ export default function HubDashboardPage() {
                   </div>
                 </div>
               </div>
-            </section>
-
-            {/* Attendance / Event Log */}
-            <section className="w-full">
-              <ExpertAttendanceTab user={user} />
             </section>
           </div>
         </main>
