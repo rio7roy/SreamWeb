@@ -1,0 +1,1307 @@
+[
+  {
+    "id": "hub-32110100105SH",
+    "email": "hub-32110100105sh@stream.edu",
+    "username": "32110100105SH",
+    "password": "$2b$12$ds1uiHHfw8M/mHm.PQKYgOI35sGKszyQXmbGkS7CbDBH9lY7wf2mi",
+    "name": "ALAPPUZHA / GOVT VHSS ARYAD",
+    "brcCode": "32110100105SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32110100105SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:49.175Z",
+    "updatedAt": "2026-06-22T07:12:49.175Z"
+  },
+  {
+    "id": "hub-32110200809SH",
+    "email": "hub-32110200809sh@stream.edu",
+    "username": "32110200809SH",
+    "password": "$2b$12$Npj783Z9o8RWEiKldJv8beRA4Mvl7wbE.WZDt5R8CYPbphFQc2gkS",
+    "name": "AMBALAPPUZHA / GHSS VALIYAZHEECKAL",
+    "brcCode": "32110200809SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32110200809SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:49.376Z",
+    "updatedAt": "2026-06-22T07:12:49.376Z"
+  },
+  {
+    "id": "hub-32110300803SH",
+    "email": "hub-32110300803sh@stream.edu",
+    "username": "32110300803SH",
+    "password": "$2b$12$WRZNnnJaXH07qiXaXSsGzO9P3QHtzuON0m1C8Sk18sibNKYEbfqyO",
+    "name": "CHENGANNUR / GHSS PULIYOOR",
+    "brcCode": "32110300803SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32110300803SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:49.575Z",
+    "updatedAt": "2026-06-22T07:12:49.575Z"
+  },
+  {
+    "id": "hub-32110400102SH",
+    "email": "hub-32110400102sh@stream.edu",
+    "username": "32110400102SH",
+    "password": "$2b$12$MzfbtfaBDqQnVBMpLpLakuy5bHDNyn9ckEd3wHxVCQUCKmQZbAbFy",
+    "name": "CHERTHALA / GHS POLLETHAI",
+    "brcCode": "32110400102SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32110400102SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:49.773Z",
+    "updatedAt": "2026-06-22T07:12:49.773Z"
+  },
+  {
+    "id": "hub-32110500702SH",
+    "email": "hub-32110500702sh@stream.edu",
+    "username": "32110500702SH",
+    "password": "$2b$12$uUx9qFAT7D2bKsKoJchLQOsPyPBrrEBPKrrZhZnnpQyd0ibM2vOJe",
+    "name": "HARIPPAD / GBHSS HARIPAD",
+    "brcCode": "32110500702SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32110500702SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:49.972Z",
+    "updatedAt": "2026-06-22T07:12:49.972Z"
+  },
+  {
+    "id": "hub-32110600703SH",
+    "email": "hub-32110600703sh@stream.edu",
+    "username": "32110600703SH",
+    "password": "$2b$12$KPJ7nNsJy0uArAqWPS/vce83lYDuukMLD0uU.u9RJ.MBQANuRCpTe",
+    "name": "KAYAMKULAM / GHSS RAMAPURAM",
+    "brcCode": "32110600703SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32110600703SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:50.169Z",
+    "updatedAt": "2026-06-22T07:12:50.169Z"
+  },
+  {
+    "id": "hub-32110700504SH",
+    "email": "hub-32110700504sh@stream.edu",
+    "username": "32110700504SH",
+    "password": "$2b$12$A6tBHJyvYYDrD6hw/9zkC.8hcx6dPW75kCDoHbsQDy7N8jhJwcyL.",
+    "name": "MAVELIKKARA / GVHSS CHUNAKKARA",
+    "brcCode": "32110700504SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32110700504SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:50.365Z",
+    "updatedAt": "2026-06-22T07:12:50.365Z"
+  },
+  {
+    "id": "hub-32110800102SH",
+    "email": "hub-32110800102sh@stream.edu",
+    "username": "32110800102SH",
+    "password": "$2b$12$IpzFeFzjoAkBRaIYZzx0ueaAFfPPDa5aYt06I1WSX9tdIkX9UrmfO",
+    "name": "MONCOMPU / GHS THEKKEKKARA",
+    "brcCode": "32110800102SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32110800102SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:50.560Z",
+    "updatedAt": "2026-06-22T07:12:50.560Z"
+  },
+  {
+    "id": "hub-32110901034SH",
+    "email": "hub-32110901034sh@stream.edu",
+    "username": "32110901034SH",
+    "password": "$2b$12$MB9XPAYtKk0evoV7W2SfXevwcQXoYabXrlhctZgTAPaKQvK36LzuC",
+    "name": "THALAVADY / KKKPS GHS KARUMADY",
+    "brcCode": "32110901034SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32110901034SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:50.761Z",
+    "updatedAt": "2026-06-22T07:12:50.761Z"
+  },
+  {
+    "id": "hub-32111000804SH",
+    "email": "hub-32111000804sh@stream.edu",
+    "username": "32111000804SH",
+    "password": "$2b$12$cNqi4cRF40Fi3pOqzvX2xeVmHxQ3yMgDcOq4WzNNKfw6df4R8HOhm",
+    "name": "THURAVOOR / SCUGVHSS PATTANAKKAD",
+    "brcCode": "32111000804SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32111000804SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:50.980Z",
+    "updatedAt": "2026-06-22T07:12:50.980Z"
+  },
+  {
+    "id": "hub-32111100607SH",
+    "email": "hub-32111100607sh@stream.edu",
+    "username": "32111100607SH",
+    "password": "$2b$12$wpNMduvdPZa1wNjt/ZHYPeT75WZzrc6Ex9z0d84.3aYWwTKznZVHW",
+    "name": "VELIYANADU / GHSS KIDANGARA",
+    "brcCode": "32111100607SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32111100607SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:51.200Z",
+    "updatedAt": "2026-06-22T07:12:51.200Z"
+  },
+  {
+    "id": "hub-32080102104SH",
+    "email": "hub-32080102104sh@stream.edu",
+    "username": "32080102104SH",
+    "password": "$2b$12$3wOrUaR81TnJ6yysd.eOaeB8KejPFuqs3ibH4Khx/ksDWH0Thr/IO",
+    "name": "ALUVA / GHSS KONGORPILLY",
+    "brcCode": "32080102104SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32080102104SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:51.422Z",
+    "updatedAt": "2026-06-22T07:12:51.422Z"
+  },
+  {
+    "id": "hub-32080101705SH",
+    "email": "hub-32080101705sh@stream.edu",
+    "username": "32080101705SH",
+    "password": "$2b$12$GJlmle2ZWmL0MMCyr/sD7u0JDOSHugvbPzQ5xL8pM3XLH5h7PkRHG",
+    "name": "ANGAMALY / GHSS CHENGAMANAD",
+    "brcCode": "32080101705SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32080101705SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:51.623Z",
+    "updatedAt": "2026-06-22T07:12:51.623Z"
+  },
+  {
+    "id": "hub-32080303316SH",
+    "email": "hub-32080303316sh@stream.edu",
+    "username": "32080303316SH",
+    "password": "$2b$12$22LUvxs5C6Hb72gXs/p3Mesy/xp.qozHZlRMHRvhEZkaw5SljfZd2",
+    "name": "ERNAKULAM / SRVGMVHSS EKM",
+    "brcCode": "32080303316SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32080303316SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:51.824Z",
+    "updatedAt": "2026-06-22T07:12:51.824Z"
+  },
+  {
+    "id": "hub-32080500302SH",
+    "email": "hub-32080500302sh@stream.edu",
+    "username": "32080500302SH",
+    "password": "$2b$12$a2oL28CQ96b7IOKGAOGVQ.Rj8yh6gz.zhxiano1EyAFBusJC1zVY2",
+    "name": "KOLENCHERY / GHSS KADAYIRIPPU",
+    "brcCode": "32080500302SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32080500302SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:52.032Z",
+    "updatedAt": "2026-06-22T07:12:52.032Z"
+  },
+  {
+    "id": "hub-32080600504SH",
+    "email": "hub-32080600504sh@stream.edu",
+    "username": "32080600504SH",
+    "password": "$2b$12$HqvR0CKkouOHw4MrBRXameJ2.25oK4WqJ7T8Ts0.wKBxdIeDx4IOi",
+    "name": "KOOTHATTUKULAM / GHS AROOR",
+    "brcCode": "32080600504SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32080600504SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:52.272Z",
+    "updatedAt": "2026-06-22T07:12:52.272Z"
+  },
+  {
+    "id": "hub-32080701105SH",
+    "email": "hub-32080701105sh@stream.edu",
+    "username": "32080701105SH",
+    "password": "$2b$12$BicwSpPG5WEGeDDi.koaGeYYFA5/nN/BkPf56UGCQ9zUBK6rYoUfC",
+    "name": "KOTHAMANGALAM / GMHSS CHERUVATTOOR",
+    "brcCode": "32080701105SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32080701105SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:52.489Z",
+    "updatedAt": "2026-06-22T07:12:52.489Z"
+  },
+  {
+    "id": "hub-32060300206SH",
+    "email": "hub-32060300206sh@stream.edu",
+    "username": "32060300206SH",
+    "password": "$2b$12$BaUZquym1HeJj7Cx3Af55empV2qvZP/Ntm8EeWlqqYuslXT9leeLu",
+    "name": "MATTANCHERY / GHSS PUTHENTHODE",
+    "brcCode": "32060300206SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32060300206SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:52.695Z",
+    "updatedAt": "2026-06-22T07:12:52.695Z"
+  },
+  {
+    "id": "hub-32080901201SH",
+    "email": "hub-32080901201sh@stream.edu",
+    "username": "32080901201SH",
+    "password": "$2b$12$fryIk0wcva8.aIqUiQY.veHcEqmKeW8weE7UGyLMvcRFNYLGMDMe.",
+    "name": "MUVATTUPUZHA / GHSS PEZHAKKAPILLY",
+    "brcCode": "32080901201SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32080901201SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:52.901Z",
+    "updatedAt": "2026-06-22T07:12:52.901Z"
+  },
+  {
+    "id": "hub-32081000706SH",
+    "email": "hub-32081000706sh@stream.edu",
+    "username": "32081000706SH",
+    "password": "$2b$12$4mqnHOdgEEZiygwkMk6JquykoQP7G5LyajedBYVFHfnlr.5RISVn2",
+    "name": "N. PARAVOOR / GVHSS KAITHARAM",
+    "brcCode": "32081000706SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32081000706SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:53.102Z",
+    "updatedAt": "2026-06-22T07:12:53.102Z"
+  },
+  {
+    "id": "hub-32081100506SH",
+    "email": "hub-32081100506sh@stream.edu",
+    "username": "32081100506SH",
+    "password": "$2b$12$nOhVCjbp2TBoLHGlFYjYt.MTnCiuX08gbDtX9TtcjfV7pNBZpp3x6",
+    "name": "PERUMABVOOR / GHSS CHERANALLOR",
+    "brcCode": "32081100506SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32081100506SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:53.310Z",
+    "updatedAt": "2026-06-22T07:12:53.310Z"
+  },
+  {
+    "id": "hub-32081200102SH",
+    "email": "hub-32081200102sh@stream.edu",
+    "username": "32081200102SH",
+    "password": "$2b$12$QMSsc/huddjtJm9THk3eWeclnItLn.Ie3aOaCVELA7ahXGSAzJDVq",
+    "name": "PIRAVOM / GV&HSS MANEED",
+    "brcCode": "32081200102SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32081200102SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:53.515Z",
+    "updatedAt": "2026-06-22T07:12:53.515Z"
+  },
+  {
+    "id": "hub-32081300407SH",
+    "email": "hub-32081300407sh@stream.edu",
+    "username": "32081300407SH",
+    "password": "$2b$12$7IQJG57bY9zxd5FU3pyCbO1i0k4m4I.c7A7DBjJaua2F0i5yT352S",
+    "name": "TRIPUNITHURA / GOVT SANSKRIT HSS THRIPUNITHURA",
+    "brcCode": "32081300407SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32081300407SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:53.714Z",
+    "updatedAt": "2026-06-22T07:12:53.714Z"
+  },
+  {
+    "id": "hub-32080100806SH",
+    "email": "hub-32080100806sh@stream.edu",
+    "username": "32080100806SH",
+    "password": "$2b$12$g1AvChH/Dj7DzZU7Ej0WNuKJOGgOKwwEJrR9AJOannePWImrzGy1q",
+    "name": "VYPIN / GHS ELAKUNNAPUZHA",
+    "brcCode": "32080100806SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32080100806SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:53.918Z",
+    "updatedAt": "2026-06-22T07:12:53.918Z"
+  },
+  {
+    "id": "hub-32081500701SH",
+    "email": "hub-32081500701sh@stream.edu",
+    "username": "32081500701SH",
+    "password": "$2b$12$a9/s0z5.H54WdUWWE2kgFO8SXHKbAubkKbPZHUTaiZc.K7vP6c0wq",
+    "name": "KOOVAPPADY / GUPS KOMBANAD",
+    "brcCode": "32081500701SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32081500701SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:54.118Z",
+    "updatedAt": "2026-06-22T07:12:54.118Z"
+  },
+  {
+    "id": "hub-32080400301SH",
+    "email": "hub-32080400301sh@stream.edu",
+    "username": "32080400301SH",
+    "password": "$2b$12$hj1sDRO/.mmbBaNzstwZ3ecZZZS0kNld3w9PzddLFFGMyh3W8zI2C",
+    "name": "KALLOORKKAD / PUPS VELLARAMKALLU",
+    "brcCode": "32080400301SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32080400301SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:54.318Z",
+    "updatedAt": "2026-06-22T07:12:54.318Z"
+  },
+  {
+    "id": "hub-32020500202SH",
+    "email": "hub-32020500202sh@stream.edu",
+    "username": "32020500202SH",
+    "password": "$2b$12$er1x993ejRUfR6ZbO34XDuI3fjf7TcKkJw4nrLGvhXkt/cqzAMgoG",
+    "name": "CHOKLI / GUPS PUTHUSSERI",
+    "brcCode": "32020500202SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32020500202SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:54.518Z",
+    "updatedAt": "2026-06-22T07:12:54.518Z"
+  },
+  {
+    "id": "hub-32021501306SH",
+    "email": "hub-32021501306sh@stream.edu",
+    "username": "32021501306SH",
+    "password": "$2b$12$HG1Xel08cx6uiSm99WhaR.pYJrfr9IGfyNvBFIP.Ir8v4KboGIsMq",
+    "name": "IRIKKUR / GHSS CHUZHALI",
+    "brcCode": "32021501306SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32021501306SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:54.719Z",
+    "updatedAt": "2026-06-22T07:12:54.719Z"
+  },
+  {
+    "id": "hub-32020901306SH",
+    "email": "hub-32020901306sh@stream.edu",
+    "username": "32020901306SH",
+    "password": "$2b$12$3p1KzIFK6B1Eb6C/Ne0jHe7ymR8tL8t00WjCRBeroJWyp3oCJtfTy",
+    "name": "IRITTY / GHSS CHAVASSERY",
+    "brcCode": "32020901306SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32020901306SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:54.921Z",
+    "updatedAt": "2026-06-22T07:12:54.921Z"
+  },
+  {
+    "id": "hub-32020100224SH",
+    "email": "hub-32020100224sh@stream.edu",
+    "username": "32020100224SH",
+    "password": "$2b$12$gA3vF/zx3O8V9ISkrTcp2uNtq0nTbEmSqShLgkYTunUMds4nbcUaq",
+    "name": "KANNUR NORTH / GOVT HSS CHALA",
+    "brcCode": "32020100224SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32020100224SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:55.122Z",
+    "updatedAt": "2026-06-22T07:12:55.122Z"
+  },
+  {
+    "id": "hub-32020200921SH",
+    "email": "hub-32020200921sh@stream.edu",
+    "username": "32020200921SH",
+    "password": "$2b$12$6fVhrUuMw1nK5rGvO9ro/uUDhtjWkAfkIcTGfoGzlOReCEsITE4Uq",
+    "name": "KANNUR SOUTH / PERALASSERY AKG SMARAKA GHSS",
+    "brcCode": "32020200921SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32020200921SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:55.329Z",
+    "updatedAt": "2026-06-22T07:12:55.329Z"
+  },
+  {
+    "id": "hub-32020700306SH",
+    "email": "hub-32020700306sh@stream.edu",
+    "username": "32020700306SH",
+    "password": "$2b$12$qk3MSEP0l1WWRSxulRSqa./lv9LJ1aLhWq8X1ajii2d2XYzU3rmKO",
+    "name": "KUTHUPARAMBA / GUPS PALAYATHUVAYAL",
+    "brcCode": "32020700306SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32020700306SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:55.539Z",
+    "updatedAt": "2026-06-22T07:12:55.539Z"
+  },
+  {
+    "id": "hub-32020140520SH",
+    "email": "hub-32020140520sh@stream.edu",
+    "username": "32020140520SH",
+    "password": "$2b$12$U/Y2miwTdJqVFWJkOQ.aP.m869x/QN7izF1PCJ7e6hdOksFKXHZzm",
+    "name": "MADAYI / GVHSS BOYS MADAYI",
+    "brcCode": "32020140520SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32020140520SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:55.745Z",
+    "updatedAt": "2026-06-22T07:12:55.745Z"
+  },
+  {
+    "id": "hub-32020800314SH",
+    "email": "hub-32020800314sh@stream.edu",
+    "username": "32020800314SH",
+    "password": "$2b$12$YUKtLbK36n.ENo9ozxg3tulNHzGNR28KstZA.dpOC5geOIhsBws.K",
+    "name": "MATTANNUR / GVHSS EDAYANNUR",
+    "brcCode": "32020800314SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32020800314SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:55.946Z",
+    "updatedAt": "2026-06-22T07:12:55.946Z"
+  },
+  {
+    "id": "hub-32020600909SH",
+    "email": "hub-32020600909sh@stream.edu",
+    "username": "32020600909SH",
+    "password": "$2b$12$.2BTmnSSl7yYo3i1vTEsoOq3XHYywURa7KsQle1pW.FwQVPH3u0SC",
+    "name": "PANOOR / ABDURAHIMAN SMARAKAM UPS",
+    "brcCode": "32020600909SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32020600909SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:56.145Z",
+    "updatedAt": "2026-06-22T07:12:56.145Z"
+  },
+  {
+    "id": "hub-32021301010SH",
+    "email": "hub-32021301010sh@stream.edu",
+    "username": "32021301010SH",
+    "password": "$2b$12$j9wgt3Olok/4iRKOWRrBvud95bdC.EeJm53pz43B/hnaGmSar2W4y",
+    "name": "PAPPINISSERY / GHS AZHIKODE",
+    "brcCode": "32021301010SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32021301010SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:56.352Z",
+    "updatedAt": "2026-06-22T07:12:56.352Z"
+  },
+  {
+    "id": "hub-32021201301SH",
+    "email": "hub-32021201301sh@stream.edu",
+    "username": "32021201301SH",
+    "password": "$2b$12$Cs1e3yBvbh0oyXWUY.IYKOVID/FBwu8Pp2qS.s5lxVN6Xyroi6qcO",
+    "name": "PAYYANNUR / MVMKVNSGHSS MATHIL",
+    "brcCode": "32021201301SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32021201301SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:56.551Z",
+    "updatedAt": "2026-06-22T07:12:56.551Z"
+  },
+  {
+    "id": "hub-32020400402SH",
+    "email": "hub-32020400402sh@stream.edu",
+    "username": "32020400402SH",
+    "password": "$2b$12$W7GGJyLu6YGgQ0J/deFsqOjOnspAbaUf7hRroa9QSOLdNNV2V0z0W",
+    "name": "THALASSERY NORTH / GVHSS KADIRUR",
+    "brcCode": "32020400402SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32020400402SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:56.749Z",
+    "updatedAt": "2026-06-22T07:12:56.749Z"
+  },
+  {
+    "id": "hub-32020100605SH",
+    "email": "hub-32020100605sh@stream.edu",
+    "username": "32020100605SH",
+    "password": "$2b$12$zjAPFKZWnxkav52dS1zFr.hY1pkV7L0qloma3iBXvJEaXgwFR6GIO",
+    "name": "THALASSERY SOUTH / GOVT TOWN HSS THALASSERY",
+    "brcCode": "32020100605SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32020100605SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:56.947Z",
+    "updatedAt": "2026-06-22T07:12:56.947Z"
+  },
+  {
+    "id": "hub-32021000715SH",
+    "email": "hub-32021000715sh@stream.edu",
+    "username": "32021000715SH",
+    "password": "$2b$12$uu04Pro8VQSQ8ucVwCtl6.YBNHllgD3K3IwHXqB/uDl1RbNxav9.q",
+    "name": "THALIPARAMBA NORTH / KKN PMG VHS SCHOOL",
+    "brcCode": "32021000715SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32021000715SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:57.152Z",
+    "updatedAt": "2026-06-22T07:12:57.152Z"
+  },
+  {
+    "id": "hub-32021100905SH",
+    "email": "hub-32021100905sh@stream.edu",
+    "username": "32021100905SH",
+    "password": "$2b$12$sodh/yt58T6GvZbwKERSZOIO359gzpaw9RoLH9CKB4kj7FTyehtIy",
+    "name": "THALIPARAMBA SOUTH PALAKKAD / GUPS KADAMBERY",
+    "brcCode": "32021100905SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32021100905SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:57.356Z",
+    "updatedAt": "2026-06-22T07:12:57.356Z"
+  },
+  {
+    "id": "hub-32060100307SH",
+    "email": "hub-32060100307sh@stream.edu",
+    "username": "32060100307SH",
+    "password": "$2b$12$ZdX6erWzTVlwRtXHq5EOn.jgSWpx8GNlcJ38V6yenExGbTcAwxIYm",
+    "name": "AGALI / GTHS SHOLAYUR",
+    "brcCode": "32060100307SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32060100307SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:57.558Z",
+    "updatedAt": "2026-06-22T07:12:57.558Z"
+  },
+  {
+    "id": "hub-32061000301SH",
+    "email": "hub-32061000301sh@stream.edu",
+    "username": "32061000301SH",
+    "password": "$2b$12$bW018aP0IdPrWVK2IFiD9.XeBhbSI/e9KkR0HRte.MAYG2OmCRvuG",
+    "name": "PARALI / GVHSS PATHIRIPALA",
+    "brcCode": "32061000301SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32061000301SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:57.758Z",
+    "updatedAt": "2026-06-22T07:12:57.758Z"
+  },
+  {
+    "id": "hub-32060200710SH",
+    "email": "hub-32060200710sh@stream.edu",
+    "username": "32060200710SH",
+    "password": "$2b$12$sPxRdbtcuKA8dnH0Mp5fk.mHTjhpfgoJwBqPxy2rbQj/hF7ovTF36",
+    "name": "ALATHUR / GHSS KIZHAKENCHERY",
+    "brcCode": "32060200710SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32060200710SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:57.962Z",
+    "updatedAt": "2026-06-22T07:12:57.962Z"
+  },
+  {
+    "id": "hub-32060300715SH",
+    "email": "hub-32060300715sh@stream.edu",
+    "username": "32060300715SH",
+    "password": "$2b$12$yQhCiMtWQGv52Epel8.OJ.0x0EHfizIEwDblmqryeJTxiS2ugkf4O",
+    "name": "CHERPPULASSERY / GVHSS CHERPULASSERY",
+    "brcCode": "32060300715SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32060300715SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:58.175Z",
+    "updatedAt": "2026-06-22T07:12:58.175Z"
+  },
+  {
+    "id": "hub-32060400104SH",
+    "email": "hub-32060400104sh@stream.edu",
+    "username": "32060400104SH",
+    "password": "$2b$12$UWM7FATryJYfwihM9pcMxOUneIfpa3VwZbY0myG6rZCk4qkoERdYO",
+    "name": "CHITTUR / GHSS CHITTUR",
+    "brcCode": "32060400104SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32060400104SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:58.463Z",
+    "updatedAt": "2026-06-22T07:12:58.463Z"
+  },
+  {
+    "id": "hub-32060500301SH",
+    "email": "hub-32060500301sh@stream.edu",
+    "username": "32060500301SH",
+    "password": "$2b$12$ejsqh9rexsLwbEvMDX2s0uUWomO.fqqqLz3JQ7Pqg1M7pQ1ljo8ri",
+    "name": "KOLLENGODE / GHSS KODUVAYUR",
+    "brcCode": "32060500301SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32060500301SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:58.688Z",
+    "updatedAt": "2026-06-22T07:12:58.688Z"
+  },
+  {
+    "id": "hub-32060600201SH",
+    "email": "hub-32060600201sh@stream.edu",
+    "username": "32060600201SH",
+    "password": "$2b$12$VQmKbMUdouXRZilzwGXs9eSPFGled9q0DZFmXI9T92e7rt6ujIELy",
+    "name": "KUZHALMANNAM / GHSS PERINGOTTUKURISSI",
+    "brcCode": "32060600201SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32060600201SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:58.920Z",
+    "updatedAt": "2026-06-22T07:12:58.920Z"
+  },
+  {
+    "id": "hub-32060700606SH",
+    "email": "hub-32060700606sh@stream.edu",
+    "username": "32060700606SH",
+    "password": "$2b$12$bF5JFDidhYQCqBWGq/7dfOTxR1F6j3To0xtGc5szpUeQ4o3il1WJC",
+    "name": "MANNARKKAD / GHSS POTTASSERY",
+    "brcCode": "32060700606SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32060700606SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:59.130Z",
+    "updatedAt": "2026-06-22T07:12:59.130Z"
+  },
+  {
+    "id": "hub-32020200412SH",
+    "email": "hub-32020200412sh@stream.edu",
+    "username": "32020200412SH",
+    "password": "$2b$12$/oAm5iOpsY8c8wo8UYnE2eMgSMQ5xQx2NPpwDosKvFRTB.g9kRi7W",
+    "name": "OTTAPPALAM / GHSS KADAMBUR",
+    "brcCode": "32020200412SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32020200412SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:59.331Z",
+    "updatedAt": "2026-06-22T07:12:59.331Z"
+  },
+  {
+    "id": "hub-32060900747SH",
+    "email": "hub-32060900747sh@stream.edu",
+    "username": "32060900747SH",
+    "password": "$2b$12$HiaZKnxTxy/oMyokzNVi5O/tUf7PYFDMBglUieRIUhF5W2BH7d.x.",
+    "name": "PALAKKAD / GHSS BIGBAZAR",
+    "brcCode": "32060900747SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32060900747SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:59.530Z",
+    "updatedAt": "2026-06-22T07:12:59.530Z"
+  },
+  {
+    "id": "hub-32061100108SH",
+    "email": "hub-32061100108sh@stream.edu",
+    "username": "32061100108SH",
+    "password": "$2b$12$X2FsobFDR1rR34lsSO66teMf0uuAs.6i.nRZXfKdYT8uxWxC..Qym",
+    "name": "PATTAMBI / GHSS PATTAMBI",
+    "brcCode": "32061100108SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32061100108SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:59.733Z",
+    "updatedAt": "2026-06-22T07:12:59.733Z"
+  },
+  {
+    "id": "hub-32061200219SH",
+    "email": "hub-32061200219sh@stream.edu",
+    "username": "32061200219SH",
+    "password": "$2b$12$T59/8Pr7lvjZ7NyqPrAty.uXUjLtAgs9.hVLtSa.Bw1rAkrWCYeoS",
+    "name": "SHORANUR / GHSS MARAYAMANGALAM",
+    "brcCode": "32061200219SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32061200219SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:12:59.935Z",
+    "updatedAt": "2026-06-22T07:12:59.935Z"
+  },
+  {
+    "id": "hub-32061300309SH",
+    "email": "hub-32061300309sh@stream.edu",
+    "username": "32061300309SH",
+    "password": "$2b$12$1CCImUfUfRkuEIgvkht99.NeBfXqYxFHmbufW0X6Gi5gdwlkHwPjK",
+    "name": "THRITHALA / GGHSS KALLADATHUR",
+    "brcCode": "32061300309SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32061300309SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:00.137Z",
+    "updatedAt": "2026-06-22T07:13:00.137Z"
+  },
+  {
+    "id": "hub-32070203701SH",
+    "email": "hub-32070203701sh@stream.edu",
+    "username": "32070203701SH",
+    "password": "$2b$12$IvU.ABGESGJRphWzO5f1JeVnvA2NuxQIL7AVeJnDVD5CSu98mP3ia",
+    "name": "AREACODE / GHS VETTILAPPARA",
+    "brcCode": "32070203701SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32070203701SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:00.336Z",
+    "updatedAt": "2026-06-22T07:13:00.336Z"
+  },
+  {
+    "id": "hub-32050700412SH",
+    "email": "hub-32050700412sh@stream.edu",
+    "username": "32050700412SH",
+    "password": "$2b$12$cPDwKFEvYOqFO6agd3uRrubVJ0XMbvK9..UTlqQOEyOMT/H0oxOe2",
+    "name": "EDAPPAL / PCNGHSS MOOKKUTHALA",
+    "brcCode": "32050700412SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32050700412SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:00.537Z",
+    "updatedAt": "2026-06-22T07:13:00.537Z"
+  },
+  {
+    "id": "hub-32050200516SH",
+    "email": "hub-32050200516sh@stream.edu",
+    "username": "32050200516SH",
+    "password": "$2b$12$9VUUGv62klWVntonyxeKLu4DTS3nNqhzFOPREHqOP9q3xqmtGQaOm",
+    "name": "KONDOTTY / GHSS KOTTAPPURAM",
+    "brcCode": "32050200516SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32050200516SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:00.738Z",
+    "updatedAt": "2026-06-22T07:13:00.738Z"
+  },
+  {
+    "id": "hub-32050800618SH",
+    "email": "hub-32050800618sh@stream.edu",
+    "username": "32050800618SH",
+    "password": "$2b$12$98kLNAl9QRCXOcSJ63pVdevCfuAdfs.1FG7TqHLqeqG4BoGN8IPeW",
+    "name": "KUTTIPPURAM / GHSS PERASSANNUR",
+    "brcCode": "32050800618SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32050800618SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:00.935Z",
+    "updatedAt": "2026-06-22T07:13:00.935Z"
+  },
+  {
+    "id": "hub-32050101826SH",
+    "email": "hub-32050101826sh@stream.edu",
+    "username": "32050101826SH",
+    "password": "$2b$12$67TkJO5D4H3bvVvaRsN8zur6aepy0aGAFF14Tuvdjuipy/a3TuXxe",
+    "name": "MALAPPURAM / GBHSS MALAPPURAM",
+    "brcCode": "32050101826SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32050101826SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:01.141Z",
+    "updatedAt": "2026-06-22T07:13:01.141Z"
+  },
+  {
+    "id": "hub-32050600631SH",
+    "email": "hub-32050600631sh@stream.edu",
+    "username": "32050600631SH",
+    "password": "$2b$12$TzdM6UMXj6fNGeEGP3WYrOKWR6l3KyUdlMDxov7nFmm8gh3TYZQOK",
+    "name": "MANJERI / GGHSS MANJERI",
+    "brcCode": "32050600631SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32050600631SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:01.355Z",
+    "updatedAt": "2026-06-22T07:13:01.355Z"
+  },
+  {
+    "id": "hub-32051500318SH",
+    "email": "hub-32051500318sh@stream.edu",
+    "username": "32051500318SH",
+    "password": "$2b$12$lRwgxwc5J/T2QKc70wnJ8eRfYIsokpPzPjmI0C0TrONFkDlOJAhWa",
+    "name": "MANKADA / GHSS MANKADA PALLIPPURAM",
+    "brcCode": "32051500318SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32051500318SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:01.557Z",
+    "updatedAt": "2026-06-22T07:13:01.557Z"
+  },
+  {
+    "id": "hub-32020100136SH",
+    "email": "hub-32020100136sh@stream.edu",
+    "username": "32020100136SH",
+    "password": "$2b$12$pLaK.lasjau1P.oziAIP5uYZIsy3ZelXFhBzZ7ckASL2X6JDqI4X2",
+    "name": "NILAMBUR / GHS MUNDERI",
+    "brcCode": "32020100136SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32020100136SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:01.755Z",
+    "updatedAt": "2026-06-22T07:13:01.755Z"
+  },
+  {
+    "id": "hub-32051200106SH",
+    "email": "hub-32051200106sh@stream.edu",
+    "username": "32051200106SH",
+    "password": "$2b$12$DkVQ3JBp1/pqo42y2rqIDOwhbchNKLwQXbzNhLVDyBpnIszsZWtk.",
+    "name": "PARAPPANANGADI / GHS NEDUVA",
+    "brcCode": "32051200106SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32051200106SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:01.953Z",
+    "updatedAt": "2026-06-22T07:13:01.953Z"
+  },
+  {
+    "id": "hub-32050500910SH",
+    "email": "hub-32050500910sh@stream.edu",
+    "username": "32050500910SH",
+    "password": "$2b$12$Jd7zglq9Zo2LF47DhpPacOjP7K2FPwVphqm8PQmQk0DPxZl9gIoVO",
+    "name": "PERINTALMANNA / GHSS VETTATHUR",
+    "brcCode": "32050500910SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32050500910SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:02.153Z",
+    "updatedAt": "2026-06-22T07:13:02.153Z"
+  },
+  {
+    "id": "hub-32050900510SH",
+    "email": "hub-32050900510sh@stream.edu",
+    "username": "32050900510SH",
+    "password": "$2b$12$w2DzaEf01bkBmxaRej0Rv.zs1Kt6Iv5owIUKMr78p/J381.QiO5I2",
+    "name": "PONNANI / GHSS THRIKKAV",
+    "brcCode": "32050900510SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32050900510SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:02.350Z",
+    "updatedAt": "2026-06-22T07:13:02.350Z"
+  },
+  {
+    "id": "hub-32051100131SH",
+    "email": "hub-32051100131sh@stream.edu",
+    "username": "32051100131SH",
+    "password": "$2b$12$yvSWhWvvFnNzU5US.eszgOBBxmaLN1EnujzpcZ586dV63wW9aHsku",
+    "name": "TANUR / GRFTVHSS TANLUR",
+    "brcCode": "32051100131SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32051100131SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:02.548Z",
+    "updatedAt": "2026-06-22T07:13:02.548Z"
+  },
+  {
+    "id": "hub-32051000627SH",
+    "email": "hub-32051000627sh@stream.edu",
+    "username": "32051000627SH",
+    "password": "$2b$12$ETf0N8AnEBg9Ozlknn6qeeO1nxBndAo4Duub7MV3loXFlmNO9fJ1.",
+    "name": "TIRUR / GBHSS TIRUR",
+    "brcCode": "32051000627SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32051000627SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:02.746Z",
+    "updatedAt": "2026-06-22T07:13:02.746Z"
+  },
+  {
+    "id": "hub-32051300201SH",
+    "email": "hub-32051300201sh@stream.edu",
+    "username": "32051300201SH",
+    "password": "$2b$12$oFYkM6E3NGI38MVbyEKSuuwuVZMZMjHIBKFUGwpUvcp2y09DIQfye",
+    "name": "VENGARA / GVHSS VENGARA",
+    "brcCode": "32051300201SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32051300201SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:02.956Z",
+    "updatedAt": "2026-06-22T07:13:02.956Z"
+  },
+  {
+    "id": "hub-32050100706SH",
+    "email": "hub-32050100706sh@stream.edu",
+    "username": "32050100706SH",
+    "password": "$2b$12$RumqXf3yXYPZF5BFVLjShueuDM5rHuXXmKM5X0P0Dd49B8zovRwAO",
+    "name": "WANDOOR / GHSS PULLENGODE",
+    "brcCode": "32050100706SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32050100706SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:03.175Z",
+    "updatedAt": "2026-06-22T07:13:03.175Z"
+  },
+  {
+    "id": "hub-32070101302SH",
+    "email": "hub-32070101302sh@stream.edu",
+    "username": "32070101302SH",
+    "password": "$2b$12$NI0mDspVXQMmdxLdzjt26urcYaPG/6ko7S/ZABXVPZ3C9EFf7lyMe",
+    "name": "ANTHIKKAD / GHSS PERINGOTTUKARA",
+    "brcCode": "32070101302SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32070101302SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:03.378Z",
+    "updatedAt": "2026-06-22T07:13:03.378Z"
+  },
+  {
+    "id": "hub-32070203701SH",
+    "email": "hub-32070203701sh@stream.edu",
+    "username": "32070203701SH",
+    "password": "$2b$12$xW2jUpAlnL3wPGGFd9sm/.2uX4W2JGmDfeXTjmHlZcFKbD27oEk22",
+    "name": "CHALAKUDY / GHSS VETTILAPPARA",
+    "brcCode": "32070203701SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32070203701SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:03.577Z",
+    "updatedAt": "2026-06-22T07:13:03.577Z"
+  },
+  {
+    "id": "hub-32070303021SH",
+    "email": "hub-32070303021sh@stream.edu",
+    "username": "32070303021SH",
+    "password": "$2b$12$IAs4N3jITC1kbqYqkyADSekgTM/VbTW9PTPnUYFx/u3sqR2d4VfKe",
+    "name": "CHAVAKKAD / GHSS MANATHALA",
+    "brcCode": "32070303021SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32070303021SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:03.775Z",
+    "updatedAt": "2026-06-22T07:13:03.775Z"
+  },
+  {
+    "id": "hub-32070400504SH",
+    "email": "hub-32070400504sh@stream.edu",
+    "username": "32070400504SH",
+    "password": "$2b$12$Wst6ailZv77v8q0k4zxxY.ZllCkKD.LgexOykWo5KbfMaNhbM4w56",
+    "name": "CHERPU / GVHSS CHERPU",
+    "brcCode": "32070400504SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32070400504SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:03.973Z",
+    "updatedAt": "2026-06-22T07:13:03.973Z"
+  },
+  {
+    "id": "hub-32070502201SH",
+    "email": "hub-32070502201sh@stream.edu",
+    "username": "32070502201SH",
+    "password": "$2b$12$.IUBn5w6OzELtQmgAhCTgeDqdCtx2GCxG48DEjvPyARz2oNH/TVXG",
+    "name": "CHOWANNUR / GHSS KADAVALLUR",
+    "brcCode": "32070502201SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32070502201SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:04.171Z",
+    "updatedAt": "2026-06-22T07:13:04.171Z"
+  },
+  {
+    "id": "hub-32070700705SH",
+    "email": "hub-32070700705sh@stream.edu",
+    "username": "32070700705SH",
+    "password": "$2b$12$nGUMxw.2RuWhAdVPZbagIO/ln3qqu3vCLjoF0FpT46Rh6SNtXc86.",
+    "name": "IRINJALAKUDA / GMBHSS IRINJALAKUDA",
+    "brcCode": "32070700705SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32070700705SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:04.369Z",
+    "updatedAt": "2026-06-22T07:13:04.369Z"
+  },
+  {
+    "id": "hub-32070800501SH",
+    "email": "hub-32070800501sh@stream.edu",
+    "username": "32070800501SH",
+    "password": "$2b$12$q219Zq8mCKk1sklRuW9LquAN4ZH6YRul70.ALjnNTc.UIgc4Jinrq",
+    "name": "KODAKARA / GHSS KODAKARA",
+    "brcCode": "32070800501SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32070800501SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:04.568Z",
+    "updatedAt": "2026-06-22T07:13:04.568Z"
+  },
+  {
+    "id": "hub-32070303021SH",
+    "email": "hub-32070303021sh@stream.edu",
+    "username": "32070303021SH",
+    "password": "$2b$12$tfQUbub/I6J7WhF0j2ZjQe3Hb/FdE.BwzTCK9dkdL7aKUSuSI1S6.",
+    "name": "KODUNGALLUR / PBMGHSS KODUNGALLUR",
+    "brcCode": "32070303021SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32070303021SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:04.765Z",
+    "updatedAt": "2026-06-22T07:13:04.765Z"
+  },
+  {
+    "id": "hub-32070900301SH",
+    "email": "hub-32070900301sh@stream.edu",
+    "username": "32070900301SH",
+    "password": "$2b$12$9kd45gNGziD3w0HPkaFwduEvdGSTD5d6mw5xr.rnJl4NXShYQADLW",
+    "name": "MALA / GSHSS MELADOOR",
+    "brcCode": "32070900301SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32070900301SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:04.962Z",
+    "updatedAt": "2026-06-22T07:13:04.962Z"
+  },
+  {
+    "id": "hub-32071000403SH",
+    "email": "hub-32071000403sh@stream.edu",
+    "username": "32071000403SH",
+    "password": "$2b$12$M1iUhTjHHiZIjPcDiC91J.dEXCrNs/tHXHGs4DVD6r5BtGoglghB.",
+    "name": "MATHILAKAM / GMHSS CHAMAKKALA",
+    "brcCode": "32071000403SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32071000403SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:05.160Z",
+    "updatedAt": "2026-06-22T07:13:05.160Z"
+  },
+  {
+    "id": "hub-32071100901SH",
+    "email": "hub-32071100901sh@stream.edu",
+    "username": "32071100901SH",
+    "password": "$2b$12$MJydgOxVZ/3bt4G4ybc1BesFqZnxYb9XLavEwreFRq0PhUAQp.dAS",
+    "name": "MULLASSERY / GHSS MULLASSERY",
+    "brcCode": "32071100901SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32071100901SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:05.358Z",
+    "updatedAt": "2026-06-22T07:13:05.358Z"
+  },
+  {
+    "id": "hub-32071205403SH",
+    "email": "hub-32071205403sh@stream.edu",
+    "username": "32071205403SH",
+    "password": "$2b$12$t1cNNjzqQ4rz.o8zYApQ0OXRkjfT4QHz67yMOlnfazN6SYX5hvH8O",
+    "name": "OLLUKKARA / GHSS PATTIKAD",
+    "brcCode": "32071205403SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32071205403SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:05.559Z",
+    "updatedAt": "2026-06-22T07:13:05.559Z"
+  },
+  {
+    "id": "hub-32071210901SH",
+    "email": "hub-32071210901sh@stream.edu",
+    "username": "32071210901SH",
+    "password": "$2b$12$4IQNLmuGPFCPLws53CH5jumfpSa4jkD6eo6qg568/e42jS1w6/FIa",
+    "name": "OLLUKKARA / CHANDRA MGHSS KUTTUR",
+    "brcCode": "32071210901SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32071210901SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:05.757Z",
+    "updatedAt": "2026-06-22T07:13:05.757Z"
+  },
+  {
+    "id": "hub-32071300106SH",
+    "email": "hub-32071300106sh@stream.edu",
+    "username": "32071300106SH",
+    "password": "$2b$12$u5crUmLwyi/qzVFmkhwzFuebs2twJ80K.lrgHTqHbT0TjHiF9Ywqy",
+    "name": "PAZHAYANNUR / SMTGHSS CHELAKKARA",
+    "brcCode": "32071300106SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32071300106SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:05.954Z",
+    "updatedAt": "2026-06-22T07:13:05.954Z"
+  },
+  {
+    "id": "hub-32071501104SH",
+    "email": "hub-32071501104sh@stream.edu",
+    "username": "32071501104SH",
+    "password": "$2b$12$FBk7e8h5VKrtrjO23.d3aOR.irGKwEeDIo5lXPwF2Pwnov3koQEjO",
+    "name": "THALIKULAM / GHSS VATANAPPALLY",
+    "brcCode": "32071501104SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32071501104SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:06.155Z",
+    "updatedAt": "2026-06-22T07:13:06.155Z"
+  },
+  {
+    "id": "hub-32071800404SH",
+    "email": "hub-32071800404sh@stream.edu",
+    "username": "32071800404SH",
+    "password": "$2b$12$1aSyi6CoFy34X.8kL8KYL.N4kM./ioQQUSH0V7hEqiqeeY7yo7vSu",
+    "name": "URC THRISSUR / GMHSS FOR BOYS THRISSUR",
+    "brcCode": "32071800404SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32071800404SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:06.353Z",
+    "updatedAt": "2026-06-22T07:13:06.353Z"
+  },
+  {
+    "id": "hub-32071703301SH",
+    "email": "hub-32071703301sh@stream.edu",
+    "username": "32071703301SH",
+    "password": "$2b$12$uQ5eslgkjXdFlpRQhJ1sZuonY2aqtXR/XTFQxlr3X37TAoxNItklu",
+    "name": "WADAKKANCHERY / VNMMGHSS MACHAD",
+    "brcCode": "32071703301SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32071703301SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:06.554Z",
+    "updatedAt": "2026-06-22T07:13:06.554Z"
+  },
+  {
+    "id": "hub-32071601701SH",
+    "email": "hub-32071601701sh@stream.edu",
+    "username": "32071601701SH",
+    "password": "$2b$12$CKopbixp5HxitHyl/xfv8.kNlhcYkviMybJJ7D1DKMiS6AZ59f9A6",
+    "name": "VELLANGALLUR / GHSS KARUPADANNA",
+    "brcCode": "32071601701SH",
+    "role": "STREAM_LAB",
+    "assignedBrcs": [
+      "32071601701SH"
+    ],
+    "isActive": true,
+    "createdAt": "2026-06-22T07:13:06.752Z",
+    "updatedAt": "2026-06-22T07:13:06.752Z"
+  }
+]
