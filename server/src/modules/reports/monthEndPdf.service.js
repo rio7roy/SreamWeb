@@ -124,9 +124,11 @@ async function generateMonthEndPdfReport(month, year) {
       const colX = [50, 250, 350, 450]; // x positions for columns
 
       doc.fillColor('#785900').fontSize(10).font('Helvetica-Bold');
-      headers.forEach((h, i) => doc.text(h, colX[i], tableTop));
+      headers.forEach((h, i) => doc.text(h, colX[i], tableTop, { lineBreak: false }));
 
-      doc.moveDown(0.5);
+      // Move down after headers
+      doc.text('', 50, tableTop);
+      doc.moveDown(1);
       doc.strokeColor('#E0E0E0').lineWidth(1).moveTo(50, doc.y).lineTo(545, doc.y).stroke();
       doc.moveDown(0.5);
 
@@ -136,9 +138,11 @@ async function generateMonthEndPdfReport(month, year) {
         if (doc.y > 750) {
           doc.addPage();
           // redraw header
+          const headerY = doc.y;
           doc.fillColor('#785900').fontSize(10).font('Helvetica-Bold');
-          headers.forEach((h, i) => doc.text(h, colX[i], doc.y));
-          doc.moveDown(0.5);
+          headers.forEach((h, i) => doc.text(h, colX[i], headerY, { lineBreak: false }));
+          doc.text('', 50, headerY);
+          doc.moveDown(1);
           doc.strokeColor('#E0E0E0').lineWidth(1).moveTo(50, doc.y).lineTo(545, doc.y).stroke();
           doc.moveDown(0.5);
           doc.font('Helvetica').fontSize(9).fillColor('#1a1c1c');
@@ -149,12 +153,13 @@ async function generateMonthEndPdfReport(month, year) {
         }
 
         const rowY = doc.y;
-        doc.text(row[0], colX[0], rowY, { width: 190, ellipsis: true });
-        doc.text(row[1].toString(), colX[1], rowY);
-        doc.text(row[2].toString(), colX[2], rowY);
-        doc.text(row[3].toString(), colX[3], rowY);
+        doc.text(row[0], colX[0], rowY, { width: 190, ellipsis: true, lineBreak: false });
+        doc.text(row[1].toString(), colX[1], rowY, { lineBreak: false });
+        doc.text(row[2].toString(), colX[2], rowY, { lineBreak: false });
+        doc.text(row[3].toString(), colX[3], rowY, { lineBreak: false });
 
-        doc.moveDown(0.5);
+        doc.text('', 50, rowY);
+        doc.moveDown(1.5);
       });
       doc.moveDown(2);
     };
