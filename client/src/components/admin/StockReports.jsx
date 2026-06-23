@@ -71,6 +71,22 @@ export default function StockReports() {
     }
   };
 
+  const groupedStocks = React.useMemo(() => {
+    if (!stocks || stocks.length === 0) return [];
+    const groups = {};
+    stocks.forEach(stock => {
+      const b = brcs.find(x => x.code === stock.brc);
+      const brcLabel = b ? `${b.location} / ${b.name}` : (stock.brc || 'Unknown BRC');
+      const key = `${stock.district || 'Unknown District'} ➔ ${brcLabel}`;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(stock);
+    });
+    return Object.keys(groups).sort().map(key => ({
+      label: key,
+      items: groups[key]
+    }));
+  }, [stocks, brcs]);
+
   const handleSort = (key) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -228,26 +244,35 @@ export default function StockReports() {
               ) : stocks.length === 0 ? (
                 <tr><td colSpan="9" className="text-center py-8 text-slate-500">No stock found matching filters.</td></tr>
               ) : (
-                stocks.map((stock) => (
-                  <tr key={stock.id} className="hover:bg-slate-50">
-                    <td className="px-6 py-4 text-sm font-medium text-slate-900 max-w-[200px] truncate" title={stock.itemName}>{stock.itemName}</td>
-                    <td className="px-6 py-4 text-sm text-slate-500 max-w-[150px] truncate" title={stock.category}>{stock.category}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        stock.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                        stock.status === 'DEFECTIVE' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {stock.status || 'ACTIVE'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.serialNumber || 'N/A'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.newQty ?? stock.quantity}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">{stock.availableQty !== undefined ? stock.availableQty : (stock.newQty ?? stock.quantity)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.district || 'NA'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.brc || 'NA'}</td>
-                    <td className="px-6 py-4 text-sm text-slate-500 max-w-[200px] truncate" title={stock.remarks}>{stock.remarks || '-'}</td>
-                  </tr>
+                groupedStocks.map((group) => (
+                  <React.Fragment key={group.label}>
+                    <tr>
+                      <td colSpan="9" className="bg-slate-200/60 font-semibold text-slate-800 py-3 px-6 text-sm border-y border-slate-300">
+                        📍 {group.label}
+                      </td>
+                    </tr>
+                    {group.items.map((stock) => (
+                      <tr key={stock.id} className="hover:bg-slate-50">
+                        <td className="px-6 py-4 text-sm font-medium text-slate-900 max-w-[200px] truncate" title={stock.itemName}>{stock.itemName}</td>
+                        <td className="px-6 py-4 text-sm text-slate-500 max-w-[150px] truncate" title={stock.category}>{stock.category}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            stock.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
+                            stock.status === 'DEFECTIVE' ? 'bg-red-100 text-red-800' :
+                            'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {stock.status || 'ACTIVE'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.serialNumber || 'N/A'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.newQty ?? stock.quantity}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">{stock.availableQty !== undefined ? stock.availableQty : (stock.newQty ?? stock.quantity)}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.district || 'NA'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.brc || 'NA'}</td>
+                        <td className="px-6 py-4 text-sm text-slate-500 max-w-[200px] truncate" title={stock.remarks}>{stock.remarks || '-'}</td>
+                      </tr>
+                    ))}
+                  </React.Fragment>
                 ))
               )}
             </tbody>

@@ -167,12 +167,34 @@ module.exports = {
         if (stocksData.length === 0) {
           doc.fontSize(12).text('No stocks found for the selected filters.', { align: 'center' });
         } else {
-          stocksData.forEach((stock, i) => {
-            const qty = stock.availableQty !== undefined ? stock.availableQty : (stock.newQty ?? stock.quantity);
-            doc.fontSize(11).text(`${i + 1}. ${stock.itemName}`, { continued: true }).text(`  [${stock.category || 'N/A'}]`, { align: 'right' });
-            doc.fontSize(10).fillColor('gray').text(`    Status: ${stock.status || 'ACTIVE'} | Qty: ${qty} | Serial: ${stock.serialNumber || 'N/A'}`);
+          const brcsPath = path.join(__dirname, '../../../data/brcs.json');
+          let brcs = [];
+          if (fs.existsSync(brcsPath)) {
+            brcs = JSON.parse(fs.readFileSync(brcsPath, 'utf8'));
+          }
+
+          const groupedStocks = {};
+          stocksData.forEach(stock => {
+            const b = brcs.find(x => x.code === stock.brc);
+            const brcLabel = b ? `${b.location} / ${b.name}` : (stock.brc || 'Unknown BRC');
+            const key = `${stock.district || 'Unknown District'} ➔ ${brcLabel}`;
+            if (!groupedStocks[key]) groupedStocks[key] = [];
+            groupedStocks[key].push(stock);
+          });
+
+          Object.keys(groupedStocks).sort().forEach(groupKey => {
+            doc.fontSize(14).font('Helvetica-Bold').fillColor('#1e40af').text(`📍 ${groupKey}`);
             doc.moveDown(0.5);
-            doc.fillColor('black');
+            doc.font('Helvetica').fillColor('black');
+
+            groupedStocks[groupKey].forEach((stock, i) => {
+              const qty = stock.availableQty !== undefined ? stock.availableQty : (stock.newQty ?? stock.quantity);
+              doc.fontSize(11).text(`${i + 1}. ${stock.itemName}`, { continued: true }).text(`  [${stock.category || 'N/A'}]`, { align: 'right' });
+              doc.fontSize(10).fillColor('gray').text(`    Status: ${stock.status || 'ACTIVE'} | Qty: ${qty} | Serial: ${stock.serialNumber || 'N/A'}`);
+              doc.moveDown(0.5);
+              doc.fillColor('black');
+            });
+            doc.moveDown(1);
           });
         }
 
