@@ -268,8 +268,6 @@ module.exports = {
             if (val.includes('category')) headerMap['category'] = colNumber;
             if (val.includes('serial')) headerMap['serialNumber'] = colNumber;
             if (val.includes('quantity') || val.includes('qty')) headerMap['quantity'] = colNumber;
-            if (val.includes('district')) headerMap['district'] = colNumber;
-            if (val.includes('brc')) headerMap['brc'] = colNumber;
           });
           if (Object.keys(headerMap).length > 0) headerRowFound = true;
           return;
@@ -281,8 +279,6 @@ module.exports = {
         const quantityVal = headerMap['quantity'] ? row.getCell(headerMap['quantity']).value : 1;
         const quantity = parseInt(quantityVal, 10) || 1;
 
-        const rowDistrict = headerMap['district'] ? (row.getCell(headerMap['district']).value?.toString() || '') : '';
-        const rowBrc = headerMap['brc'] ? (row.getCell(headerMap['brc']).value?.toString() || '') : '';
         const rowCategory = headerMap['category'] ? (row.getCell(headerMap['category']).value?.toString() || 'Uncategorized') : 'Uncategorized';
         const rowSerialNumber = headerMap['serialNumber'] ? (row.getCell(headerMap['serialNumber']).value?.toString() || '') : '';
 
@@ -293,8 +289,8 @@ module.exports = {
               category: rowCategory,
               serialNumber: rowSerialNumber,
               quantity,
-              district: t.district || rowDistrict,
-              brc: t.brc || rowBrc,
+              district: t.district,
+              brc: t.brc,
             });
           });
         } else {
@@ -303,8 +299,8 @@ module.exports = {
             category: rowCategory,
             serialNumber: rowSerialNumber,
             quantity,
-            district: rowDistrict,
-            brc: rowBrc,
+            district: '',
+            brc: '',
           });
         }
       });

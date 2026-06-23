@@ -80,17 +80,30 @@ export default function StockForms({ onActionComplete }) {
   useEffect(() => {
     if (activeTab === 'create') {
       fetchRecentCreations();
+    } else if (activeTab === 'bulkUpload') {
+      fetchRecentBulkUploads();
     }
   }, [activeTab]);
 
   const fetchRecentCreations = async () => {
     try {
-      const res = await api.get('/stocks?source=MANUAL&limit=10');
+      const res = await api.get('/stocks?source=MANUAL&limit=10000');
       if (res.data?.data?.stocks) {
         setRecentCreations(res.data.data.stocks);
       }
     } catch (err) {
       console.error('Failed to fetch recent stocks:', err);
+    }
+  };
+
+  const fetchRecentBulkUploads = async () => {
+    try {
+      const res = await api.get('/stocks?source=BULK&limit=10000');
+      if (res.data?.data?.stocks) {
+        setRecentBulkUploads(res.data.data.stocks);
+      }
+    } catch (err) {
+      console.error('Failed to fetch recent bulk uploads:', err);
     }
   };
 
@@ -306,10 +319,10 @@ export default function StockForms({ onActionComplete }) {
   };
 
   const handleDownloadTemplate = () => {
-    const headers = ['Item Name', 'Category', 'Serial Number', 'Quantity', 'District', 'BRC'];
+    const headers = ['Item Name', 'Category', 'Serial Number', 'Quantity'];
     const sampleRows = [
-      ['Sample Arduino Uno', 'Development Boards', 'SN-1001', '10', 'ALAPPUZHA', '1234567890'],
-      ['Sample Resistors 10k', 'Electronic components', '', '100', 'ALAPPUZHA', '1234567890']
+      ['Sample Arduino Uno', 'Development Boards', 'SN-1001', '10'],
+      ['Sample Resistors 10k', 'Electronic components', '', '100']
     ];
     
     const csvContent = [
@@ -331,6 +344,13 @@ export default function StockForms({ onActionComplete }) {
   const handleBulkUpload = async (e) => {
     e.preventDefault();
     if (!file) return showMessage('Please select a file to upload', 'error');
+
+    if (!bulkUploadForm.district || bulkUploadForm.district.length === 0) {
+      return showMessage('Please select at least one District', 'error');
+    }
+    if (!bulkUploadForm.brc || bulkUploadForm.brc.length === 0) {
+      return showMessage('Please select at least one BRC', 'error');
+    }
 
     const formData = new FormData();
     formData.append('file', file);
@@ -480,7 +500,7 @@ export default function StockForms({ onActionComplete }) {
       {/* RECENTLY CREATED TABLE */}
       {activeTab === 'create' && recentCreations.length > 0 && (
         <div className="mt-10 border-t border-slate-200 pt-6">
-          <h3 className="text-lg font-bold text-slate-800 mb-4">Recently Created Stocks (Session)</h3>
+          <h3 className="text-lg font-bold text-slate-800 mb-4">Recently Created Stocks</h3>
           <div className="overflow-x-auto rounded-lg border border-slate-200">
             <table className="min-w-full text-sm text-left">
               <thead className="bg-slate-50 text-slate-600 font-medium">
@@ -627,7 +647,7 @@ export default function StockForms({ onActionComplete }) {
           </p>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">District (Multiple)</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">District (Multiple) *</label>
               <MultiSelect 
                 options={districts.map(d => ({ value: d, label: d }))}
                 selected={bulkUploadForm.district}
@@ -638,7 +658,7 @@ export default function StockForms({ onActionComplete }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">BRC (Multiple)</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">BRC (Multiple) *</label>
               <MultiSelect 
                 options={(bulkUploadForm.district?.length > 0 ? brcs.filter(b => bulkUploadForm.district.includes(b.district)) : brcs).map(b => ({ value: `${b.code}|${b.district}`, label: `${b.location}/${b.name}` }))}
                 selected={bulkUploadForm.brc}
@@ -673,7 +693,7 @@ export default function StockForms({ onActionComplete }) {
       {/* RECENTLY BULK UPLOADED TABLE */}
       {activeTab === 'bulkUpload' && recentBulkUploads.length > 0 && (
         <div className="mt-10 border-t border-slate-200 pt-6">
-          <h3 className="text-lg font-bold text-slate-800 mb-4">Recently Uploaded Stocks (Session)</h3>
+          <h3 className="text-lg font-bold text-slate-800 mb-4">Recently Uploaded Stocks</h3>
           <div className="overflow-x-auto rounded-lg border border-slate-200">
             <table className="min-w-full text-sm text-left">
               <thead className="bg-slate-50 text-slate-600 font-medium">

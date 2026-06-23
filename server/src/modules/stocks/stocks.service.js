@@ -115,6 +115,7 @@ async function bulkUpsertStocks(items) {
           category: item.category || ex.category,
           serialNumber: item.serialNumber || ex.serialNumber,
           district: item.district || ex.district,
+          source: 'BULK'
         }
       });
       affectedStocks.push({ ...updated, _isNew: false });
@@ -126,6 +127,7 @@ async function bulkUpsertStocks(items) {
           status: 'ACTIVE',
           newQty: item.quantity,
           availableQty: item.quantity,
+          source: 'BULK',
           ...item
         }
       });
