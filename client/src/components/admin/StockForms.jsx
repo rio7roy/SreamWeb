@@ -643,7 +643,7 @@ export default function StockForms({ onActionComplete }) {
       {activeTab === 'bulkUpload' && (
         <form onSubmit={handleBulkUpload} className="space-y-4 max-w-lg">
           <p className="text-sm text-slate-600">
-            Upload an Excel (.xlsx) or CSV file containing stock data. Alternatively, if you have a PDF, you can try uploading it here.
+            Upload a CSV (.csv) file containing stock data. Please download and use the CSV template below.
           </p>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -673,7 +673,7 @@ export default function StockForms({ onActionComplete }) {
             <input 
               type="file" 
               ref={fileInputRef}
-              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, application/pdf"
+              accept=".csv"
               onChange={(e) => setFile(e.target.files[0])}
               className="w-full"
             />

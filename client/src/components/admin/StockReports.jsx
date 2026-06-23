@@ -42,11 +42,7 @@ export default function StockReports() {
   }, [filters, sortConfig]);
 
   const fetchReportData = async () => {
-    if (!filters.brc) {
-      setStocks([]);
-      setLoading(false);
-      return;
-    }
+    // No restriction on brc anymore
     setLoading(true);
     try {
       // filters object already contains district, brc, status, category, month
@@ -84,10 +80,7 @@ export default function StockReports() {
   };
 
   const handleDownload = async (format) => {
-    if (!filters.brc) {
-      alert("Please select a District and BRC to download the report.");
-      return;
-    }
+    // No restriction on brc anymore
     setLoading(true);
     try {
       const cleanFilters = Object.fromEntries(
@@ -127,7 +120,7 @@ export default function StockReports() {
             value={filters.district}
             onChange={(e) => setFilters({...filters, district: e.target.value, brc: ''})}
           >
-            <option value="" disabled>Select District</option>
+            <option value="">All Districts</option>
             {districts.map(d => <option key={d} value={d}>{d}</option>)}
           </select>
         </div>
@@ -146,7 +139,7 @@ export default function StockReports() {
               }
             }}
           >
-            <option value="" disabled>Select BRC</option>
+            <option value="">All BRCs</option>
             {brcs
               .filter(b => !filters.district || b.district === filters.district)
               .map(b => <option key={b.code} value={b.code}>{b.location}/{b.name}</option>)}
@@ -228,9 +221,7 @@ export default function StockReports() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-slate-200">
-              {!filters.brc ? (
-                <tr><td colSpan="9" className="text-center py-8 text-slate-500">Please select a District and BRC to view the stock report.</td></tr>
-              ) : filters.month && MONTHS.indexOf(filters.month) < 5 ? (
+              {filters.month && MONTHS.indexOf(filters.month) < 5 ? (
                 <tr><td colSpan="9" className="text-center py-8 text-red-500 font-medium">Stock not entered for this month.</td></tr>
               ) : loading && stocks.length === 0 ? (
                 <tr><td colSpan="9" className="text-center py-8 text-slate-500">Loading report data...</td></tr>
