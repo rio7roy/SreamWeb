@@ -136,16 +136,7 @@ async function seedDatabase() {
         }));
         stocks.push(...seededStocks);
 
-        // Seed history for June 1st
-        seededStocks.forEach(s => {
-          stockHistory.push({
-             stockId: s.id,
-             availableQty: s.availableQty !== undefined ? s.availableQty : (s.newQty ?? s.quantity),
-             updatedAt: s.updatedAt,
-             brc: s.brc,
-             district: s.district
-          });
-        });
+        // Removed manual seeding of stockHistory so baseline items aren't treated as 'updated' in June.
       });
     }
   }
@@ -418,6 +409,16 @@ const db = {
         ...data,
       };
       stocks.push(newStock);
+      
+      // Auto-create a history record for new items
+      stockHistory.push({
+         stockId: newStock.id,
+         availableQty: newStock.availableQty !== undefined ? newStock.availableQty : (newStock.newQty ?? newStock.quantity),
+         updatedAt: newStock.updatedAt,
+         brc: newStock.brc,
+         district: newStock.district
+      });
+      
       return { ...newStock };
     },
 
