@@ -376,6 +376,7 @@ module.exports = {
         
         // Filter history for just this stock
         const thisStockHistory = stockHistoryAll.filter(h => h.stockId === stock.id);
+        let wasUpdatedInSelectedMonths = false;
 
         monthsArray.forEach(m => {
           const monthIndex = MONTHS.indexOf(m);
@@ -384,8 +385,19 @@ module.exports = {
           } else {
             // Find the end date of the month `m` in the current year
             const currentYear = new Date().getFullYear();
+            const startOfMonth = new Date(currentYear, monthIndex, 1);
             const endOfMonth = new Date(currentYear, monthIndex + 1, 0, 23, 59, 59, 999);
             
+            const createdDate = new Date(stock.createdAt);
+            if (createdDate >= startOfMonth && createdDate <= endOfMonth) {
+               wasUpdatedInSelectedMonths = true;
+            }
+
+            const updatesInThisMonth = thisStockHistory.filter(h => new Date(h.updatedAt) >= startOfMonth && new Date(h.updatedAt) <= endOfMonth);
+            if (updatesInThisMonth.length > 0) {
+               wasUpdatedInSelectedMonths = true;
+            }
+
             // Find the latest history entry before or on endOfMonth
             const validHistory = thisStockHistory
               .filter(h => new Date(h.updatedAt) <= endOfMonth)
@@ -403,9 +415,10 @@ module.exports = {
         });
         return {
           ...stock,
-          history
+          history,
+          _wasUpdatedInSelectedMonths: wasUpdatedInSelectedMonths
         };
-      });
+      }).filter(stock => stock._wasUpdatedInSelectedMonths);
 
       return success(res, { stocks: comparisonData }, 200, 'Comparison data fetched successfully');
     } catch (err) {
