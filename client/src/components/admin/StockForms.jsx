@@ -508,7 +508,7 @@ export default function StockForms({ onActionComplete }) {
                   <th className="px-4 py-3">Item Name</th>
                   <th className="px-4 py-3">Unique No</th>
                   <th className="px-4 py-3">Category</th>
-                  <th className="px-4 py-3">BRC</th>
+                  <th className="px-4 py-3">BRC / School Name</th>
                   <th className="px-4 py-3 text-center">Qty</th>
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
@@ -701,7 +701,7 @@ export default function StockForms({ onActionComplete }) {
                   <th className="px-4 py-3">Item Name</th>
                   <th className="px-4 py-3">Unique No</th>
                   <th className="px-4 py-3">Category</th>
-                  <th className="px-4 py-3">BRC</th>
+                  <th className="px-4 py-3">BRC / School Name</th>
                   <th className="px-4 py-3 text-center">Qty</th>
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>

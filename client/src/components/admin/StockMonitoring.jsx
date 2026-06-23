@@ -22,10 +22,7 @@ export default function StockMonitoring() {
   }, [filters, sortConfig]);
 
   const fetchStocks = async () => {
-    if (!filters.district && !filters.brc) {
-      setStocks([]);
-      return;
-    }
+    // No restriction on district or brc anymore
 
     setLoading(true);
     try {
@@ -145,7 +142,7 @@ export default function StockMonitoring() {
                     onClick={() => handleSort(col)}
                     className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100"
                   >
-                    {col.replace(/([A-Z])/g, ' $1').trim()}
+                    {col === 'brc' ? 'BRC / School Name' : col.replace(/([A-Z])/g, ' $1').trim()}
                     {sortConfig.key === col && (sortConfig.direction === 'asc' ? ' ↑' : ' ↓')}
                   </th>
                 ))}
@@ -154,12 +151,6 @@ export default function StockMonitoring() {
             <tbody className="divide-y divide-slate-100">
               {loading ? (
                 <tr><td colSpan="10" className="text-center py-8 text-slate-500">Loading stocks...</td></tr>
-              ) : (!filters.district && !filters.brc) ? (
-                <tr>
-                  <td colSpan="10" className="text-center py-10 text-slate-500 font-medium">
-                    Please select a District or BRC to view stocks.
-                  </td>
-                </tr>
               ) : stocks.length === 0 ? (
                 <tr>
                   <td colSpan="10" className="text-center py-10 text-slate-500 font-medium">
@@ -180,7 +171,13 @@ export default function StockMonitoring() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-medium">{stock.usedQty || 0}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-orange-600 font-medium">{stock.consumedQty || 0}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.district || 'NA'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.brc || 'NA'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                      {(() => {
+                        if (!stock.brc) return 'NA';
+                        const found = brcs.find(b => b.code === stock.brc);
+                        return found ? `${found.location}/${found.name}` : stock.brc;
+                      })()}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         stock.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
