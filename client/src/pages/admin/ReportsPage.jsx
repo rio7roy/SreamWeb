@@ -256,7 +256,16 @@ export default function ReportsPage() {
                           <td className="px-6 py-3 font-mono text-xs text-secondary">{e.brcName || e.brcCode}</td>
                           <td className="px-6 py-3 text-secondary">{e.teachersCount || 0}</td>
                           <td className="px-6 py-3 text-secondary">{e.studentsCount || 0}</td>
-                          <td className="px-6 py-3 capitalize text-secondary">{e.customTag || e.tag || 'N/A'}</td>
+                          <td className="px-6 py-3">
+                            <div className="flex items-center gap-2">
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${e.tag === 'other event' ? 'bg-indigo-100 text-indigo-800' : 'bg-blue-100 text-blue-800'}`}>
+                                {e.customTag || e.tag || 'N/A'}
+                              </span>
+                              {e.venueType === 'OTHER_BRC' && (
+                                <span className="material-symbols-outlined text-[14px] text-amber-600" title="Other Venue">share_location</span>
+                              )}
+                            </div>
+                          </td>
                           <td className="px-6 py-3">
                             <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${e.status === 'SUBMITTED' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
                               {e.status}
@@ -300,7 +309,16 @@ export default function ReportsPage() {
                           <td className="px-6 py-3 font-mono text-xs text-amber-700">{e.brcName || e.brcCode}</td>
                           <td className="px-6 py-3 text-amber-800">{e.teachersCount || 0}</td>
                           <td className="px-6 py-3 text-amber-800">{e.studentsCount || 0}</td>
-                          <td className="px-6 py-3 capitalize text-amber-800">{e.customTag || e.tag || 'N/A'}</td>
+                          <td className="px-6 py-3">
+                            <div className="flex items-center gap-2">
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${e.tag === 'other event' ? 'bg-indigo-200 text-indigo-900' : 'bg-blue-200 text-blue-900'}`}>
+                                {e.customTag || e.tag || 'N/A'}
+                              </span>
+                              {e.venueType === 'OTHER_BRC' && (
+                                <span className="material-symbols-outlined text-[14px] text-amber-600" title="Other Venue">share_location</span>
+                              )}
+                            </div>
+                          </td>
                           <td className="px-6 py-3">
                             <span className="px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-200 text-amber-800">
                               HUB UPLOAD

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import api from '../../lib/api';
 
-export default function ExpertAttendanceTab({ user }) {
+export default function ExpertAttendanceTab({ user, brcCode }) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -13,12 +13,15 @@ export default function ExpertAttendanceTab({ user }) {
   // Independent state for the dashboard badge
   const [currentMonthUniqueDays, setCurrentMonthUniqueDays] = useState(0);
 
+  // Build query param: if brcCode is provided (hub user), fetch by BRC; otherwise fetch own events
+  const baseQuery = brcCode ? `brcCode=${brcCode}` : 'mine=true';
+
   // Fetch current month stats ONCE for the badge
   useEffect(() => {
     const fetchCurrentMonthStats = async () => {
       try {
         const currentMonthStr = (new Date().getMonth() + 1).toString();
-        const res = await api.get(`/events?mine=true&month=${currentMonthStr}`);
+        const res = await api.get(`/events?${baseQuery}&month=${currentMonthStr}`);
         const currentMonthEvents = Array.isArray(res.data) ? res.data : (res.data?.data || []);
         
         const dates = new Set(currentMonthEvents.map(e => {
@@ -32,17 +35,17 @@ export default function ExpertAttendanceTab({ user }) {
       }
     };
     fetchCurrentMonthStats();
-  }, []);
+  }, [baseQuery]);
 
   // Fetch events based on the selected filter for the table
   useEffect(() => {
     fetchEvents();
-  }, [selectedMonth]);
+  }, [selectedMonth, baseQuery]);
 
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      let url = '/events?mine=true';
+      let url = `/events?${baseQuery}`;
       if (selectedMonth) {
         url += `&month=${selectedMonth}`;
       }
@@ -56,7 +59,7 @@ export default function ExpertAttendanceTab({ user }) {
   };
 
   const handleDownload = () => {
-    let url = `${import.meta.env.VITE_API_URL || '/api'}/events/export/excel?mine=true`;
+    let url = `${import.meta.env.VITE_API_URL || '/api'}/events/export/excel?${baseQuery}`;
     if (selectedMonth) {
       url += `&month=${selectedMonth}`;
     }
@@ -229,11 +232,16 @@ export default function ExpertAttendanceTab({ user }) {
                               {new Date(e.locationTimestamp && !isNaN(Number(e.locationTimestamp)) ? Number(e.locationTimestamp) : (e.locationTimestamp || e.createdAt)).toLocaleDateString()}
                             </td>
                             <td className="px-6 py-4 truncate max-w-[300px]" title={e.name}>{e.name}</td>
-                            <td className="px-6 py-4 font-mono text-xs text-secondary flex items-center gap-2">
-                              {e.brcLocation || e.brcName}
-                              {(e.venueType === 'OTHER_BRC' || e.tag === 'other event') && (
-                                <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-[10px] font-bold uppercase tracking-widest">OTHER</span>
-                              )}
+                            <td className="px-6 py-4 font-mono text-xs text-secondary flex flex-col gap-1">
+                              <div className="flex items-center gap-2">
+                                {e.brcLocation || e.brcName}
+                                {e.venueType === 'OTHER_BRC' && (
+                                  <span className="material-symbols-outlined text-[14px] text-amber-600" title="Other Venue">share_location</span>
+                                )}
+                              </div>
+                              <span className={`self-start px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${e.tag === 'other event' ? 'bg-indigo-100 text-indigo-800' : 'bg-blue-100 text-blue-800'}`}>
+                                {e.customTag || e.tag || 'N/A'}
+                              </span>
                             </td>
                             <td className="px-6 py-4">
                               <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${e.status === 'SUBMITTED' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
