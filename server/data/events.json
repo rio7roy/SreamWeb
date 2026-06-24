@@ -85,6 +85,30 @@
     ],
     "status": "SUBMITTED",
     "createdAt": "2026-06-17T08:48:50.260Z",
-    "createdBy": "fb9fc04a-8328-40ab-beaa-a5c912a439ed"
+    "createdBy": "fb9fc04a-8328-40ab-beaa-a5c912a439ed",
+    "reportPdf": "/uploads/1782113504510-7e44f11257d591a5.pdf",
+    "updatedAt": "2026-06-22T07:31:44.512Z"
+  },
+  {
+    "id": "442b4f89b1ed9911cc748639100c87fd",
+    "brcCode": "32110100105SH",
+    "venueType": "SELECTED_BRC",
+    "venueValue": "32110100105SH",
+    "name": "yrtyr",
+    "date": "2026-06-22",
+    "teachersCount": 0,
+    "studentsCount": 0,
+    "latitude": null,
+    "longitude": null,
+    "locationTimestamp": null,
+    "tag": null,
+    "customTag": null,
+    "photos": [],
+    "status": "SUBMITTED",
+    "createdAt": "2026-06-22T09:50:03.586Z",
+    "createdBy": "hub-32110100105SH",
+    "creatorRole": "STREAM_LAB",
+    "reportPdf": "/uploads/1782121803605-e4b8b0380f1e4bd0.pdf",
+    "updatedAt": "2026-06-22T09:50:03.608Z"
   }
 ]

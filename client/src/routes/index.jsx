@@ -4,6 +4,7 @@ import DashboardLayout from '../components/layout/DashboardLayout';
 import PortalPage from '../pages/PortalPage';
 import DashboardPage from '../pages/DashboardPage';
 import ExpertDashboardPage from '../pages/ExpertDashboardPage';
+import HubDashboardPage from '../pages/HubDashboardPage';
 import AdminDashboardPage from '../pages/AdminDashboardPage';
 import BrcManagementPage from '../pages/admin/BrcManagementPage';
 import ExpertManagementPage from '../pages/admin/ExpertManagementPage';
@@ -79,6 +80,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={['EXPERT']}>
             <ExpertDashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/hub',
+        element: (
+          <ProtectedRoute allowedRoles={['STREAM_LAB']}>
+            <HubDashboardPage />
           </ProtectedRoute>
         ),
       },

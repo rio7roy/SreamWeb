@@ -109,9 +109,10 @@ async function seedDatabase() {
 
   const activeExperts = loadJSON('experts.json');
   const activeAdmins = loadJSON('admins.json');
+  const hubUsers = loadJSON('hub_users.json');
   const initialStocks = loadJSON('stocks.json');
 
-  users.push(...activeExperts, ...activeAdmins);
+  users.push(...activeExperts, ...activeAdmins, ...hubUsers);
   const allBrcs = loadJSON('brcs.json');
 
   if (initialStocks && initialStocks.length > 0) {
