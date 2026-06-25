@@ -390,18 +390,17 @@ exports.exportEventsExcel = async (req, res) => {
     // Add rows
     events.forEach(e => {
       const brc = brcMap[e.brcCode];
-      const isOther = e.venueType === 'OTHER_BRC' || e.tag === 'other event';
       worksheet.addRow({
         date: new Date(e.date || e.createdAt).toLocaleDateString(),
         name: e.name || 'Untitled Event',
-        brcLocation: (brc ? brc.location : e.brcCode) + (isOther ? ' [OTHER]' : ''),
+        brcLocation: (brc ? brc.location : e.brcCode),
         gpsTime: e.locationTimestamp ? new Date(parseInt(e.locationTimestamp)).toLocaleString() : 'N/A',
         venueType: e.venueType || 'SELECTED_BRC',
         venueValue: e.venueValue || e.brcCode,
         district: brc ? brc.district : 'N/A',
         teachers: e.teachersCount || 0,
         students: e.studentsCount || 0,
-        tag: isOther ? 'OTHER' : (e.tag === 'other event' ? (e.customTag || 'OTHER') : e.tag || 'N/A'),
+        tag: e.tag === 'other event' ? (e.customTag || 'Other Event') : (e.tag || 'N/A'),
         desc: e.description || '',
       });
     });

@@ -176,13 +176,10 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
 
         const evFootfall = (e.studentsCount || 0) + (e.teachersCount || 0);
 
-        // BRC Location with OTHER tag
+        // BRC Location
         const brc = brcMap[e.brcCode];
         let brcLabel = brc ? brc.location : e.brcCode;
         let districtLabel = brc ? brc.district : 'N/A';
-        if (e.venueType === 'OTHER_BRC' || e.tag === 'other event') {
-          brcLabel += ' [OTHER]';
-        }
 
         // Limit the strings to 1 line (lineBreak: false) so they don't wrap and overlap the next row
         doc.font('Helvetica').fontSize(8).fillColor('#1a1c1c');
