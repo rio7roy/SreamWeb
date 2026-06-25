@@ -453,7 +453,8 @@ exports.exportEventsPdf = async (req, res) => {
 
     events.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
 
-    const doc = new PDFDocument({ margin: 30, size: 'A4' });
+    // Landscape A4 to fit 11 columns
+    const doc = new PDFDocument({ margin: 30, size: 'A4', layout: 'landscape' });
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename=Event_Reports.pdf');
@@ -464,13 +465,10 @@ exports.exportEventsPdf = async (req, res) => {
 
     doc.fontSize(12).font('Helvetica').text(`Generated on: ${new Date().toLocaleString()}`, { align: 'center' });
     
-    // Add filters used to the heading
     const filterParts = [];
     if (district) filterParts.push(`District: ${district}`);
     if (brcCode) filterParts.push(`Hub Code: ${brcCode}`);
     if (month) filterParts.push(`Month: ${new Date(0, month - 1).toLocaleString('default', { month: 'long' })}`);
-    
-    // For expert name, we can try to fetch it if expertId is present
     if (expertId) {
       try {
         const EXPERTS_FILE = require('path').join(__dirname, '../../../data/experts.json');
@@ -492,23 +490,79 @@ exports.exportEventsPdf = async (req, res) => {
     if (events.length === 0) {
       doc.fontSize(14).text('No events found for the selected filters.', { align: 'center' });
     } else {
-      events.forEach((event, index) => {
-        doc.fontSize(14).font('Helvetica-Bold').text(`${index + 1}. ${event.name}`);
-        doc.fontSize(10).font('Helvetica').text(`Date: ${new Date(event.date || event.createdAt).toLocaleDateString()}`);
-        const pdfBrc = brcMap[event.brcCode];
-        const pdfBrcLabel = pdfBrc ? pdfBrc.location : event.brcCode;
-        const pdfIsOther = event.venueType === 'OTHER_BRC' || event.tag === 'other event';
-        doc.text(`BRC: ${pdfBrcLabel}${pdfIsOther ? ' [OTHER]' : ''}`);
-        const displayTag = event.venueType === 'OTHER_BRC' ? 'OTHER' : (event.tag === 'other event' ? (event.customTag || 'OTHER') : event.tag || 'N/A');
-        doc.text(`Tag: ${displayTag}`);
-        doc.text(`Attendance: ${event.teachersCount} Teachers, ${event.studentsCount} Students`);
+      const tableTop = doc.y;
+      
+      const colX = [30, 90, 175, 235, 305, 375, 435, 495, 545, 595, 665];
+      const colW = [55, 80, 55, 65, 65, 55, 55, 45, 45, 65, 110];
+
+      const drawHeader = (y) => {
+        doc.fillColor('#785900').fontSize(9).font('Helvetica-Bold');
+        doc.text('Date', colX[0], y, { lineBreak: false });
+        doc.text('Event Name', colX[1], y, { lineBreak: false });
+        doc.text('BRC Location', colX[2], y, { lineBreak: false });
+        doc.text('GPS Time', colX[3], y, { lineBreak: false });
+        doc.text('Venue Type', colX[4], y, { lineBreak: false });
+        doc.text('Venue Value', colX[5], y, { lineBreak: false });
+        doc.text('District', colX[6], y, { lineBreak: false });
+        doc.text('Teachers', colX[7], y, { lineBreak: false });
+        doc.text('Students', colX[8], y, { lineBreak: false });
+        doc.text('Event Tag', colX[9], y, { lineBreak: false });
+        doc.text('Description', colX[10], y, { lineBreak: false });
         
-        if (event.description) {
-          doc.moveDown(0.5);
-          doc.text(`Description: ${event.description}`);
+        doc.text('', 30, y);
+        doc.moveDown(0.5);
+        doc.strokeColor('#E0E0E0').lineWidth(1).moveTo(30, doc.y).lineTo(812, doc.y).stroke();
+        doc.moveDown(0.5);
+      };
+
+      drawHeader(tableTop);
+
+      doc.font('Helvetica').fontSize(8).fillColor('#1a1c1c');
+
+      events.forEach((e, index) => {
+        if (doc.y > 520) { // A4 landscape height is 595
+          doc.addPage();
+          drawHeader(doc.y);
+          doc.font('Helvetica').fontSize(8).fillColor('#1a1c1c');
         }
+
+        if (index % 2 === 0) {
+          doc.rect(30, doc.y - 2, 782, 16).fill('#FAFAFA').fillColor('#1a1c1c');
+        }
+
+        const rowY = doc.y;
         
-        doc.moveDown(1.5);
+        let brcLabel = e.brcCode;
+        let districtLabel = 'N/A';
+        const brc = brcMap[e.brcCode];
+        if (brc) {
+          brcLabel = brc.location;
+          districtLabel = brc.district;
+        }
+
+        let gpsTime = 'N/A';
+        if (e.locationTimestamp) {
+          const ts = !isNaN(Number(e.locationTimestamp)) ? Number(e.locationTimestamp) : e.locationTimestamp;
+          gpsTime = new Date(ts).toLocaleString();
+        }
+
+        let venueType = e.venueType === 'OTHER_BRC' ? 'OTHER BRC' : (e.venueType || 'N/A');
+        let venueValue = e.venueType === 'OTHER_BRC' ? (e.venueValue || 'N/A') : (brcMap[e.venueValue]?.location || e.venueValue || 'N/A');
+        let eventTag = e.tag === 'other event' ? (e.customTag || 'Other Event') : (e.tag || 'N/A');
+
+        doc.text(new Date(e.date || e.createdAt).toLocaleDateString(), colX[0], rowY, { width: colW[0], lineBreak: false, ellipsis: true });
+        doc.text(e.name || 'Untitled', colX[1], rowY, { width: colW[1], lineBreak: false, ellipsis: true });
+        doc.text(brcLabel, colX[2], rowY, { width: colW[2], lineBreak: false, ellipsis: true });
+        doc.text(gpsTime, colX[3], rowY, { width: colW[3], lineBreak: false, ellipsis: true });
+        doc.text(venueType, colX[4], rowY, { width: colW[4], lineBreak: false, ellipsis: true });
+        doc.text(venueValue, colX[5], rowY, { width: colW[5], lineBreak: false, ellipsis: true });
+        doc.text(districtLabel, colX[6], rowY, { width: colW[6], lineBreak: false, ellipsis: true });
+        doc.text((e.teachersCount || 0).toString(), colX[7], rowY, { width: colW[7], lineBreak: false, ellipsis: true });
+        doc.text((e.studentsCount || 0).toString(), colX[8], rowY, { width: colW[8], lineBreak: false, ellipsis: true });
+        doc.text(eventTag, colX[9], rowY, { width: colW[9], lineBreak: false, ellipsis: true });
+        doc.text(e.description || 'N/A', colX[10], rowY, { width: colW[10], lineBreak: false, ellipsis: true });
+
+        doc.moveDown(0.5);
       });
     }
 
