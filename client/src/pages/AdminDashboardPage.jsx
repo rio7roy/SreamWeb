@@ -329,6 +329,7 @@ export default function AdminDashboardPage() {
                     className="w-full bg-surface-container-low border border-outline/30 rounded-xl pl-9 pr-8 py-3 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all appearance-none cursor-pointer"
                   >
                     <option value="">Select Expert...</option>
+                    <option value="all">All Experts</option>
                     {experts.map(exp => (
                       <option key={exp.id} value={exp.id}>
                         {exp.name}
@@ -342,7 +343,7 @@ export default function AdminDashboardPage() {
                 <div className="flex shrink-0 gap-2">
                   <button
                     onClick={() => setShowExpertManageModal(true)}
-                    disabled={!selectedExpertId}
+                    disabled={!selectedExpertId || selectedExpertId === 'all'}
                     className="px-6 py-3 bg-amber-500 text-white font-bold rounded-xl shadow hover:opacity-90 transition-all disabled:opacity-50 disabled:shadow-none flex items-center gap-2"
                   >
                     <span className="material-symbols-outlined text-sm">edit</span>

@@ -29,13 +29,23 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
   const brcMap = {};
   brcs.forEach(b => brcMap[b.code] = b);
 
-  const expert = experts.find(e => e.id === expertId);
-  if (!expert) {
-    throw new Error('Expert not found');
+  let expert;
+  if (expertId === 'all') {
+    expert = { name: 'All Experts' };
+  } else {
+    expert = experts.find(e => e.id === expertId);
+    if (!expert) {
+      throw new Error('Expert not found');
+    }
   }
 
   // Filter events for this expert
-  let expertEvents = events.filter(e => e.status === 'SUBMITTED' && e.createdBy === expertId);
+  let expertEvents;
+  if (expertId === 'all') {
+    expertEvents = events.filter(e => e.status === 'SUBMITTED' && e.creatorRole !== 'STREAM_LAB');
+  } else {
+    expertEvents = events.filter(e => e.status === 'SUBMITTED' && e.createdBy === expertId);
+  }
 
   if (month && year) {
     expertEvents = expertEvents.filter(e => {
@@ -117,15 +127,30 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
     doc.moveDown(1);
 
     const tableTop = doc.y;
-    const colX = [50, 130, 200, 275, 370, 480]; // Event Name, BRC, District, GPS Date, GPS Location, Footfall
+    const isAll = expertId === 'all';
+    
+    // Columns: [Expert], Event Name, BRC, District, GPS Date, GPS Loc, Footfall
+    const colX = isAll 
+      ? [50, 110, 175, 235, 290, 375, 465]
+      : [50, 130, 200, 275, 370, 480];
 
     doc.fillColor('#785900').fontSize(9).font('Helvetica-Bold');
-    doc.text('Event Name', colX[0], tableTop);
-    doc.text('BRC', colX[1], tableTop);
-    doc.text('District', colX[2], tableTop);
-    doc.text('GPS Marked Date', colX[3], tableTop);
-    doc.text('GPS Location', colX[4], tableTop);
-    doc.text('Footfall', colX[5], tableTop);
+    if (isAll) {
+      doc.text('Expert', colX[0], tableTop);
+      doc.text('Event Name', colX[1], tableTop);
+      doc.text('BRC', colX[2], tableTop);
+      doc.text('District', colX[3], tableTop);
+      doc.text('Date', colX[4], tableTop);
+      doc.text('Location', colX[5], tableTop);
+      doc.text('Footfall', colX[6], tableTop);
+    } else {
+      doc.text('Event Name', colX[0], tableTop);
+      doc.text('BRC', colX[1], tableTop);
+      doc.text('District', colX[2], tableTop);
+      doc.text('GPS Marked Date', colX[3], tableTop);
+      doc.text('GPS Location', colX[4], tableTop);
+      doc.text('Footfall', colX[5], tableTop);
+    }
 
     doc.moveDown(0.5);
     doc.strokeColor('#E0E0E0').lineWidth(1).moveTo(50, doc.y).lineTo(545, doc.y).stroke();
@@ -134,19 +159,29 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
     doc.font('Helvetica').fontSize(9).fillColor('#1a1c1c');
 
     if (expertEvents.length === 0) {
-      doc.text("No events found for this expert.", 50, doc.y);
+      doc.text("No events found for this selection.", 50, doc.y);
     } else {
       expertEvents.forEach((e, index) => {
         if (doc.y > 750) {
           doc.addPage();
           // redraw header
           doc.fillColor('#785900').fontSize(9).font('Helvetica-Bold');
-          doc.text('Event Name', colX[0], doc.y);
-          doc.text('BRC', colX[1], doc.y);
-          doc.text('District', colX[2], doc.y);
-          doc.text('GPS Marked Date', colX[3], doc.y);
-          doc.text('GPS Location', colX[4], doc.y);
-          doc.text('Footfall', colX[5], doc.y);
+          if (isAll) {
+            doc.text('Expert', colX[0], doc.y);
+            doc.text('Event Name', colX[1], doc.y);
+            doc.text('BRC', colX[2], doc.y);
+            doc.text('District', colX[3], doc.y);
+            doc.text('Date', colX[4], doc.y);
+            doc.text('Location', colX[5], doc.y);
+            doc.text('Footfall', colX[6], doc.y);
+          } else {
+            doc.text('Event Name', colX[0], doc.y);
+            doc.text('BRC', colX[1], doc.y);
+            doc.text('District', colX[2], doc.y);
+            doc.text('GPS Marked Date', colX[3], doc.y);
+            doc.text('GPS Location', colX[4], doc.y);
+            doc.text('Footfall', colX[5], doc.y);
+          }
           doc.moveDown(0.5);
           doc.strokeColor('#E0E0E0').lineWidth(1).moveTo(50, doc.y).lineTo(545, doc.y).stroke();
           doc.moveDown(0.5);
@@ -183,12 +218,23 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
 
         // Limit the strings to 1 line (lineBreak: false) so they don't wrap and overlap the next row
         doc.font('Helvetica').fontSize(8).fillColor('#1a1c1c');
-        doc.text(e.name || 'Unnamed Event', colX[0], rowY, { width: 75, lineBreak: false, ellipsis: true });
-        doc.text(brcLabel, colX[1], rowY, { width: 65, lineBreak: false, ellipsis: true });
-        doc.text(districtLabel, colX[2], rowY, { width: 70, lineBreak: false, ellipsis: true });
-        doc.text(gpsDateStr, colX[3], rowY, { width: 90, lineBreak: false, ellipsis: true });
-        doc.text(gpsLocStr, colX[4], rowY, { width: 105, lineBreak: false, ellipsis: true });
-        doc.text(evFootfall.toString(), colX[5], rowY, { width: 40, lineBreak: false, ellipsis: true });
+        if (isAll) {
+          const expName = experts.find(ex => ex.id === e.createdBy)?.name || 'Unknown';
+          doc.text(expName, colX[0], rowY, { width: 55, lineBreak: false, ellipsis: true });
+          doc.text(e.name || 'Untitled', colX[1], rowY, { width: 60, lineBreak: false, ellipsis: true });
+          doc.text(brcLabel, colX[2], rowY, { width: 55, lineBreak: false, ellipsis: true });
+          doc.text(districtLabel, colX[3], rowY, { width: 50, lineBreak: false, ellipsis: true });
+          doc.text(gpsDateStr, colX[4], rowY, { width: 80, lineBreak: false, ellipsis: true });
+          doc.text(gpsLocStr, colX[5], rowY, { width: 85, lineBreak: false, ellipsis: true });
+          doc.text(evFootfall.toString(), colX[6], rowY, { width: 30, lineBreak: false, ellipsis: true });
+        } else {
+          doc.text(e.name || 'Untitled Event', colX[0], rowY, { width: 75, lineBreak: false, ellipsis: true });
+          doc.text(brcLabel, colX[1], rowY, { width: 65, lineBreak: false, ellipsis: true });
+          doc.text(districtLabel, colX[2], rowY, { width: 70, lineBreak: false, ellipsis: true });
+          doc.text(gpsDateStr, colX[3], rowY, { width: 90, lineBreak: false, ellipsis: true });
+          doc.text(gpsLocStr, colX[4], rowY, { width: 105, lineBreak: false, ellipsis: true });
+          doc.text(evFootfall.toString(), colX[5], rowY, { width: 40, lineBreak: false, ellipsis: true });
+        }
 
         doc.moveDown(0.5);
       });
