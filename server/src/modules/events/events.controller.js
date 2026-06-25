@@ -492,46 +492,14 @@ exports.exportEventsPdf = async (req, res) => {
     } else {
       const tableTop = doc.y;
       
-      const colX = [30, 90, 175, 235, 305, 375, 435, 495, 545, 595, 665];
-      const colW = [55, 80, 55, 65, 65, 55, 55, 45, 45, 65, 110];
-
-      const drawHeader = (y) => {
-        doc.fillColor('#785900').fontSize(9).font('Helvetica-Bold');
-        doc.text('Date', colX[0], y, { lineBreak: false });
-        doc.text('Event Name', colX[1], y, { lineBreak: false });
-        doc.text('BRC Location', colX[2], y, { lineBreak: false });
-        doc.text('GPS Time', colX[3], y, { lineBreak: false });
-        doc.text('Venue Type', colX[4], y, { lineBreak: false });
-        doc.text('Venue Value', colX[5], y, { lineBreak: false });
-        doc.text('District', colX[6], y, { lineBreak: false });
-        doc.text('Teachers', colX[7], y, { lineBreak: false });
-        doc.text('Students', colX[8], y, { lineBreak: false });
-        doc.text('Event Tag', colX[9], y, { lineBreak: false });
-        doc.text('Description', colX[10], y, { lineBreak: false });
-        
-        doc.text('', 30, y);
-        doc.moveDown(0.5);
-        doc.strokeColor('#E0E0E0').lineWidth(1).moveTo(30, doc.y).lineTo(812, doc.y).stroke();
-        doc.moveDown(0.5);
-      };
-
-      drawHeader(tableTop);
-
-      doc.font('Helvetica').fontSize(8).fillColor('#1a1c1c');
-
-      events.forEach((e, index) => {
-        if (doc.y > 520) { // A4 landscape height is 595
-          doc.addPage();
-          drawHeader(doc.y);
-          doc.font('Helvetica').fontSize(8).fillColor('#1a1c1c');
-        }
-
-        if (index % 2 === 0) {
-          doc.rect(30, doc.y - 2, 782, 16).fill('#FAFAFA').fillColor('#1a1c1c');
-        }
-
-        const rowY = doc.y;
-        
+      const headers = ['Date', 'Event Name', 'BRC Location', 'GPS Time', 'Venue Type', 'Venue Value', 'District', 'Teachers', 'Students', 'Event Tag', 'Description'];
+      
+      doc.font('Helvetica').fontSize(8);
+      
+      // Calculate optimal widths for each column
+      const optimalW = headers.map(h => doc.widthOfString(h) + 10);
+      
+      const allRowData = events.map(e => {
         let brcLabel = e.brcCode;
         let districtLabel = 'N/A';
         const brc = brcMap[e.brcCode];
@@ -550,18 +518,97 @@ exports.exportEventsPdf = async (req, res) => {
         let venueValue = e.venueType === 'OTHER_BRC' ? (e.venueValue || 'N/A') : (brcMap[e.venueValue]?.location || e.venueValue || 'N/A');
         let eventTag = e.tag === 'other event' ? (e.customTag || 'Other Event') : (e.tag || 'N/A');
 
-        doc.text(new Date(e.date || e.createdAt).toLocaleDateString(), colX[0], rowY, { width: colW[0], lineBreak: false, ellipsis: true });
-        doc.text(e.name || 'Untitled', colX[1], rowY, { width: colW[1], lineBreak: false, ellipsis: true });
-        doc.text(brcLabel, colX[2], rowY, { width: colW[2], lineBreak: false, ellipsis: true });
-        doc.text(gpsTime, colX[3], rowY, { width: colW[3], lineBreak: false, ellipsis: true });
-        doc.text(venueType, colX[4], rowY, { width: colW[4], lineBreak: false, ellipsis: true });
-        doc.text(venueValue, colX[5], rowY, { width: colW[5], lineBreak: false, ellipsis: true });
-        doc.text(districtLabel, colX[6], rowY, { width: colW[6], lineBreak: false, ellipsis: true });
-        doc.text((e.teachersCount || 0).toString(), colX[7], rowY, { width: colW[7], lineBreak: false, ellipsis: true });
-        doc.text((e.studentsCount || 0).toString(), colX[8], rowY, { width: colW[8], lineBreak: false, ellipsis: true });
-        doc.text(eventTag, colX[9], rowY, { width: colW[9], lineBreak: false, ellipsis: true });
-        doc.text(e.description || 'N/A', colX[10], rowY, { width: colW[10], lineBreak: false, ellipsis: true });
+        return [
+          new Date(e.date || e.createdAt).toLocaleDateString(),
+          e.name || 'Untitled',
+          brcLabel,
+          gpsTime,
+          venueType,
+          venueValue,
+          districtLabel,
+          (e.teachersCount || 0).toString(),
+          (e.studentsCount || 0).toString(),
+          eventTag,
+          e.description || 'N/A'
+        ];
+      });
 
+      // Update optimal widths with data widths
+      allRowData.forEach(row => {
+        row.forEach((text, i) => {
+          const w = doc.widthOfString(text) + 10; // add 10px padding
+          if (w > optimalW[i]) optimalW[i] = w;
+        });
+      });
+
+      const PAGE_WIDTH = 782; // 842 - 30 - 30
+      const MIN_W = 40;
+      let totalOptimalW = optimalW.reduce((sum, w) => sum + w, 0);
+
+      let colW = [];
+      if (totalOptimalW <= PAGE_WIDTH) {
+        colW = optimalW;
+      } else {
+        let extraNeeded = 0;
+        optimalW.forEach(w => { if (w > MIN_W) extraNeeded += (w - MIN_W); });
+        
+        const extraAvailable = PAGE_WIDTH - (MIN_W * 11);
+        colW = optimalW.map(w => {
+           if (w <= MIN_W) return MIN_W;
+           const factor = (w - MIN_W) / extraNeeded;
+           return MIN_W + (factor * extraAvailable);
+        });
+      }
+
+      const colX = [30];
+      for (let i = 1; i < 11; i++) {
+        colX[i] = colX[i-1] + colW[i-1];
+      }
+
+      const drawHeader = (y) => {
+        doc.fillColor('#785900').fontSize(9).font('Helvetica-Bold');
+        headers.forEach((h, i) => {
+          doc.text(h, colX[i], y, { width: colW[i], lineBreak: false });
+        });
+        
+        doc.text('', 30, y);
+        doc.moveDown(0.5);
+        doc.strokeColor('#E0E0E0').lineWidth(1).moveTo(30, doc.y).lineTo(812, doc.y).stroke();
+        doc.moveDown(0.5);
+      };
+
+      drawHeader(tableTop);
+
+      doc.font('Helvetica').fontSize(8).fillColor('#1a1c1c');
+
+      events.forEach((e, index) => {
+        const rowData = allRowData[index];
+
+        // Calculate maximum height required for this row
+        let maxRowHeight = 0;
+        rowData.forEach((text, i) => {
+          const h = doc.heightOfString(text, { width: colW[i] });
+          if (h > maxRowHeight) maxRowHeight = h;
+        });
+
+        // Check page break (540 is a safe threshold for A4 landscape bottom margin)
+        if (doc.y + maxRowHeight > 540) { 
+          doc.addPage();
+          drawHeader(doc.y);
+          doc.font('Helvetica').fontSize(8).fillColor('#1a1c1c');
+        }
+
+        if (index % 2 === 0) {
+          doc.rect(30, doc.y - 2, 782, maxRowHeight + 4).fill('#FAFAFA').fillColor('#1a1c1c');
+        }
+
+        const rowTop = doc.y;
+        
+        rowData.forEach((text, i) => {
+          doc.text(text, colX[i], rowTop, { width: colW[i] });
+        });
+
+        doc.y = rowTop + maxRowHeight;
         doc.moveDown(0.5);
       });
     }
