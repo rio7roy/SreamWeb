@@ -74,6 +74,7 @@ async function generateMonthEndPdfReport(month, year) {
         hubStats[e.brcCode] = {
           code: e.brcCode,
           name: brcMap[e.brcCode] ? brcMap[e.brcCode].name : e.brcCode,
+          district: brcMap[e.brcCode] ? brcMap[e.brcCode].district : 'Unknown',
           programs: 0,
           footfall: 0,
           dates: new Set()
@@ -121,7 +122,10 @@ async function generateMonthEndPdfReport(month, year) {
       doc.moveDown(1);
 
       const tableTop = doc.y;
-      const colX = [50, 250, 350, 450]; // x positions for columns
+      
+      // Determine if this is a 4-column table (Expert) or 5-column table (Hub)
+      const isFiveColumns = headers.length === 5;
+      const colX = isFiveColumns ? [50, 200, 300, 380, 460] : [50, 250, 350, 450];
 
       doc.fillColor('#785900').fontSize(10).font('Helvetica-Bold');
       headers.forEach((h, i) => doc.text(h, colX[i], tableTop, { lineBreak: false }));
@@ -153,10 +157,13 @@ async function generateMonthEndPdfReport(month, year) {
         }
 
         const rowY = doc.y;
-        doc.text(row[0], colX[0], rowY, { width: 190, ellipsis: true, lineBreak: false });
-        doc.text(row[1].toString(), colX[1], rowY, { lineBreak: false });
+        doc.text(row[0], colX[0], rowY, { width: isFiveColumns ? 140 : 190, ellipsis: true, lineBreak: false });
+        doc.text(row[1].toString(), colX[1], rowY, { width: isFiveColumns ? 90 : undefined, ellipsis: true, lineBreak: false });
         doc.text(row[2].toString(), colX[2], rowY, { lineBreak: false });
         doc.text(row[3].toString(), colX[3], rowY, { lineBreak: false });
+        if (isFiveColumns) {
+          doc.text(row[4].toString(), colX[4], rowY, { lineBreak: false });
+        }
 
         doc.text('', 50, rowY);
         doc.moveDown(1.5);
@@ -177,12 +184,13 @@ async function generateMonthEndPdfReport(month, year) {
     // Hub Data
     const hubDataArray = Object.values(hubStats).sort((a, b) => b.programs - a.programs).map(h => [
       h.name,
+      h.district,
       h.programs,
       h.dates.size,
       h.footfall
     ]);
-    if (hubDataArray.length === 0) hubDataArray.push(["No data", "-", "-", "-"]);
-    drawTable("STREAM Hub Performance", ["Hub Name", "Programs", "Unique Days", "Footfall"], hubDataArray);
+    if (hubDataArray.length === 0) hubDataArray.push(["No data", "-", "-", "-", "-"]);
+    drawTable("STREAM Hub Performance", ["Hub Name", "District", "Programs", "Unique Days", "Footfall"], hubDataArray);
 
     // Footer
     doc.strokeColor('#FFC107').lineWidth(1).moveTo(50, 800).lineTo(545, 800).stroke();

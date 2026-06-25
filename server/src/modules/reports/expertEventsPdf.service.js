@@ -117,14 +117,15 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
     doc.moveDown(1);
 
     const tableTop = doc.y;
-    const colX = [50, 150, 245, 365, 470]; // Event Name, BRC, GPS Date, GPS Location, Footfall
+    const colX = [50, 130, 200, 275, 370, 480]; // Event Name, BRC, District, GPS Date, GPS Location, Footfall
 
-    doc.fillColor('#785900').fontSize(10).font('Helvetica-Bold');
+    doc.fillColor('#785900').fontSize(9).font('Helvetica-Bold');
     doc.text('Event Name', colX[0], tableTop);
     doc.text('BRC', colX[1], tableTop);
-    doc.text('GPS Marked Date', colX[2], tableTop);
-    doc.text('GPS Location', colX[3], tableTop);
-    doc.text('Footfall', colX[4], tableTop);
+    doc.text('District', colX[2], tableTop);
+    doc.text('GPS Marked Date', colX[3], tableTop);
+    doc.text('GPS Location', colX[4], tableTop);
+    doc.text('Footfall', colX[5], tableTop);
 
     doc.moveDown(0.5);
     doc.strokeColor('#E0E0E0').lineWidth(1).moveTo(50, doc.y).lineTo(545, doc.y).stroke();
@@ -139,16 +140,17 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
         if (doc.y > 750) {
           doc.addPage();
           // redraw header
-          doc.fillColor('#785900').fontSize(10).font('Helvetica-Bold');
+          doc.fillColor('#785900').fontSize(9).font('Helvetica-Bold');
           doc.text('Event Name', colX[0], doc.y);
           doc.text('BRC', colX[1], doc.y);
-          doc.text('GPS Marked Date', colX[2], doc.y);
-          doc.text('GPS Location', colX[3], doc.y);
-          doc.text('Footfall', colX[4], doc.y);
+          doc.text('District', colX[2], doc.y);
+          doc.text('GPS Marked Date', colX[3], doc.y);
+          doc.text('GPS Location', colX[4], doc.y);
+          doc.text('Footfall', colX[5], doc.y);
           doc.moveDown(0.5);
           doc.strokeColor('#E0E0E0').lineWidth(1).moveTo(50, doc.y).lineTo(545, doc.y).stroke();
           doc.moveDown(0.5);
-          doc.font('Helvetica').fontSize(9).fillColor('#1a1c1c');
+          doc.font('Helvetica').fontSize(8).fillColor('#1a1c1c');
         }
 
         if (index % 2 === 0) {
@@ -177,16 +179,19 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
         // BRC Location with OTHER tag
         const brc = brcMap[e.brcCode];
         let brcLabel = brc ? brc.location : e.brcCode;
+        let districtLabel = brc ? brc.district : 'N/A';
         if (e.venueType === 'OTHER_BRC' || e.tag === 'other event') {
           brcLabel += ' [OTHER]';
         }
 
         // Limit the strings to 1 line (lineBreak: false) so they don't wrap and overlap the next row
-        doc.text(e.name || 'Unnamed Event', colX[0], rowY, { width: 95, lineBreak: false, ellipsis: true });
-        doc.text(brcLabel, colX[1], rowY, { width: 90, lineBreak: false, ellipsis: true });
-        doc.text(gpsDateStr, colX[2], rowY, { width: 115, lineBreak: false, ellipsis: true });
-        doc.text(gpsLocStr, colX[3], rowY, { width: 100, lineBreak: false, ellipsis: true });
-        doc.text(evFootfall.toString(), colX[4], rowY, { width: 50, lineBreak: false, ellipsis: true });
+        doc.font('Helvetica').fontSize(8).fillColor('#1a1c1c');
+        doc.text(e.name || 'Unnamed Event', colX[0], rowY, { width: 75, lineBreak: false, ellipsis: true });
+        doc.text(brcLabel, colX[1], rowY, { width: 65, lineBreak: false, ellipsis: true });
+        doc.text(districtLabel, colX[2], rowY, { width: 70, lineBreak: false, ellipsis: true });
+        doc.text(gpsDateStr, colX[3], rowY, { width: 90, lineBreak: false, ellipsis: true });
+        doc.text(gpsLocStr, colX[4], rowY, { width: 105, lineBreak: false, ellipsis: true });
+        doc.text(evFootfall.toString(), colX[5], rowY, { width: 40, lineBreak: false, ellipsis: true });
 
         doc.moveDown(0.5);
       });
