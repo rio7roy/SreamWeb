@@ -172,11 +172,12 @@ async function generateUserPdfReport() {
       .fontSize(9)
       .font('Helvetica-Bold');
 
-    doc.text('Name', col.name, tableTop);
-    doc.text('Email', col.email, tableTop);
-    doc.text('Role', col.role, tableTop);
-    doc.text('Status', col.status, tableTop);
+    doc.text('Name', col.name, tableTop, { lineBreak: false });
+    doc.text('Email', col.email, tableTop, { lineBreak: false });
+    doc.text('Role', col.role, tableTop, { lineBreak: false });
+    doc.text('Status', col.status, tableTop, { lineBreak: false });
 
+    doc.text('', 50, tableTop);
     doc.moveDown(0.5);
     doc
       .strokeColor('#E0E0E0')
@@ -205,12 +206,13 @@ async function generateUserPdfReport() {
       }
 
       const rowY = doc.y;
-      doc.text(user.name, col.name, rowY, { width: 120, ellipsis: true });
-      doc.text(user.email, col.email, rowY, { width: 160, ellipsis: true });
-      doc.text(user.role.replace('_', ' '), col.role, rowY, { width: 90 });
-      doc.text(user.isActive ? 'Active' : 'Inactive', col.status, rowY);
+      doc.text(user.name, col.name, rowY, { width: 120, ellipsis: true, lineBreak: false });
+      doc.text(user.email, col.email, rowY, { width: 160, ellipsis: true, lineBreak: false });
+      doc.text(user.role.replace('_', ' '), col.role, rowY, { width: 90, ellipsis: true, lineBreak: false });
+      doc.text(user.isActive ? 'Active' : 'Inactive', col.status, rowY, { width: 90, ellipsis: true, lineBreak: false });
 
-      doc.moveDown(0.5);
+      doc.text('', 50, rowY);
+      doc.moveDown(1.5);
     });
 
     // ── Footer ──

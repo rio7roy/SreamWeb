@@ -136,22 +136,23 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
 
     doc.fillColor('#785900').fontSize(9).font('Helvetica-Bold');
     if (isAll) {
-      doc.text('Expert', colX[0], tableTop);
-      doc.text('Event Name', colX[1], tableTop);
-      doc.text('BRC', colX[2], tableTop);
-      doc.text('District', colX[3], tableTop);
-      doc.text('Date', colX[4], tableTop);
-      doc.text('Location', colX[5], tableTop);
-      doc.text('Footfall', colX[6], tableTop);
+      doc.text('Expert', colX[0], tableTop, { lineBreak: false });
+      doc.text('Event Name', colX[1], tableTop, { lineBreak: false });
+      doc.text('BRC', colX[2], tableTop, { lineBreak: false });
+      doc.text('District', colX[3], tableTop, { lineBreak: false });
+      doc.text('Date', colX[4], tableTop, { lineBreak: false });
+      doc.text('Location', colX[5], tableTop, { lineBreak: false });
+      doc.text('Footfall', colX[6], tableTop, { lineBreak: false });
     } else {
-      doc.text('Event Name', colX[0], tableTop);
-      doc.text('BRC', colX[1], tableTop);
-      doc.text('District', colX[2], tableTop);
-      doc.text('GPS Marked Date', colX[3], tableTop);
-      doc.text('GPS Location', colX[4], tableTop);
-      doc.text('Footfall', colX[5], tableTop);
+      doc.text('Event Name', colX[0], tableTop, { lineBreak: false });
+      doc.text('BRC', colX[1], tableTop, { lineBreak: false });
+      doc.text('District', colX[2], tableTop, { lineBreak: false });
+      doc.text('GPS Marked Date', colX[3], tableTop, { lineBreak: false });
+      doc.text('GPS Location', colX[4], tableTop, { lineBreak: false });
+      doc.text('Footfall', colX[5], tableTop, { lineBreak: false });
     }
 
+    doc.text('', 50, tableTop);
     doc.moveDown(0.5);
     doc.strokeColor('#E0E0E0').lineWidth(1).moveTo(50, doc.y).lineTo(545, doc.y).stroke();
     doc.moveDown(0.5);
@@ -165,23 +166,25 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
         if (doc.y > 750) {
           doc.addPage();
           // redraw header
+          const headerY = doc.y;
           doc.fillColor('#785900').fontSize(9).font('Helvetica-Bold');
           if (isAll) {
-            doc.text('Expert', colX[0], doc.y);
-            doc.text('Event Name', colX[1], doc.y);
-            doc.text('BRC', colX[2], doc.y);
-            doc.text('District', colX[3], doc.y);
-            doc.text('Date', colX[4], doc.y);
-            doc.text('Location', colX[5], doc.y);
-            doc.text('Footfall', colX[6], doc.y);
+            doc.text('Expert', colX[0], headerY, { lineBreak: false });
+            doc.text('Event Name', colX[1], headerY, { lineBreak: false });
+            doc.text('BRC', colX[2], headerY, { lineBreak: false });
+            doc.text('District', colX[3], headerY, { lineBreak: false });
+            doc.text('Date', colX[4], headerY, { lineBreak: false });
+            doc.text('Location', colX[5], headerY, { lineBreak: false });
+            doc.text('Footfall', colX[6], headerY, { lineBreak: false });
           } else {
-            doc.text('Event Name', colX[0], doc.y);
-            doc.text('BRC', colX[1], doc.y);
-            doc.text('District', colX[2], doc.y);
-            doc.text('GPS Marked Date', colX[3], doc.y);
-            doc.text('GPS Location', colX[4], doc.y);
-            doc.text('Footfall', colX[5], doc.y);
+            doc.text('Event Name', colX[0], headerY, { lineBreak: false });
+            doc.text('BRC', colX[1], headerY, { lineBreak: false });
+            doc.text('District', colX[2], headerY, { lineBreak: false });
+            doc.text('GPS Marked Date', colX[3], headerY, { lineBreak: false });
+            doc.text('GPS Location', colX[4], headerY, { lineBreak: false });
+            doc.text('Footfall', colX[5], headerY, { lineBreak: false });
           }
+          doc.text('', 50, headerY);
           doc.moveDown(0.5);
           doc.strokeColor('#E0E0E0').lineWidth(1).moveTo(50, doc.y).lineTo(545, doc.y).stroke();
           doc.moveDown(0.5);
