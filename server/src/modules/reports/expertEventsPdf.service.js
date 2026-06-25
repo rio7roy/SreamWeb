@@ -129,10 +129,10 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
     const tableTop = doc.y;
     const isAll = expertId === 'all';
     
-    // Columns: [Expert], Event Name, BRC, District, GPS Date, GPS Loc, Footfall
+    // Columns: [Expert], Event Name, BRC, District, Tag, GPS Date, GPS Loc, Footfall
     const colX = isAll 
-      ? [50, 110, 175, 235, 290, 375, 465]
-      : [50, 130, 200, 275, 370, 480];
+      ? [50, 105, 160, 215, 265, 320, 395, 465]
+      : [50, 120, 180, 240, 305, 390, 465];
 
     doc.fillColor('#785900').fontSize(9).font('Helvetica-Bold');
     if (isAll) {
@@ -140,16 +140,18 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
       doc.text('Event Name', colX[1], tableTop, { lineBreak: false });
       doc.text('BRC', colX[2], tableTop, { lineBreak: false });
       doc.text('District', colX[3], tableTop, { lineBreak: false });
-      doc.text('Date', colX[4], tableTop, { lineBreak: false });
-      doc.text('Location', colX[5], tableTop, { lineBreak: false });
-      doc.text('Footfall', colX[6], tableTop, { lineBreak: false });
+      doc.text('Tag', colX[4], tableTop, { lineBreak: false });
+      doc.text('Date', colX[5], tableTop, { lineBreak: false });
+      doc.text('Location', colX[6], tableTop, { lineBreak: false });
+      doc.text('Footfall', colX[7], tableTop, { lineBreak: false });
     } else {
       doc.text('Event Name', colX[0], tableTop, { lineBreak: false });
       doc.text('BRC', colX[1], tableTop, { lineBreak: false });
       doc.text('District', colX[2], tableTop, { lineBreak: false });
-      doc.text('GPS Marked Date', colX[3], tableTop, { lineBreak: false });
-      doc.text('GPS Location', colX[4], tableTop, { lineBreak: false });
-      doc.text('Footfall', colX[5], tableTop, { lineBreak: false });
+      doc.text('Tag', colX[3], tableTop, { lineBreak: false });
+      doc.text('GPS Date', colX[4], tableTop, { lineBreak: false });
+      doc.text('GPS Location', colX[5], tableTop, { lineBreak: false });
+      doc.text('Footfall', colX[6], tableTop, { lineBreak: false });
     }
 
     doc.text('', 50, tableTop);
@@ -173,16 +175,18 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
             doc.text('Event Name', colX[1], headerY, { lineBreak: false });
             doc.text('BRC', colX[2], headerY, { lineBreak: false });
             doc.text('District', colX[3], headerY, { lineBreak: false });
-            doc.text('Date', colX[4], headerY, { lineBreak: false });
-            doc.text('Location', colX[5], headerY, { lineBreak: false });
-            doc.text('Footfall', colX[6], headerY, { lineBreak: false });
+            doc.text('Tag', colX[4], headerY, { lineBreak: false });
+            doc.text('Date', colX[5], headerY, { lineBreak: false });
+            doc.text('Location', colX[6], headerY, { lineBreak: false });
+            doc.text('Footfall', colX[7], headerY, { lineBreak: false });
           } else {
             doc.text('Event Name', colX[0], headerY, { lineBreak: false });
             doc.text('BRC', colX[1], headerY, { lineBreak: false });
             doc.text('District', colX[2], headerY, { lineBreak: false });
-            doc.text('GPS Marked Date', colX[3], headerY, { lineBreak: false });
-            doc.text('GPS Location', colX[4], headerY, { lineBreak: false });
-            doc.text('Footfall', colX[5], headerY, { lineBreak: false });
+            doc.text('Tag', colX[3], headerY, { lineBreak: false });
+            doc.text('GPS Date', colX[4], headerY, { lineBreak: false });
+            doc.text('GPS Location', colX[5], headerY, { lineBreak: false });
+            doc.text('Footfall', colX[6], headerY, { lineBreak: false });
           }
           doc.text('', 50, headerY);
           doc.moveDown(0.5);
@@ -219,24 +223,29 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
         let brcLabel = brc ? brc.location : e.brcCode;
         let districtLabel = brc ? brc.district : 'N/A';
 
+        // Event Tag
+        let eventTag = e.tag === 'other event' ? (e.customTag || 'Other Event') : (e.tag || 'N/A');
+
         // Limit the strings to 1 line (lineBreak: false) so they don't wrap and overlap the next row
         doc.font('Helvetica').fontSize(8).fillColor('#1a1c1c');
         if (isAll) {
           const expName = experts.find(ex => ex.id === e.createdBy)?.name || 'Unknown';
-          doc.text(expName, colX[0], rowY, { width: 55, lineBreak: false, ellipsis: true });
-          doc.text(e.name || 'Untitled', colX[1], rowY, { width: 60, lineBreak: false, ellipsis: true });
-          doc.text(brcLabel, colX[2], rowY, { width: 55, lineBreak: false, ellipsis: true });
-          doc.text(districtLabel, colX[3], rowY, { width: 50, lineBreak: false, ellipsis: true });
-          doc.text(gpsDateStr, colX[4], rowY, { width: 80, lineBreak: false, ellipsis: true });
-          doc.text(gpsLocStr, colX[5], rowY, { width: 85, lineBreak: false, ellipsis: true });
-          doc.text(evFootfall.toString(), colX[6], rowY, { width: 30, lineBreak: false, ellipsis: true });
+          doc.text(expName, colX[0], rowY, { width: 50, lineBreak: false, ellipsis: true });
+          doc.text(e.name || 'Untitled', colX[1], rowY, { width: 50, lineBreak: false, ellipsis: true });
+          doc.text(brcLabel, colX[2], rowY, { width: 50, lineBreak: false, ellipsis: true });
+          doc.text(districtLabel, colX[3], rowY, { width: 45, lineBreak: false, ellipsis: true });
+          doc.text(eventTag, colX[4], rowY, { width: 50, lineBreak: false, ellipsis: true });
+          doc.text(gpsDateStr, colX[5], rowY, { width: 70, lineBreak: false, ellipsis: true });
+          doc.text(gpsLocStr, colX[6], rowY, { width: 65, lineBreak: false, ellipsis: true });
+          doc.text(evFootfall.toString(), colX[7], rowY, { width: 30, lineBreak: false, ellipsis: true });
         } else {
-          doc.text(e.name || 'Untitled Event', colX[0], rowY, { width: 75, lineBreak: false, ellipsis: true });
-          doc.text(brcLabel, colX[1], rowY, { width: 65, lineBreak: false, ellipsis: true });
-          doc.text(districtLabel, colX[2], rowY, { width: 70, lineBreak: false, ellipsis: true });
-          doc.text(gpsDateStr, colX[3], rowY, { width: 90, lineBreak: false, ellipsis: true });
-          doc.text(gpsLocStr, colX[4], rowY, { width: 105, lineBreak: false, ellipsis: true });
-          doc.text(evFootfall.toString(), colX[5], rowY, { width: 40, lineBreak: false, ellipsis: true });
+          doc.text(e.name || 'Untitled Event', colX[0], rowY, { width: 65, lineBreak: false, ellipsis: true });
+          doc.text(brcLabel, colX[1], rowY, { width: 55, lineBreak: false, ellipsis: true });
+          doc.text(districtLabel, colX[2], rowY, { width: 55, lineBreak: false, ellipsis: true });
+          doc.text(eventTag, colX[3], rowY, { width: 60, lineBreak: false, ellipsis: true });
+          doc.text(gpsDateStr, colX[4], rowY, { width: 80, lineBreak: false, ellipsis: true });
+          doc.text(gpsLocStr, colX[5], rowY, { width: 70, lineBreak: false, ellipsis: true });
+          doc.text(evFootfall.toString(), colX[6], rowY, { width: 30, lineBreak: false, ellipsis: true });
         }
 
         doc.moveDown(0.5);
