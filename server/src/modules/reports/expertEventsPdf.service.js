@@ -165,7 +165,21 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
       doc.text("No events found for this selection.", 50, doc.y);
     } else {
       expertEvents.forEach((e, index) => {
-        if (doc.y > 750) {
+        const expName = isAll ? (experts.find(ex => ex.id === e.createdBy)?.name || 'Unknown') : '';
+        const colW = isAll ? [50, 50, 50, 45, 50, 70, 65, 30] : [65, 55, 55, 60, 80, 70, 30];
+        const rowData = isAll 
+          ? [expName, e.name || 'Untitled', brcLabel, districtLabel, eventTag, gpsDateStr, gpsLocStr, evFootfall.toString()]
+          : [e.name || 'Untitled Event', brcLabel, districtLabel, eventTag, gpsDateStr, gpsLocStr, evFootfall.toString()];
+
+        doc.font('Helvetica').fontSize(8);
+        
+        let maxRowHeight = 0;
+        rowData.forEach((text, i) => {
+          const h = doc.heightOfString(text, { width: colW[i] });
+          if (h > maxRowHeight) maxRowHeight = h;
+        });
+
+        if (doc.y + maxRowHeight > 750) {
           doc.addPage();
           // redraw header
           const headerY = doc.y;
@@ -196,57 +210,17 @@ async function generateExpertEventsPdfReport(expertId, month, year) {
         }
 
         if (index % 2 === 0) {
-          doc.rect(50, doc.y - 2, 495, 16).fill('#FAFAFA').fillColor('#1a1c1c');
+          doc.rect(50, doc.y - 2, 495, maxRowHeight + 4).fill('#FAFAFA').fillColor('#1a1c1c');
         }
 
-        const rowY = doc.y;
+        const rowTop = doc.y;
+        doc.fillColor('#1a1c1c');
         
-        // Formulate GPS Date
-        let gpsDateStr = 'N/A';
-        if (e.locationTimestamp) {
-          const ts = !isNaN(Number(e.locationTimestamp)) ? Number(e.locationTimestamp) : e.locationTimestamp;
-          gpsDateStr = new Date(ts).toLocaleString();
-        } else {
-          gpsDateStr = new Date(e.createdAt).toLocaleString();
-        }
+        rowData.forEach((text, i) => {
+          doc.text(text, colX[i], rowTop, { width: colW[i] });
+        });
 
-        // Formulate GPS Location
-        let gpsLocStr = 'N/A';
-        if (e.latitude && e.longitude) {
-          gpsLocStr = `${parseFloat(e.latitude).toFixed(4)}, ${parseFloat(e.longitude).toFixed(4)}`;
-        }
-
-        const evFootfall = (e.studentsCount || 0) + (e.teachersCount || 0);
-
-        // BRC Location
-        const brc = brcMap[e.brcCode];
-        let brcLabel = brc ? brc.location : e.brcCode;
-        let districtLabel = brc ? brc.district : 'N/A';
-
-        // Event Tag
-        let eventTag = e.tag === 'other event' ? (e.customTag || 'Other Event') : (e.tag || 'N/A');
-
-        // Limit the strings to 1 line (lineBreak: false) so they don't wrap and overlap the next row
-        doc.font('Helvetica').fontSize(8).fillColor('#1a1c1c');
-        if (isAll) {
-          const expName = experts.find(ex => ex.id === e.createdBy)?.name || 'Unknown';
-          doc.text(expName, colX[0], rowY, { width: 50, lineBreak: false, ellipsis: true });
-          doc.text(e.name || 'Untitled', colX[1], rowY, { width: 50, lineBreak: false, ellipsis: true });
-          doc.text(brcLabel, colX[2], rowY, { width: 50, lineBreak: false, ellipsis: true });
-          doc.text(districtLabel, colX[3], rowY, { width: 45, lineBreak: false, ellipsis: true });
-          doc.text(eventTag, colX[4], rowY, { width: 50, lineBreak: false, ellipsis: true });
-          doc.text(gpsDateStr, colX[5], rowY, { width: 70, lineBreak: false, ellipsis: true });
-          doc.text(gpsLocStr, colX[6], rowY, { width: 65, lineBreak: false, ellipsis: true });
-          doc.text(evFootfall.toString(), colX[7], rowY, { width: 30, lineBreak: false, ellipsis: true });
-        } else {
-          doc.text(e.name || 'Untitled Event', colX[0], rowY, { width: 65, lineBreak: false, ellipsis: true });
-          doc.text(brcLabel, colX[1], rowY, { width: 55, lineBreak: false, ellipsis: true });
-          doc.text(districtLabel, colX[2], rowY, { width: 55, lineBreak: false, ellipsis: true });
-          doc.text(eventTag, colX[3], rowY, { width: 60, lineBreak: false, ellipsis: true });
-          doc.text(gpsDateStr, colX[4], rowY, { width: 80, lineBreak: false, ellipsis: true });
-          doc.text(gpsLocStr, colX[5], rowY, { width: 70, lineBreak: false, ellipsis: true });
-          doc.text(evFootfall.toString(), colX[6], rowY, { width: 30, lineBreak: false, ellipsis: true });
-        }
+        doc.y = rowTop + maxRowHeight;
 
         doc.moveDown(0.5);
       });
