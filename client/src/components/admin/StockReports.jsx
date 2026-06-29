@@ -224,7 +224,7 @@ export default function StockReports() {
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50 sticky top-0">
               <tr>
-                {['itemName', 'category', 'status', 'serialNumber', 'newQty', 'availableQty', 'district', 'brc', 'remarks'].map((col) => (
+                {['itemName', 'category', 'status', 'uniqueId', 'newQty', 'availableQty', 'district', 'brc', 'remarks'].map((col) => (
                   <th 
                     key={col}
                     onClick={() => handleSort(col)}
@@ -266,7 +266,7 @@ export default function StockReports() {
                             {stock.status || 'ACTIVE'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.serialNumber || 'N/A'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.uniqueId || stock.serialNumber || 'N/A'}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.newQty ?? stock.quantity}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">{stock.availableQty !== undefined ? stock.availableQty : (stock.newQty ?? stock.quantity)}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.district || 'NA'}</td>

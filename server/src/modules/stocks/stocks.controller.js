@@ -224,6 +224,7 @@ module.exports = {
       stocksData.forEach(stock => {
         worksheet.addRow({
           ...stock,
+          uniqueId: stock.uniqueId || stock.serialNumber || 'N/A',
           newQty: stock.newQty ?? stock.quantity,
           availableQty: stock.availableQty ?? stock.newQty ?? stock.quantity,
           usedQty: stock.usedQty || 0,

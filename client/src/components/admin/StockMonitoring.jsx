@@ -138,7 +138,7 @@ export default function StockMonitoring() {
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50">
               <tr>
-                {['itemName', 'category', 'serialNumber', 'availableQty', 'damagedQty', 'usedQty', 'consumedQty', 'district', 'brc', 'status'].map((col) => (
+                {['itemName', 'category', 'uniqueId', 'availableQty', 'damagedQty', 'usedQty', 'consumedQty', 'district', 'brc', 'status'].map((col) => (
                   <th 
                     key={col}
                     onClick={() => handleSort(col)}
@@ -164,7 +164,7 @@ export default function StockMonitoring() {
                   <tr key={stock.id} className="hover:bg-slate-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">{stock.itemName}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.category}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.serialNumber || 'N/A'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{stock.uniqueId || stock.serialNumber || 'N/A'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                       <span className="font-medium text-slate-900">{stock.availableQty !== undefined ? stock.availableQty : (stock.newQty ?? stock.quantity)}</span>
                       <span className="text-slate-400 text-xs ml-1">/ {stock.newQty ?? stock.quantity ?? 0}</span>
