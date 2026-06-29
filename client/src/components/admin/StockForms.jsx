@@ -189,7 +189,7 @@ export default function StockForms({ onActionComplete }) {
     const groups = {};
     recentCreations.forEach(stock => {
       const displayQty = stock.newQty ?? stock.quantity;
-      const key = `${stock.itemName}-${stock.uniqueId}-${stock.category}-${displayQty}`;
+      const key = `${stock.itemName}-${stock.uniqueId}-${stock.category}`;
       if (!groups[key]) {
         groups[key] = {
           ...stock,
@@ -218,7 +218,7 @@ export default function StockForms({ onActionComplete }) {
     const groups = {};
     recentBulkUploads.forEach(stock => {
       const displayQty = stock.newQty ?? stock.quantity;
-      const key = `${stock.itemName}-${stock.uniqueId}-${stock.category}-${displayQty}`;
+      const key = `${stock.itemName}-${stock.uniqueId}-${stock.category}`;
       if (!groups[key]) {
         groups[key] = {
           ...stock,
