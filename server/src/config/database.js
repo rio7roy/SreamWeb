@@ -26,6 +26,20 @@ let users = [];
 let stocks = [];
 let stockHistory = [];
 
+const PERSISTED_STOCKS_FILE = path.join(__dirname, '../../data/persisted_stocks.json');
+const PERSISTED_HISTORY_FILE = path.join(__dirname, '../../data/persisted_history.json');
+const PERSISTED_USERS_FILE = path.join(__dirname, '../../data/persisted_users.json');
+
+function saveToDisk() {
+  try {
+    fs.writeFileSync(PERSISTED_STOCKS_FILE, JSON.stringify(stocks, null, 2));
+    fs.writeFileSync(PERSISTED_HISTORY_FILE, JSON.stringify(stockHistory, null, 2));
+    fs.writeFileSync(PERSISTED_USERS_FILE, JSON.stringify(users, null, 2));
+  } catch (err) {
+    console.error('Failed to persist database to disk:', err);
+  }
+}
+
 /**
  * Seed initial demo users.
  * Called once on server startup.
@@ -107,6 +121,19 @@ async function seedDatabase() {
     return [];
   };
 
+  // Check if we have persisted data first
+  if (fs.existsSync(PERSISTED_USERS_FILE)) {
+    try {
+      users = JSON.parse(fs.readFileSync(PERSISTED_USERS_FILE, 'utf8'));
+      stocks = fs.existsSync(PERSISTED_STOCKS_FILE) ? JSON.parse(fs.readFileSync(PERSISTED_STOCKS_FILE, 'utf8')) : [];
+      stockHistory = fs.existsSync(PERSISTED_HISTORY_FILE) ? JSON.parse(fs.readFileSync(PERSISTED_HISTORY_FILE, 'utf8')) : [];
+      console.log('✅ In-memory database loaded from persisted JSON files on disk.');
+      return;
+    } catch (err) {
+      console.error('Failed to load persisted data, falling back to seed:', err);
+    }
+  }
+
   const activeExperts = loadJSON('experts.json');
   const activeAdmins = loadJSON('admins.json');
   const hubUsers = loadJSON('hub_users.json');
@@ -142,6 +169,7 @@ async function seedDatabase() {
     }
   }
 
+  saveToDisk(); // Save the initial seed to disk
   console.log('✅ In-memory database seeded with demo users and persisted JSON users:');
   users.forEach((u) => console.log(`   ${u.role.padEnd(16)} → ${u.email}`));
 }
@@ -278,9 +306,11 @@ const db = {
         Object.keys(select).forEach((key) => {
           if (select[key]) selected[key] = newUser[key];
         });
+        saveToDisk();
         return selected;
       }
 
+      saveToDisk();
       return { ...newUser };
     },
 
@@ -317,9 +347,11 @@ const db = {
         Object.keys(select).forEach((key) => {
           if (select[key]) selected[key] = users[index][key];
         });
+        saveToDisk();
         return selected;
       }
 
+      saveToDisk();
       return { ...users[index] };
     },
 
@@ -420,6 +452,7 @@ const db = {
          district: newStock.district
       });
       
+      saveToDisk();
       return { ...newStock };
     },
 
@@ -431,6 +464,7 @@ const db = {
         ...item
       }));
       stocks.push(...newStocks);
+      saveToDisk();
       return { count: newStocks.length };
     },
 
@@ -452,6 +486,7 @@ const db = {
          district: updatedStock.district
       });
 
+      saveToDisk();
       return { ...updatedStock };
     },
     
@@ -463,6 +498,7 @@ const db = {
         count++;
         return { ...stock, ...data, updatedAt: new Date() };
       });
+      saveToDisk();
       return { count };
     },
 
@@ -474,6 +510,7 @@ const db = {
         throw err;
       }
       stocks.splice(index, 1);
+      saveToDisk();
       return true;
     }
   },
