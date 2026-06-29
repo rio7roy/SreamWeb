@@ -175,19 +175,27 @@ module.exports = {
 
           const groupedStocks = {};
           stocksData.forEach(stock => {
-            const b = brcs.find(x => x.code === stock.brc);
+            const bIndex = brcs.findIndex(x => x.code === stock.brc && x.district === stock.district);
+            const b = bIndex !== -1 ? brcs[bIndex] : null;
             const brcLabel = b ? `${b.location} / ${b.name}` : (stock.brc || 'Unknown BRC');
             const key = `${stock.district || 'Unknown District'} ➔ ${brcLabel}`;
-            if (!groupedStocks[key]) groupedStocks[key] = [];
-            groupedStocks[key].push(stock);
+            if (!groupedStocks[key]) {
+              groupedStocks[key] = {
+                items: [],
+                orderIndex: bIndex !== -1 ? bIndex : 999999
+              };
+            }
+            groupedStocks[key].items.push(stock);
           });
 
-          Object.keys(groupedStocks).sort().forEach(groupKey => {
+          Object.keys(groupedStocks)
+            .sort((a, b) => groupedStocks[a].orderIndex - groupedStocks[b].orderIndex)
+            .forEach(groupKey => {
             doc.fontSize(14).font('Helvetica-Bold').fillColor('#1e40af').text(`📍 ${groupKey}`);
             doc.moveDown(0.5);
             doc.font('Helvetica').fillColor('black');
 
-            groupedStocks[groupKey].forEach((stock, i) => {
+            groupedStocks[groupKey].items.forEach((stock, i) => {
               const qty = stock.availableQty !== undefined ? stock.availableQty : (stock.newQty ?? stock.quantity);
               doc.fontSize(11).text(`${i + 1}. ${stock.itemName}`, { continued: true }).text(`  [${stock.category || 'N/A'}]`, { align: 'right' });
               doc.fontSize(10).fillColor('gray').text(`    Status: ${stock.status || 'ACTIVE'} | Qty: ${qty} | Unique Id: ${stock.uniqueId || stock.serialNumber || 'N/A'}`);

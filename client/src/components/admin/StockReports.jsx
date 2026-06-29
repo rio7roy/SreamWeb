@@ -75,16 +75,24 @@ export default function StockReports() {
     if (!stocks || stocks.length === 0) return [];
     const groups = {};
     stocks.forEach(stock => {
-      const b = brcs.find(x => x.code === stock.brc);
+      const bIndex = brcs.findIndex(x => x.code === stock.brc && x.district === stock.district);
+      const b = bIndex !== -1 ? brcs[bIndex] : null;
       const brcLabel = b ? `${b.location} / ${b.name}` : (stock.brc || 'Unknown BRC');
       const key = `${stock.district || 'Unknown District'} ➔ ${brcLabel}`;
-      if (!groups[key]) groups[key] = [];
-      groups[key].push(stock);
+      if (!groups[key]) {
+        groups[key] = {
+          items: [],
+          orderIndex: bIndex !== -1 ? bIndex : 999999
+        };
+      }
+      groups[key].items.push(stock);
     });
-    return Object.keys(groups).sort().map(key => ({
-      label: key,
-      items: groups[key]
-    }));
+    return Object.keys(groups)
+      .sort((a, b) => groups[a].orderIndex - groups[b].orderIndex)
+      .map(key => ({
+        label: key,
+        items: groups[key].items
+      }));
   }, [stocks, brcs]);
 
   const handleSort = (key) => {
