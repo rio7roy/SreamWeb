@@ -554,31 +554,31 @@ export default function StockForms({ onActionComplete }) {
                <div className="col-span-2">
                  <label className="block text-sm font-medium text-slate-700 mb-1">Item Name</label>
                  <input autoFocus={!editingStock.isBulk} type="text" className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-100 disabled:text-slate-500" 
-                   value={editingStock.itemName} onChange={e => setEditingStock({...editingStock, itemName: e.target.value})} disabled={editingStock.isBulk} />
+                   value={editingStock.itemName} onChange={e => setEditingStock({...editingStock, itemName: e.target.value})} />
                </div>
                
                <div>
                  <label className="block text-sm font-medium text-slate-700 mb-1">Unique No</label>
                  <input type="text" className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-100 disabled:text-slate-500" 
-                   value={editingStock.uniqueId || ''} onChange={e => setEditingStock({...editingStock, uniqueId: e.target.value})} disabled={editingStock.isBulk} />
+                   value={editingStock.uniqueId || ''} onChange={e => setEditingStock({...editingStock, uniqueId: e.target.value})} />
                </div>
                <div>
                  <label className="block text-sm font-medium text-slate-700 mb-1">Quantity</label>
                  <input type="number" className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-100 disabled:text-slate-500" 
-                   value={editingStock.quantity} onChange={e => setEditingStock({...editingStock, quantity: Number(e.target.value)})} disabled={editingStock.isBulk} />
+                   value={editingStock.quantity} onChange={e => setEditingStock({...editingStock, quantity: Number(e.target.value)})} />
                </div>
                
                <div>
                  <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
                  <select className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white disabled:bg-slate-100 disabled:text-slate-500" 
-                   value={editingStock.category} onChange={e => setEditingStock({...editingStock, category: e.target.value})} disabled={editingStock.isBulk}>
+                   value={editingStock.category} onChange={e => setEditingStock({...editingStock, category: e.target.value})}>
                    {uniqueCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                  </select>
                </div>
                <div>
                  <label className="block text-sm font-medium text-slate-700 mb-1">Section</label>
                  <select className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white disabled:bg-slate-100 disabled:text-slate-500" 
-                   value={editingStock.section || ''} onChange={e => setEditingStock({...editingStock, section: e.target.value})} disabled={editingStock.isBulk}>
+                   value={editingStock.section || ''} onChange={e => setEditingStock({...editingStock, section: e.target.value})}>
                    <option value="">-- Select Section --</option>
                    {PREDEFINED_SECTIONS.map(s => <option key={s} value={s}>{s}</option>)}
                  </select>
@@ -587,7 +587,7 @@ export default function StockForms({ onActionComplete }) {
                <div className="col-span-2">
                   <label className="block text-sm font-medium text-slate-700 mb-1">Label</label>
                   <select className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white disabled:bg-slate-100 disabled:text-slate-500" 
-                    value={editingStock.label || ''} onChange={e => setEditingStock({...editingStock, label: e.target.value})} disabled={editingStock.isBulk}>
+                    value={editingStock.label || ''} onChange={e => setEditingStock({...editingStock, label: e.target.value})}>
                     <option value="">-- Select Label --</option>
                     {PREDEFINED_LABELS.map(l => <option key={l} value={l}>{l}</option>)}
                   </select>
@@ -600,7 +600,7 @@ export default function StockForms({ onActionComplete }) {
                     </div>
                   )}
                   <input type="file" accept="image/*" className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white disabled:bg-slate-100 disabled:text-slate-500" 
-                    onChange={e => setEditingStock({...editingStock, imgFile: e.target.files[0]})} disabled={editingStock.isBulk} />
+                    onChange={e => setEditingStock({...editingStock, imgFile: e.target.files[0]})} />
                 </div>
                
                <div className="col-span-2 sm:col-span-1">
