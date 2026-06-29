@@ -22,6 +22,17 @@ export default function DashboardLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Redirect users with dedicated dashboards away from the generic one
+  useEffect(() => {
+    if (user?.role === 'ADMIN' || user?.role === 'MAIN_ADMIN') {
+      navigate('/admin');
+    } else if (user?.role === 'EXPERT') {
+      navigate('/expert');
+    } else if (user?.role === 'STREAM_LAB') {
+      navigate('/hub');
+    }
+  }, [user, navigate]);
 
   const handleLogout = () => {
     logout();
