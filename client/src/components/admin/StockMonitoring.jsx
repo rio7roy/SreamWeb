@@ -27,7 +27,7 @@ export default function StockMonitoring() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      params.append('limit', '2000'); // Fetch enough stocks so changes aren't paginated out
+      params.append('limit', '100000'); // Fetch enough stocks so changes aren't paginated out
       if (filters.search) params.append('search', filters.search);
       if (filters.status) params.append('status', filters.status);
       if (filters.district) params.append('district', filters.district);

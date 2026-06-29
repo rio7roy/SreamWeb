@@ -729,62 +729,6 @@
     "createdAt": "2026-06-22T06:36:10.060Z"
   },
   {
-    "id": "019b1497-3502-4c83-b14b-51f6a06d0c7e",
-    "type": "STOCK_REMARK",
-    "title": "📝 New Remark: Sewing Thread Cutter",
-    "content": "📦 Item: Sewing Thread Cutter (Sewing kit)\n📍 Location: GOVT VHSS ARYAD, ALAPPUZHA\n💬 Remark: \"hi\"",
-    "to": [
-      "ADMIN"
-    ],
-    "message": "📦 Item: Sewing Thread Cutter (Sewing kit)\n📍 Location: GOVT VHSS ARYAD, ALAPPUZHA\n💬 Remark: \"hi\"",
-    "brc": "32110100105SH",
-    "priority": "NORMAL",
-    "createdAt": "2026-06-22T06:38:07.456Z",
-    "read": true
-  },
-  {
-    "id": "71b952bc-f2c3-4d2a-9344-ff21ec98ff34",
-    "type": "LOW_STOCK_ALERT",
-    "title": "⚠️ Low Stock: Sewing Thread Cutter",
-    "content": "⚠️ Low Stock: \"Sewing Thread Cutter\" (SW05-T) at GOVT VHSS ARYAD. Available: 3 / Original: 5",
-    "to": [
-      "ADMIN"
-    ],
-    "message": "⚠️ Low Stock: \"Sewing Thread Cutter\" (SW05-T) at GOVT VHSS ARYAD. Available: 3 / Original: 5",
-    "brc": "32110100105SH",
-    "priority": "HIGH",
-    "createdAt": "2026-06-22T06:43:27.449Z",
-    "read": true
-  },
-  {
-    "id": "8e5e82c2-0bf5-426f-a068-0a19eb7929a7",
-    "type": "STOCK_REMARK",
-    "title": "📝 New Remark: Sewing Seam Ripper",
-    "content": "📦 Item: Sewing Seam Ripper (Sewing kit)\n📍 Location: GOVT VHSS ARYAD, ALAPPUZHA\n💬 Remark: \"ji\"",
-    "to": [
-      "ADMIN"
-    ],
-    "message": "📦 Item: Sewing Seam Ripper (Sewing kit)\n📍 Location: GOVT VHSS ARYAD, ALAPPUZHA\n💬 Remark: \"ji\"",
-    "brc": "32110100105SH",
-    "priority": "NORMAL",
-    "createdAt": "2026-06-22T06:44:21.037Z",
-    "read": false
-  },
-  {
-    "id": "5c58b30e-bf7c-46ca-a6d2-f6ca2327643a",
-    "type": "STOCK_REMARK",
-    "title": "📝 New Remark: m",
-    "content": "📦 Item: m (Adhesive and tapes)\n📍 Location: GOVT VHSS ARYAD, ALAPPUZHA\n💬 Remark: \"l\"",
-    "to": [
-      "ADMIN"
-    ],
-    "message": "📦 Item: m (Adhesive and tapes)\n📍 Location: GOVT VHSS ARYAD, ALAPPUZHA\n💬 Remark: \"l\"",
-    "brc": "32110100105SH",
-    "priority": "NORMAL",
-    "createdAt": "2026-06-22T06:44:39.829Z",
-    "read": false
-  },
-  {
     "id": "e83cf28c-c47a-4ab4-b3f4-11ea895b2ccb",
     "to": [
       "ADMIN"

@@ -388,11 +388,6 @@ module.exports = {
             const startOfMonth = new Date(currentYear, monthIndex, 1);
             const endOfMonth = new Date(currentYear, monthIndex + 1, 0, 23, 59, 59, 999);
             
-            const createdDate = new Date(stock.createdAt);
-            if (createdDate >= startOfMonth && createdDate <= endOfMonth) {
-               wasUpdatedInSelectedMonths = true;
-            }
-
             const updatesInThisMonth = thisStockHistory.filter(h => new Date(h.updatedAt) >= startOfMonth && new Date(h.updatedAt) <= endOfMonth);
             if (updatesInThisMonth.length > 0) {
                wasUpdatedInSelectedMonths = true;
