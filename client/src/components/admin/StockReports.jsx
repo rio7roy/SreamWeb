@@ -144,12 +144,12 @@ export default function StockReports() {
           <label className="block text-sm font-medium text-slate-700 mb-1">BRC</label>
           <select 
             className="w-full border rounded px-3 py-2 text-sm bg-white"
-            value={filters.brc}
+            value={filters.brc ? `${filters.brc}|${filters.district}` : ''}
             onChange={(e) => {
-              const selectedBrcCode = e.target.value;
-              if (selectedBrcCode) {
-                const brcObj = brcs.find(b => b.code === selectedBrcCode);
-                setFilters({ ...filters, brc: selectedBrcCode, district: brcObj ? brcObj.district : filters.district });
+              const selectedValue = e.target.value;
+              if (selectedValue) {
+                const [selectedBrcCode, selectedDistrict] = selectedValue.split('|');
+                setFilters({ ...filters, brc: selectedBrcCode, district: selectedDistrict || filters.district });
               } else {
                 setFilters({ ...filters, brc: '' });
               }
@@ -158,7 +158,7 @@ export default function StockReports() {
             <option value="">All BRCs</option>
             {brcs
               .filter(b => !filters.district || b.district === filters.district)
-              .map(b => <option key={b.code} value={b.code}>{b.location}/{b.name}</option>)}
+              .map((b, idx) => <option key={`${b.code}-${b.district}-${idx}`} value={`${b.code}|${b.district}`}>{b.location}/{b.name}</option>)}
           </select>
         </div>
         <div>
