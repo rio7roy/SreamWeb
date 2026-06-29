@@ -125,8 +125,10 @@ export default function StockMonitoring() {
           >
             <option value="">All Statuses</option>
             <option value="ACTIVE">Active</option>
-            <option value="DEFECTIVE">Defective</option>
-            <option value="IN_REPAIR">In Repair</option>
+            <option value="AVAILABLE">Available</option>
+            <option value="DAMAGED">Damaged</option>
+            <option value="USED">Used</option>
+            <option value="CONSUMED">Consumed</option>
           </select>
         </div>
       </div>
@@ -180,9 +182,11 @@ export default function StockMonitoring() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        stock.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                        stock.status === 'DEFECTIVE' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
+                        stock.status === 'ACTIVE' || stock.status === 'AVAILABLE' ? 'bg-green-100 text-green-800' :
+                        stock.status === 'DAMAGED' || stock.status === 'DEFECTIVE' ? 'bg-red-100 text-red-800' :
+                        stock.status === 'USED' ? 'bg-blue-100 text-blue-800' :
+                        stock.status === 'CONSUMED' ? 'bg-orange-100 text-orange-800' :
+                        'bg-slate-100 text-slate-800'
                       }`}>
                         {stock.status || 'ACTIVE'}
                       </span>

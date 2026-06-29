@@ -257,9 +257,11 @@ export default function StockReports() {
                         <td className="px-6 py-4 text-sm text-slate-500 max-w-[150px] truncate" title={stock.category}>{stock.category}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            stock.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                            stock.status === 'DEFECTIVE' ? 'bg-red-100 text-red-800' :
-                            'bg-yellow-100 text-yellow-800'
+                            stock.status === 'ACTIVE' || stock.status === 'AVAILABLE' ? 'bg-green-100 text-green-800' :
+                            stock.status === 'DAMAGED' || stock.status === 'DEFECTIVE' ? 'bg-red-100 text-red-800' :
+                            stock.status === 'USED' ? 'bg-blue-100 text-blue-800' :
+                            stock.status === 'CONSUMED' ? 'bg-orange-100 text-orange-800' :
+                            'bg-slate-100 text-slate-800'
                           }`}>
                             {stock.status || 'ACTIVE'}
                           </span>
