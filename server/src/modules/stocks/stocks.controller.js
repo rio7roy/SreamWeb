@@ -174,11 +174,31 @@ module.exports = {
           }
 
           const groupedStocks = {};
+          
+          // Determine the target BRCs for prepopulation (so empty BRCs show up if requested, or at least they are in correct order)
+          let targetBrcs = brcs;
+          if (district) {
+            targetBrcs = targetBrcs.filter(b => b.district === district);
+          }
+          if (brc) {
+            const [bCode, bDist] = brc.split('|');
+            targetBrcs = targetBrcs.filter(b => b.code === bCode && b.district === bDist);
+          }
+
+          targetBrcs.forEach((b, idx) => {
+            const key = `${b.district} ➔ ${b.location} / ${b.name}`;
+            groupedStocks[key] = {
+              items: [],
+              orderIndex: idx
+            };
+          });
+
           stocksData.forEach(stock => {
             const bIndex = brcs.findIndex(x => x.code === stock.brc && x.district === stock.district);
             const b = bIndex !== -1 ? brcs[bIndex] : null;
             const brcLabel = b ? `${b.location} / ${b.name}` : (stock.brc || 'Unknown BRC');
             const key = `${stock.district || 'Unknown District'} ➔ ${brcLabel}`;
+            
             if (!groupedStocks[key]) {
               groupedStocks[key] = {
                 items: [],

@@ -72,21 +72,44 @@ export default function StockReports() {
   };
 
   const groupedStocks = React.useMemo(() => {
-    if (!stocks || stocks.length === 0) return [];
     const groups = {};
-    stocks.forEach(stock => {
-      const bIndex = brcs.findIndex(x => x.code === stock.brc && x.district === stock.district);
-      const b = bIndex !== -1 ? brcs[bIndex] : null;
-      const brcLabel = b ? `${b.location} / ${b.name}` : (stock.brc || 'Unknown BRC');
-      const key = `${stock.district || 'Unknown District'} ➔ ${brcLabel}`;
-      if (!groups[key]) {
-        groups[key] = {
-          items: [],
-          orderIndex: bIndex !== -1 ? bIndex : 999999
-        };
-      }
-      groups[key].items.push(stock);
+    
+    // First, pre-populate the groups in the exact order of the BRCs list
+    // Only include BRCs for the selected district, or all if no district is selected
+    const relevantBrcs = brcs.filter(b => !filters.district || b.district === filters.district);
+    
+    // If a specific BRC is selected, only show that one
+    let targetBrcs = relevantBrcs;
+    if (filters.brc) {
+      const [bCode, bDist] = filters.brc.split('|');
+      targetBrcs = relevantBrcs.filter(b => b.code === bCode && b.district === bDist);
+    }
+    
+    targetBrcs.forEach((b, idx) => {
+      const key = `${b.district} ➔ ${b.location} / ${b.name}`;
+      groups[key] = {
+        items: [],
+        orderIndex: idx // This guarantees dropdown order
+      };
     });
+
+    // Then, add the stock items to their respective groups
+    if (stocks && stocks.length > 0) {
+      stocks.forEach(stock => {
+        const b = brcs.find(x => x.code === stock.brc && x.district === stock.district);
+        const brcLabel = b ? `${b.location} / ${b.name}` : (stock.brc || 'Unknown BRC');
+        const key = `${stock.district || 'Unknown District'} ➔ ${brcLabel}`;
+        
+        if (!groups[key]) {
+          groups[key] = {
+            items: [],
+            orderIndex: 999999
+          };
+        }
+        groups[key].items.push(stock);
+      });
+    }
+
     return Object.keys(groups)
       .sort((a, b) => groups[a].orderIndex - groups[b].orderIndex)
       .map(key => ({
