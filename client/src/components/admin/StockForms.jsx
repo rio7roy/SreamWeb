@@ -199,12 +199,16 @@ export default function StockForms({ onActionComplete }) {
           isNewItem: stock._isNew
         };
       } else {
-        groups[key].ids.push(stock.id);
+        if (!groups[key].ids.includes(stock.id)) {
+          groups[key].ids.push(stock.id);
+        }
         if (stock.brc) {
           const bVal = `${stock.brc}|${stock.district}`;
           if (!groups[key].brcs.includes(bVal)) groups[key].brcs.push(bVal);
         }
-        if (stock.district && !groups[key].districts.includes(stock.district)) groups[key].districts.push(stock.district);
+        if (stock.district && !groups[key].districts.includes(stock.district)) {
+          groups[key].districts.push(stock.district);
+        }
       }
     });
     return Object.values(groups);
@@ -225,12 +229,16 @@ export default function StockForms({ onActionComplete }) {
           isBulk: true
         };
       } else {
-        groups[key].ids.push(stock.id);
+        if (!groups[key].ids.includes(stock.id)) {
+          groups[key].ids.push(stock.id);
+        }
         if (stock.brc) {
           const bVal = `${stock.brc}|${stock.district}`;
           if (!groups[key].brcs.includes(bVal)) groups[key].brcs.push(bVal);
         }
-        if (stock.district && !groups[key].districts.includes(stock.district)) groups[key].districts.push(stock.district);
+        if (stock.district && !groups[key].districts.includes(stock.district)) {
+          groups[key].districts.push(stock.district);
+        }
       }
     });
     return Object.values(groups);
