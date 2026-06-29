@@ -190,7 +190,7 @@ module.exports = {
             groupedStocks[groupKey].forEach((stock, i) => {
               const qty = stock.availableQty !== undefined ? stock.availableQty : (stock.newQty ?? stock.quantity);
               doc.fontSize(11).text(`${i + 1}. ${stock.itemName}`, { continued: true }).text(`  [${stock.category || 'N/A'}]`, { align: 'right' });
-              doc.fontSize(10).fillColor('gray').text(`    Status: ${stock.status || 'ACTIVE'} | Qty: ${qty} | Serial: ${stock.serialNumber || 'N/A'}`);
+              doc.fontSize(10).fillColor('gray').text(`    Status: ${stock.status || 'ACTIVE'} | Qty: ${qty} | Unique Id: ${stock.uniqueId || stock.serialNumber || 'N/A'}`);
               doc.moveDown(0.5);
               doc.fillColor('black');
             });
@@ -288,7 +288,7 @@ module.exports = {
             const val = (cell.value || '').toString().toLowerCase().replace(/\s+/g, '');
             if (val.includes('item')) headerMap['itemName'] = colNumber;
             if (val.includes('category')) headerMap['category'] = colNumber;
-            if (val.includes('serial')) headerMap['serialNumber'] = colNumber;
+            if (val.includes('serial') || val.includes('unique')) headerMap['uniqueId'] = colNumber;
             if (val.includes('quantity') || val.includes('qty')) headerMap['quantity'] = colNumber;
           });
           if (Object.keys(headerMap).length > 0) headerRowFound = true;
@@ -302,14 +302,14 @@ module.exports = {
         const quantity = parseInt(quantityVal, 10) || 1;
 
         const rowCategory = headerMap['category'] ? (row.getCell(headerMap['category']).value?.toString() || 'Uncategorized') : 'Uncategorized';
-        const rowSerialNumber = headerMap['serialNumber'] ? (row.getCell(headerMap['serialNumber']).value?.toString() || '') : '';
+        const rowUniqueId = headerMap['uniqueId'] ? (row.getCell(headerMap['uniqueId']).value?.toString() || '') : '';
 
         if (reqDistricts.length > 0 || reqBrcs.length > 0) {
           targets.forEach(t => {
             items.push({
               itemName: itemName.toString(),
               category: rowCategory,
-              serialNumber: rowSerialNumber,
+              uniqueId: rowUniqueId,
               quantity,
               district: t.district,
               brc: t.brc,
@@ -319,7 +319,7 @@ module.exports = {
           items.push({
             itemName: itemName.toString(),
             category: rowCategory,
-            serialNumber: rowSerialNumber,
+            uniqueId: rowUniqueId,
             quantity,
             district: '',
             brc: '',

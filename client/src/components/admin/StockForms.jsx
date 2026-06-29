@@ -319,9 +319,9 @@ export default function StockForms({ onActionComplete }) {
   };
 
   const handleDownloadTemplate = () => {
-    const headers = ['Item Name', 'Category', 'Serial Number', 'Quantity'];
+    const headers = ['Item Name', 'Category', 'Unique Id', 'Quantity'];
     const sampleRows = [
-      ['Sample Arduino Uno', 'Development Boards', 'SN-1001', '10'],
+      ['Sample Arduino Uno', 'Development Boards', 'UID-1001', '10'],
       ['Sample Resistors 10k', 'Electronic components', '', '100']
     ];
     

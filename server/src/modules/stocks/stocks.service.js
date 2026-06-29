@@ -113,7 +113,7 @@ async function bulkUpsertStocks(items) {
           newQty: currentNewQty + item.quantity,
           availableQty: currentAvailableQty + item.quantity,
           category: item.category || ex.category,
-          serialNumber: item.serialNumber || ex.serialNumber,
+          uniqueId: item.uniqueId || ex.uniqueId,
           district: item.district || ex.district,
           source: 'BULK'
         }
