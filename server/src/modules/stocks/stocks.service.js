@@ -94,6 +94,7 @@ async function bulkUpsertStocks(items) {
       where: {
         itemName: item.itemName,
         brc: item.brc,
+        district: item.district,
       },
       take: 1
     });

@@ -380,8 +380,8 @@ const db = {
     findMany: ({ where = {}, skip = 0, take, orderBy, select } = {}) => {
       let result = [...stocks];
 
-      if (where.district) result = result.filter(s => !s.district || s.district === where.district);
-      if (where.brc) result = result.filter(s => !s.brc || s.brc === where.brc);
+      if (where.district !== undefined) result = result.filter(s => s.district === where.district);
+      if (where.brc !== undefined) result = result.filter(s => s.brc === where.brc);
       if (where.status) {
         if (where.status === 'AVAILABLE' || where.status === 'ACTIVE') {
           result = result.filter(s => (s.availableQty ?? s.newQty ?? s.quantity ?? 0) > 0);
