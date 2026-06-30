@@ -186,7 +186,7 @@ module.exports = {
           }
 
           targetBrcs.forEach((b, idx) => {
-            const key = `${b.district} ➔ ${b.location} / ${b.name}`;
+            const key = `${b.district} -> ${b.location} / ${b.name}`;
             groupedStocks[key] = {
               items: [],
               orderIndex: idx
@@ -197,7 +197,7 @@ module.exports = {
             const bIndex = brcs.findIndex(x => x.code === stock.brc && x.district === stock.district);
             const b = bIndex !== -1 ? brcs[bIndex] : null;
             const brcLabel = b ? `${b.location} / ${b.name}` : (stock.brc || 'Unknown BRC');
-            const key = `${stock.district || 'Unknown District'} ➔ ${brcLabel}`;
+            const key = `${stock.district || 'Unknown District'} -> ${brcLabel}`;
             
             if (!groupedStocks[key]) {
               groupedStocks[key] = {
@@ -211,7 +211,7 @@ module.exports = {
           Object.keys(groupedStocks)
             .sort((a, b) => groupedStocks[a].orderIndex - groupedStocks[b].orderIndex)
             .forEach(groupKey => {
-            doc.fontSize(14).font('Helvetica-Bold').fillColor('#1e40af').text(`📍 ${groupKey}`);
+            doc.fontSize(14).font('Helvetica-Bold').fillColor('#1e40af').text(`> ${groupKey}`);
             doc.moveDown(0.5);
             doc.font('Helvetica').fillColor('black');
 
