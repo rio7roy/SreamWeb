@@ -305,9 +305,25 @@ module.exports = {
         targets.push({ district: '', brc: '' });
       } else {
         const brcDistricts = reqBrcs.map(b => b.split('|')[1]);
+        
+        // If they selected a district but no BRCs, expand it to all BRCs in that district
         reqDistricts.forEach(d => {
-          if (!brcDistricts.includes(d)) targets.push({ district: d, brc: '' });
+          if (!brcDistricts.includes(d)) {
+            const brcsPath = path.join(__dirname, '../../../data/brcs.json');
+            if (fs.existsSync(brcsPath)) {
+              const allBrcs = JSON.parse(fs.readFileSync(brcsPath, 'utf8'));
+              const districtBrcs = allBrcs.filter(b => b.district === d);
+              if (districtBrcs.length > 0) {
+                districtBrcs.forEach(db => targets.push({ district: db.district, brc: db.code }));
+              } else {
+                targets.push({ district: d, brc: '' });
+              }
+            } else {
+              targets.push({ district: d, brc: '' });
+            }
+          }
         });
+
         reqBrcs.forEach(b => targets.push({ district: b.split('|')[1], brc: b.split('|')[0] }));
       }
 
