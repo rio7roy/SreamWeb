@@ -19,10 +19,10 @@ export default function StockReports() {
   const [districts, setDistricts] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState({});
 
-  const toggleGroup = (label) => {
+  const toggleGroup = (label, currentState) => {
     setExpandedGroups(prev => ({
       ...prev,
-      [label]: prev[label] === undefined ? false : !prev[label]
+      [label]: !currentState
     }));
   };
 
@@ -60,7 +60,7 @@ export default function StockReports() {
       );
       const params = new URLSearchParams(cleanFilters);
 
-      const response = await api.get(`/stocks?${params.toString()}&limit=1000`); // fetch up to 1000 for report view
+      const response = await api.get(`/stocks?${params.toString()}&limit=100000`); // fetch up to 100000 for report view
       if (response.data?.success) {
         let fetchedData = response.data.data.stocks || [];
         if (sortConfig.key) {
@@ -284,13 +284,18 @@ export default function StockReports() {
                 <tr><td colSpan="9" className="text-center py-8 text-slate-500">No stock found matching filters.</td></tr>
               ) : (
                 groupedStocks.map((group) => {
-                  const isExpanded = expandedGroups[group.label] !== false; // Default expanded
+                  // Default to collapsed unless only one group is shown or explicitly expanded
+                  const defaultExpanded = groupedStocks.length === 1;
+                  const isExpanded = expandedGroups[group.label] !== undefined 
+                    ? expandedGroups[group.label] 
+                    : defaultExpanded;
+
                   return (
                   <React.Fragment key={group.label}>
                     <tr>
                       <td 
                         colSpan="9" 
-                        onClick={() => toggleGroup(group.label)}
+                        onClick={() => toggleGroup(group.label, isExpanded)}
                         className="bg-slate-200/60 hover:bg-slate-200/80 cursor-pointer font-semibold text-slate-800 py-3 px-6 text-sm border-y border-slate-300 transition-colors"
                       >
                         <div className="flex items-center justify-between">
