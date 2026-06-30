@@ -17,6 +17,14 @@ export default function StockReports() {
   const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
   const [brcs, setBrcs] = useState([]);
   const [districts, setDistricts] = useState([]);
+  const [expandedGroups, setExpandedGroups] = useState({});
+
+  const toggleGroup = (label) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [label]: prev[label] === undefined ? false : !prev[label]
+    }));
+  };
 
   const CATEGORIES = [
     "Adhesive and tapes", "Art and craft supplies", "Audio and Visual equipment",
@@ -251,9 +259,9 @@ export default function StockReports() {
       </div>
 
       <div className="bg-white shadow rounded-lg overflow-hidden border border-slate-200">
-        <div className="overflow-x-auto max-h-96">
+        <div className="overflow-x-auto max-h-[600px]">
           <table className="min-w-full divide-y divide-slate-200">
-            <thead className="bg-slate-50 sticky top-0">
+            <thead className="bg-slate-50 sticky top-0 z-10 shadow-sm">
               <tr>
                 {['itemName', 'category', 'status', 'uniqueId', 'newQty', 'availableQty', 'district', 'brc', 'remarks'].map((col) => (
                   <th 
@@ -275,14 +283,28 @@ export default function StockReports() {
               ) : stocks.length === 0 ? (
                 <tr><td colSpan="9" className="text-center py-8 text-slate-500">No stock found matching filters.</td></tr>
               ) : (
-                groupedStocks.map((group) => (
+                groupedStocks.map((group) => {
+                  const isExpanded = expandedGroups[group.label] !== false; // Default expanded
+                  return (
                   <React.Fragment key={group.label}>
                     <tr>
-                      <td colSpan="9" className="bg-slate-200/60 font-semibold text-slate-800 py-3 px-6 text-sm border-y border-slate-300">
-                        📍 {group.label}
+                      <td 
+                        colSpan="9" 
+                        onClick={() => toggleGroup(group.label)}
+                        className="bg-slate-200/60 hover:bg-slate-200/80 cursor-pointer font-semibold text-slate-800 py-3 px-6 text-sm border-y border-slate-300 transition-colors"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span>📍 {group.label} <span className="text-xs font-normal text-slate-500 ml-2">({group.items.length} items)</span></span>
+                          <svg className={`w-5 h-5 text-slate-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
                       </td>
                     </tr>
-                    {group.items.map((stock) => (
+                    {isExpanded && group.items.length === 0 && (
+                      <tr className="bg-slate-50/50">
+                        <td colSpan="9" className="px-6 py-4 text-center text-sm text-slate-400 italic">No stock data assigned to this BRC.</td>
+                      </tr>
+                    )}
+                    {isExpanded && group.items.map((stock) => (
                       <tr key={stock.id} className="hover:bg-slate-50">
                         <td className="px-6 py-4 text-sm font-medium text-slate-900 max-w-[200px] truncate" title={stock.itemName}>{stock.itemName}</td>
                         <td className="px-6 py-4 text-sm text-slate-500 max-w-[150px] truncate" title={stock.category}>{stock.category}</td>
@@ -306,7 +328,7 @@ export default function StockReports() {
                       </tr>
                     ))}
                   </React.Fragment>
-                ))
+                )})
               )}
             </tbody>
           </table>
